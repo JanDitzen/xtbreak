@@ -260,7 +260,7 @@ program define xtbreak_tests, rclass
 					else {
 						*** model with only a constant
 						tempname cons
-						noi disp "No breaks defined, assumed break in constant"
+
 						gen double `cons' = 1	
 						local indepdepvars `indepdepvars' `cons'
 						local ConstantType = -1

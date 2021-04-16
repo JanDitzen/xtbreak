@@ -207,8 +207,6 @@ This is essentially the following call:
 {stata `"net install xtbreak , from("https://janditzen.github.io/xtbreak/") force replace"'}
 {p_end}
 
-
-
 {marker cov}{title:Covariance Estimators}
 
 {marker saved_vales}{title:Saved Values}
@@ -233,6 +231,8 @@ This is essentially the following call:
 {col 8}{cmd: r(c99)}{col 27} Critival value at 99%.
 
 {marker examples}{title:Examples}
+
+{p 4 4}{ul:Examples using usmacro.dta}
 
 {p 4 4}For example we want to find breaks in the 
 US macro dataset supplied in Stata 16.
@@ -296,6 +296,36 @@ To test if there are between 2 and 4 breaks under the alterantive:{p_end}
 {p 4 4}To change the minimal segment length to 5%:{p_end}
 
 {col 8}{stata xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)}
+
+{p 4 4}{ul:Examples: Excess deaths in the UK due to COVID 19}
+
+{p 4 4}An early version of {cmd:xtbreak test} was presented at the 2020 Swiss User Group meeting (see slides {browse "https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf":here},
+{bf:NOTE:} The examples are on an early version of {cmd:xtbreak}. Results have changed!)
+The empircal example was on the question if can we identify structural breaks in the excess deaths in the
+UK in 2020 due to COVID19?
+Data from Office of National Statistics (ONS) for weekly deaths in the UK for 2020 was used.
+The data can be downloaded {browse "https://github.com/JanDitzen/xtbreak/tree/main/data":here}.{p_end}
+
+{p 4 4}To test for an unknown breakdate with up to for breaks:{p_end}
+
+{col 8}{stata xtbreak test ExcessDeaths , breakconstant breaks(1 4) hypothesis(2)}
+
+{p 4 4}We can test if there is a break in weeks 13 and 20 against the
+hypothesis of no break.{p_end}
+
+{col 8}{stata xtbreak test ExcessDeaths , breakconstant hypothesis(1) breakpoints(13 20, index)}
+
+{p 4 4}Using a HAC consistent estimator rather than the SSR.{p_end} 
+
+{col 8}{stata xtbreak test ExcessDeaths , breakconstant hypothesis(1) breakpoints(13 20, index) vce(hac)}
+
+{p 4 4}Test for 2 breaks at unknown dates:{p_end}
+
+{col 8}{stata xtbreak test ExcessDeaths , breakconstant breaks(2) hypothesis(1)}
+
+{p 4 4}Test for 1 vs. 2 breaks:{p_end}
+
+{col 8}{stata xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)}
 
 {marker references}{title:References}
 

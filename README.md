@@ -23,7 +23,7 @@ xtbreak test depvar [indepvars] [if] [in] ,
         breakpoints(numlist| datelist [,index]) options1
 ```
 
-breakpoints(numlist[,index]) specifies the time period of the known structural break.
+***breakpoints(numlist[,index])*** specifies the time period of the known structural break.
 
 #### Testing for unknown structural breaks:
 
@@ -32,8 +32,7 @@ xtbreak test depvar [indepvars] [if] [in] ,
         hypothesis(1|2|3) breaks(#) options1 options2 options3
 ```
 
-hypothesis(1|2|3) specifies which hypothesis to test, see hypothesises.  breaks(#) sets the number of breaks.
-
+***hypothesis(1|2|3)*** specifies which hypothesis to test, see hypothesises. ***breaks(#)*** sets the number of breaks.
 
 #### General Options
 
@@ -79,7 +78,6 @@ y(i,t) = sigma0(s) + sigma1(s) z(i,t) + beta0(1,i) + beta1 x(i,t) + e(it) for t 
 ```
 where *s* is the number of the segment/breaks, *z(i,t)* is a *NT1xq* matrix containing the variables whose relationship with y breaks.  A break in the
 constant is possible.  *x(i,t)* is a *NTxp* matrix with variables without a break.  *sigma0(s)*, *sigma1(s)* are the coefficients with structural breaks and T1,...,Ts are the periods of the breakpoints.
-
 
 ## 2.1 Testing known breakpoints
 
@@ -192,6 +190,8 @@ Scalars | Description
 
 # 5. Examples
 
+## 5.1 Examples using usmacro.dta
+
 For example we want to find breaks in the US macro dataset supplied in Stata 16.  The dataset contains quarterly data on the inflation, GDP gap and the federal funds rate.  We load the data in as:
 
 ```
@@ -275,6 +275,47 @@ To change the minimal segment length to 5%:
 xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)
 ```
 
+## 5.1 Examples: Excess deaths in the UK due to COVID 19
+
+An early version of ***xtbreak test*** was presented at the 2020 Swiss User Group meeting (see slides here:
+https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf,
+***NOTE*** The examples are on an early version of *xtbreak*. Results have changed!)
+The empircal example was on the question if can we identify structural breaks in the excess deaths in the
+UK in 2020 due to COVID19?
+Data from Office of National Statistics (ONS) for weekly deaths in the UK for 2020 was used.
+The data can be downloaded here:
+https://github.com/JanDitzen/xtbreak/tree/main/data
+
+To test for an unknown breakdate with up to for breaks:
+
+```xtbreak test ExcessDeaths , breakconstant breaks(1 4) hypothesis(2)
+```
+
+We can test if there is a break in weeks 13 and 20 against the
+hypothesis of no break.
+
+```
+xtbreak test ExcessDeaths , breakconstant hypothesis(1) breakpoints(13 20, index)
+```
+
+Using a HAC consistent estimator rather than the SSR. 
+
+```
+xtbreak test ExcessDeaths , breakconstant hypothesis(1) breakpoints(13 20, index) vce(hac)
+```
+
+Test for 2 breaks at unknown dates:
+
+```
+xtbreak test ExcessDeaths , breakconstant breaks(2) hypothesis(1)
+```
+
+Test for 1 vs. 2 breaks:
+
+```
+xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)
+```
+
 # 6. References
 
 Andrews, D. W. K. (1993).  Tests for Parameter Instability and Structural Change With Unknown Change Point.  Econometrica, 61(4), 821–856.
@@ -315,8 +356,6 @@ Web: https://sites.google.com/site/yianniskaravias/
 Email: joakim.westerlund@nek.lu.se
 
 Web: https://sites.google.com/site/perjoakimwesterlund/
-
-
 
 ## Please cite as follows:
 Ditzen, J, Y. Karavias and J. Westerlund. 2021. xtbreak: Estimating and testing for structural breaks in Stata
