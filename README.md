@@ -10,7 +10,7 @@ __Table of Contents__
 3. [Options](#3-options)
 4. [Saved Values](#4-saved-values)
 5. [Examples](#5-examples)
-6. [References](#7-references)
+6. [References](#6-references)
 7. [How to install](#7-how-to-install)
 8. [About](#8-authors)
 
@@ -54,7 +54,8 @@ options2 | Description
 
 #### Options for testing with unknown breakdates and hypothesis(2)
 
-options3--- | ---Description
+options3 | Description
+--- | ---
 **wdmax** | Use weighted test statistic instead of unweighted
 **level(#)** | set level for critical values
 
