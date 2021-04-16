@@ -287,7 +287,8 @@ The data can be downloaded [here](https://github.com/JanDitzen/xtbreak/tree/main
 
 To test for an unknown breakdate with up to for breaks:
 
-```xtbreak test ExcessDeaths , breakconstant breaks(1 4) hypothesis(2)
+```
+xtbreak test ExcessDeaths , breakconstant breaks(1 4) hypothesis(2)
 ```
 
 We can test if there is a break in weeks 13 and 20 against the
