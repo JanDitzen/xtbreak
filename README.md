@@ -277,14 +277,13 @@ xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)
 
 ## 5.1 Examples: Excess deaths in the UK due to COVID 19
 
-An early version of ***xtbreak test*** was presented at the 2020 Swiss User Group meeting (see slides here:
-https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf,
+An early version of ***xtbreak test*** was presented at the 2020 Swiss User Group meeting (see [slides](
+https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf),
 ***NOTE*** The examples are on an early version of *xtbreak*. Results have changed!)
 The empircal example was on the question if can we identify structural breaks in the excess deaths in the
 UK in 2020 due to COVID19?
 Data from Office of National Statistics (ONS) for weekly deaths in the UK for 2020 was used.
-The data can be downloaded here:
-https://github.com/JanDitzen/xtbreak/tree/main/data
+The data can be downloaded [here](https://github.com/JanDitzen/xtbreak/tree/main/data).
 
 To test for an unknown breakdate with up to for breaks:
 
@@ -318,11 +317,11 @@ xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)
 
 # 6. References
 
-Andrews, D. W. K. (1993).  Tests for Parameter Instability and Structural Change With Unknown Change Point.  Econometrica, 61(4), 821–856.
+Andrews, D. W. K. (1993).  Tests for Parameter Instability and Structural Change With Unknown Change Point.  Econometrica, 61(4), 821–856. [link](https://www.jstor.org/stable/2951764).
 
-Bai, B. Y. J., & Perron, P. (1998).  Estimating and Testing Linear Models with Multiple Structural Changes.  Econometrica, 66(1), 47–78.
+Bai, B. Y. J., & Perron, P. (1998).  Estimating and Testing Linear Models with Multiple Structural Changes.  Econometrica, 66(1), 47–78. [link](http://www.columbia.edu/~jb3064/papers/1998_Estimating_and_testing_linear_models_with_multiple_structural_changes.pdf).
 
-Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural change models.  Journal of Applied Econometrics, 18(1), 1–22.
+Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural change models.  Journal of Applied Econometrics, 18(1), 1–22. [link](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659).
 
 Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural Breaks in Panel Data.
 

@@ -331,19 +331,25 @@ hypothesis of no break.{p_end}
 
 {marker Andrews1993}{p 4}Andrews, D. W. K. (1993). 
 Tests for Parameter Instability and Structural Change With Unknown Change Point. 
-Econometrica, 61(4), 821–856.{p_end}
+Econometrica, 61(4), 821–856.
+{browse "https://www.jstor.org/stable/2951764":link}.
+{p_end}
 
 {marker BP1998}{p 4}Bai, B. Y. J., & Perron, P. (1998). 
 Estimating and Testing Linear Models with Multiple Structural Changes. 
-Econometrica, 66(1), 47–78.{p_end}
+Econometrica, 66(1), 47–78.
+{browse "http://www.columbia.edu/~jb3064/papers/1998_Estimating_and_testing_linear_models_with_multiple_structural_changes.pd":link}.
+{p_end}
 
 {marker BP2003}{p 4}Bai, J., & Perron, P. (2003). 
 Computation and analysis of multiple structural change models. 
-Journal of Applied Econometrics, 18(1), 1–22.{p_end}
+Journal of Applied Econometrics, 18(1), 1–22.
+{browse "https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659":link}.{p_end}
 
 {marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021)
-Testing for Multiple Structural Breaks in Panel Data. {p_end}
-
+Testing for Multiple Structural Breaks in Panel Data. 
+{browse "https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf":Slides 2020 Swiss Stata User Group Meeting}.
+{p_end}
 
 {marker KNW2021}{p 4}Karavias, Y, Narayan P. & Westerlund, J. (2021)
 Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. {p_end}
