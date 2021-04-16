@@ -1,12 +1,12 @@
 # xtbreak
 
-##estimating and testing for many known and unknown structural breaks in time series and panel data.
+## estimating and testing for many known and unknown structural breaks in time series and panel data.
 
 __Table of Contents__
 1. [Syntax](#1-syntax)
 2. [Description](#2-description)
-  1. [Testing known breakpoints](#21-testing-known-breakpoints)
-  2. [Testing unknown breakpoints](#22-testing-unknown-breakpoints)
+	1. [Testing known breakpoints](#21-testing-known-breakpoints)
+	2. [Testing unknown breakpoints](#22-testing-unknown-breakpoints)
 3. [Options](#3-options)
 4. [Saved Values](#4-saved-values)
 5. [Examples](#5-examples)
