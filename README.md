@@ -275,7 +275,7 @@ To change the minimal segment length to 5%:
 xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)
 ```
 
-## 5.1 Examples: Excess deaths in the UK due to COVID 19
+## 5.2 Examples: Excess deaths in the UK due to COVID 19
 
 An early version of ***xtbreak test*** was presented at the 2020 Swiss User Group meeting (see [slides](
 https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf),
