@@ -153,16 +153,16 @@ The *F(s+1|s)* test is integrated in ***xtbreak test*** with the options ***brea
 
 Option | Description
 --- | ---
-***breakpoints(numlist| datelist [,index])*** |  specifies the known breakpoints.  Kown breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example*** breakpoints(2010Q1)* specifies a break in Quarter 1 in 2010.  If a datelist is used, the format set in *breakpoints()* and the time identifer needs to be the same.
+***breakpoints(numlist\datelist [,index])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example*** breakpoints(2010Q1)* specifies a break in Quarter 1 in 2010.  If a datelist is used, the format set in *breakpoints()* and the time identifer needs to be the same.
 ***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
-***hypothesis(1|2|3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
+***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** suppresses constant.
 ***nobreakvariables(varlist1)*** | defines variables with no structural break(s).  *varlist1* can contain time series operators.
 ***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc, np and nw.  For more see, covariance estimators.
 ***minlength(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
 ***error(real)*** | define error margin for partial break model.
-***wdmax*** Use weighted test statistic instead of unweighted for the double maximum test (hypotheisi 2).
+***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheisi 2).
 ***level(#)** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
 
 # 4. Saved Values
