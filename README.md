@@ -334,7 +334,7 @@ Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive
 The latest version of the ***xtbreak*** package can be obtained by typing in Stata:
 
 ```
-net from https://github.com/JanDitzen/xtbreak
+net from https://janditzen.github.io/xtbreak/
 ``` 
 
 # 8. Authors

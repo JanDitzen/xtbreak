@@ -1,5 +1,7 @@
 v 3
 d Jan Ditzen, Free University of Bozen-Bolzano, jan.ditzen@unibz.it, jan.ditzen.net
+d joint work with:
 d Yiannis Karavias, University of Birmingham, I.Karavias@bham.ac.uk, https://sites.google.com/site/yianniskaravias/
 d Joakim Westerlund, Lund University, joakim.westerlund@nek.lu.se, https://sites.google.com/site/perjoakimwesterlund/
-d xtbreak Estimation and testing of multiple structural breaks in time series and panel data
+
+p xtbreak Estimation and testing of multiple structural breaks in time series and panel data
