@@ -27,6 +27,7 @@ program define xtbreak_tests, rclass
 	noi disp ""
 	noi disp in red "THIS IS AN ALPHA VERSION!" 
 	noi disp in red "PLEASE CHECK FOR UPDATES PRIOR PUBLISHING ANY RESULTS OBTAINED WITH THIS VERSION!"
+	noi disp in text "Only Time Series supported."
 
 	if "`update'" != "" {
 		noi disp "Update from Github"
@@ -490,9 +491,9 @@ mata:
 		num_partial,q,p,s
 		
 		if (N > 1) {
-			RCR1 =  m_xtdcce_inverter(R * cov_p  * R')
-			W_tau = (N * (T - p - q) - p - (s+1)*q) / (s*q) * (beta_p' * R' * RCR1 * R * beta_p)
-			df = N * (T - p - q) - p - (s+1)*q
+		*	RCR1 =  m_xtdcce_inverter(R * cov_p  * R')
+		*	W_tau = (N * (T - p - q) - p - (s+1)*q) / (s*q) * (beta_p' * R' * RCR1 * R * beta_p)
+		*	df = N * (T - p - q) - p - (s+1)*q
 		}
 		else {
 			/// cov_p here is (Z'MxZ)^(-1) * SSR; Eq. 7 in Bai&Perron 1998
@@ -713,7 +714,7 @@ mata:
 		"breakpoints under null"
 		breakpointsl
 		sum(breakpointsl)
-numbreaks
+
 		/// dv in Matlab code	
 		if (sum(breakpointsl)>0) {	
 			breakpointsl1 = 0,breakpointsl,T
