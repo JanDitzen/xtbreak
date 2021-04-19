@@ -1825,5 +1825,5 @@ findfile "xtbreak_VarCov.ado"
 include "`r(fn)'"
 
 ** Critical Values
-findfile "_critval.ado"
+findfile "xtbreak_critval.ado"
 include "`r(fn)'"
