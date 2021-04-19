@@ -6,7 +6,7 @@ d Joakim Westerlund, Lund University, joakim.westerlund@nek.lu.se, https://sites
 d Distribution date: 20210419
 
 f ado\xtbreak.ado  
-f ado\dynamic_prog.do   
+f ado\dynamic_prog.ado   
 f ado\xtbreak.sthlp     
 f ado\xtbreak_about.ihlp
 f ado\xtbreak_auxiliary.ado
@@ -14,7 +14,7 @@ f ado\xtbreak_estimate.ado
 f ado\xtbreak_options.ihlp
 f ado\xtbreak_tests.ado 
 f ado\xtbreak_tests.sthlp
-f ado\xtbreak_VarCov.do 
-f ado\_critval.do   
+f ado\xtbreak_VarCov.ado 
+f ado\_critval.ado   
 
 

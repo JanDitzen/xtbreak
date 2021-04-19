@@ -1821,9 +1821,9 @@ findfile "xtbreak_auxiliary.ado"
 include "`r(fn)'"
 
 ** Variance Covariance Estimator
-findfile "xtbreak_VarCov.do"
+findfile "xtbreak_VarCov.ado"
 include "`r(fn)'"
 
 ** Critical Values
-findfile "_critval.do"
+findfile "_critval.ado"
 include "`r(fn)'"
