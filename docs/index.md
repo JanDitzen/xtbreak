@@ -32,7 +32,7 @@ xtbreak test depvar [indepvars] [if] [in] ,
         hypothesis(1|2|3) breaks(#) options1 options2 options3
 ```
 
-***hypothesis(1|2|3)*** specifies which hypothesis to test, see hypothesises. ***breaks(#)*** sets the number of breaks.
+***hypothesis(1\2\3)*** specifies which hypothesis to test, see hypothesises. ***breaks(#)*** sets the number of breaks.
 
 #### General Options
 
