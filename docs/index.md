@@ -142,7 +142,7 @@ A test of the null hypothesis that, *s* structural breaks have occurred, against
 ```
 H_0: s breaks vs H_1 s+1 breaks
 
-F(s+1|s) = sup(s=1,..,s+1) sup(s0,..s,..,s1) supF(s,q)
+F(s+1\s) = sup(s=1,..,s+1) sup(s0,..s,..,s1) supF(s,q)
 ```
 
 The test is essentially comparing the SSR of the model with *s* breaks to the minimum of the SSR of the model with *s+1* breaks. 
@@ -162,7 +162,7 @@ Option | Description
 ***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc, np and nw.  For more see, covariance estimators.
 ***minlength(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
 ***error(real)*** | define error margin for partial break model.
-***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheisi 2).
+***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheis 2).
 ***level(#)** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
 
 # 4. Saved Values
