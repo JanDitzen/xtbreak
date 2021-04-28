@@ -147,7 +147,7 @@ F(s+1|s) = sup(s=1,..,s+1) sup(s0,..s,..,s1) supF(s,q)
 
 The test is essentially comparing the SSR of the model with *s* breaks to the minimum of the SSR of the model with *s+1* breaks. 
 
-The *F(s+1|s)* test is integrated in ***xtbreak test*** with the options ***breaks(#) hypothesis(3)***.  Critical values can be found in Bai & Perron (1998, 2003) and are supplied by ***xtbreak test***.
+The *F(s+1\s)* test is integrated in ***xtbreak test*** with the options ***breaks(#) hypothesis(3)***.  Critical values can be found in Bai & Perron (1998, 2003) and are supplied by ***xtbreak test***.
 
 # 3. Options
 
