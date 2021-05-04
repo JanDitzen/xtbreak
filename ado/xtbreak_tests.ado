@@ -388,9 +388,7 @@ program define xtbreak_tests, rclass
 
 				mata st_matrix("breaks",(strtoreal(tokens("`r(index)'")) \ (strtoreal(tokens("`r(ival)'")))))
 
-				matrix rownames breaks =  Index TimeValue
-				
-				return matrix breaks = breaks
+				matrix rownames breaks =  Index TimeValue				
 
 				noi disp as text "Estimated break points: `r(val)' "
 			}
@@ -407,10 +405,12 @@ program define xtbreak_tests, rclass
 
 			*** Return
 			if `hypothesis' == 1 {
-				return scalar supWtau = `stat'				
+				return scalar supWtau = `stat'
+				return matrix breaks = breaks				
 			}
 			else if `hypothesis' == 2 {
 				return scalar `wdmaxRname' = `stat'
+				return matrix breaks = breaks
 			}
 			else if `hypothesis' == 3 {
 				return scalar f = `stat'
