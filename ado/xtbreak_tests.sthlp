@@ -207,6 +207,8 @@ This is essentially the following call:
 {stata `"net install xtbreak , from("https://janditzen.github.io/xtbreak/") force replace"'}
 {p_end}
 
+{p 4 8 12}{cmd:version}Displays version.{p_end}
+
 {marker cov}{title:Covariance Estimators}
 
 {marker saved_vales}{title:Saved Values}
@@ -229,6 +231,10 @@ This is essentially the following call:
 {col 8}{cmd: r(c90)}{col 27} Critival value at 90%. 
 {col 8}{cmd: r(c95)}{col 27} Critival value at 95%.
 {col 8}{cmd: r(c99)}{col 27} Critival value at 99%.
+
+{col 4} Matrices 
+{col 8}{cmd: r(breaks)}{col 27}Index and time identifier value of break dates.
+
 
 {marker examples}{title:Examples}
 

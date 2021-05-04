@@ -58,6 +58,15 @@ options3 | Description
 **wdmax** | Use weighted test statistic instead of unweighted
 **level(#)** | set level for critical values
 
+#### Maintenance:
+
+```
+xtbreak , [update version]
+```
+
+***xtbreak, version*** displays the current version.
+***xtbreak, update*** updates ***xtbreak*** from GitHub.
+
 # 2. Description
 ***xtbreak test*** implements multiple tests for structural breaks in time series and panel data models. The number and period of occurence of structral
 breaks can be known and unknown.  In the case of a known breakpoint ***xtbreak test*** can test if the break occurs at a specific point in time.  For
@@ -151,6 +160,9 @@ The *F(s+1\s)* test is integrated in ***xtbreak test*** with the options ***brea
 
 # 3. Options
 
+#### Options
+
+
 Option | Description
 --- | ---
 ***breakpoints(numlist\datelist [,index])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example*** breakpoints(2010Q1)* specifies a break in Quarter 1 in 2010.  If a datelist is used, the format set in *breakpoints()* and the time identifer needs to be the same.
@@ -187,6 +199,10 @@ Scalars | Description
 ***r(c90)*** | Critival value at 90%. 
 ***r(c95)*** | Critival value at 95%.
 ***r(c99)*** | Critival value at 99%.
+
+Matrix | Description
+---|---
+***r(breaks)*** | Index and value of break dates.s
 
 # 5. Examples
 

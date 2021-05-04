@@ -58,6 +58,15 @@ options3 | Description
 **wdmax** | Use weighted test statistic instead of unweighted
 **level(#)** | set level for critical values
 
+#### Maintenance:
+
+```
+xtbreak , [update version]
+```
+
+***xtbreak, version*** displays the current version.
+***xtbreak, update*** updates ***xtbreak*** from GitHub.
+
 # 2. Description
 ***xtbreak test*** implements multiple tests for structural breaks in time series and panel data models. The number and period of occurence of structral
 breaks can be known and unknown.  In the case of a known breakpoint ***xtbreak test*** can test if the break occurs at a specific point in time.  For
@@ -151,9 +160,11 @@ The *F(s+1\s)* test is integrated in ***xtbreak test*** with the options ***brea
 
 # 3. Options
 
+#### Options
+
 Option | Description
 --- | ---
-***breakpoints(numlist\datelist [,index])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example*** breakpoints(2010Q1)* specifies a break in Quarter 1 in 2010.  If a datelist is used, the format set in *breakpoints()* and the time identifer needs to be the same.
+***breakpoints(numlist\datelist [,index])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example*** breakpoints(2010Q1)* specifies a break in Quarter 1 in 2010.  If a datelist is used, the format set in ***breakpoints()*** and the time identifer needs to be the same.
 ***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.

@@ -45,15 +45,20 @@ structural break.{p_end}
 
 {p 8}{cmd:breaks(#)} sets the number of breaks.{p_end}
 
+{p 4}{ul: Maintenance}{p_end}
+
+{p 4 13}{cmd:xtbreak , [update version]}{p_end}
+
+{p 8}{cmd:version} displays version. 
+{cmd:update} updates {cmd:xtbreak} from {browse "https://janditzen.github.io/xtbreak/":GitHub}
+using {help net install}.{p_end}
+
 INCLUDE help xtbreak_options
 
 {title:Contents}
 
 {p 4}{help xtbreak_tests##description:Description}{p_end}
 {p 4}{help xtbreak_tests##options:Options}{p_end}
-
-
-{marker description}{title:Description}
 
 {marker description}{title:Description}
 {p 4 4}
