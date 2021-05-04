@@ -207,7 +207,7 @@ This is essentially the following call:
 {stata `"net install xtbreak , from("https://janditzen.github.io/xtbreak/") force replace"'}
 {p_end}
 
-{p 4 8 12}{cmd:version}Displays version.{p_end}
+{p 4 8 12}{cmd:version} Displays version.{p_end}
 
 {marker cov}{title:Covariance Estimators}
 
