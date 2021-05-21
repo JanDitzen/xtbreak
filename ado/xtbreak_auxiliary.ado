@@ -1193,7 +1193,7 @@ mata:
 		///lambda = cols(zstar)		
 		lambda = cols(Z)
 		"Y,Z,CSA"
-		(Y,Z,J(rows(Z),1,-1),CSA)[1..20,.]
+		
 		zstar = Z
 		rcZ = cols(zstar)
 		
@@ -1231,7 +1231,7 @@ mata:
 		}
 		"means"
 mean(mean(zstar)'),mean(Y)
-(Y,zstar)[1..20,.]
+
 
 		/// SSRm has partial SSRs. Rows indicate start of segment, column end.
 		/// Element (4,10) is segment starting at period 4 and ending at period 10
