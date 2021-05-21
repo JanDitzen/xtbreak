@@ -31,6 +31,7 @@ program define xtbreak_tests, rclass
 			vce(string)	varestimator(string)	/// empty for standard, kw/nw for newey west, np for non parametric (Pesaran 2006), HC for hc [only N=1], SSR for SSR [only N=1] 
 			/// internal options				
 			trace								/// show output
+			showindex							/// show index in output for  unknown breaks
 		]
 
 
@@ -389,8 +390,12 @@ program define xtbreak_tests, rclass
 				mata st_matrix("breaks",(strtoreal(tokens("`r(index)'")) \ (strtoreal(tokens("`r(ival)'")))))
 
 				matrix rownames breaks =  Index TimeValue				
-
-				noi disp as text "Estimated break points: `r(val)' "
+				if "`showindex'" == "" {
+					noi disp as text "Estimated break points: `r(val)' "
+				}
+				else {
+					noi disp as text "Estimated break points: ``EstBreak'' "
+				}
 			}
 			if `hypothesis' == 2 {
 				noi disp as text "* evaluated at a level of " %04.2f `level' "."

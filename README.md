@@ -20,7 +20,7 @@ __Table of Contents__
 
 ```
 xtbreak test depvar [indepvars] [if] [in] , 
-        breakpoints(numlist| datelist [,index]) options1
+        breakpoints(numlist| datelist [,index]) options1 options4
 ```
 
 ***breakpoints(numlist[,index])*** specifies the time period of the known structural break.
@@ -29,7 +29,7 @@ xtbreak test depvar [indepvars] [if] [in] ,
 
 ```
 xtbreak test depvar [indepvars] [if] [in] , 
-        hypothesis(1|2|3) breaks(#) options1 options2 options3
+        hypothesis(1|2|3) breaks(#) options1 options2 options3 options4
 ```
 
 ***hypothesis(1\2\3)*** specifies which hypothesis to test, see hypothesises. ***breaks(#)*** sets the number of breaks.
@@ -42,7 +42,6 @@ options1 | Description
 **noconstant** | suppresses constant
 **nobreakvariables(varlist1)** | variables with no structural break(s)
 **vce(type)** | covariance matrix estimator, allowed: ssr, hac, np and nw
-**update** | update from Github
 
 #### Options for unknown breakdates
 
@@ -57,6 +56,15 @@ options3 | Description
 --- | ---
 **wdmax** | Use weighted test statistic instead of unweighted
 **level(#)** | set level for critical values
+
+#### Options for panel data
+
+options4 | Description
+--- | ---
+***nofixedeffects*** | suppresses fixed effects (only for panel data sets)
+***csa(varlist)*** | Variables with breaks used to calculate cross-sectional averages
+***csanobreak(varlist)*** | Variables without breaks used to calculate cross-sectional averages
+
 
 #### Maintenance:
 
@@ -169,14 +177,35 @@ Option | Description
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** suppresses constant.
+***nofixedeffects*** suppresses individual fixed effects (panel data only).
 ***nobreakvariables(varlist1)*** | defines variables with no structural break(s).  *varlist1* can contain time series operators.
 ***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc, np and nw.  For more see, covariance estimators.
 ***minlength(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
 ***error(real)*** | define error margin for partial break model.
 ***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheis 2).
 ***level(#)** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
+***csa(varlist)*** | specifies the variables without breaks which are added as cross-sectional averages. xtbreak calculates internally the cross-sectional averages.
+***csanobreak(varlist)*** | specifies the variables with  breaks which are added as cross-sectional averages. xtbreak calculates internally the cross-sectional averages.
 
-# 4. Saved Values
+# 4. Note on panel data
+
+If a panel dataset is used, xtbreak differentiates between four models.  The first model is a fixed effects model. A break in the fixed effects is not possible. The second and third models arewith a pooled constant (pooled OLS) with and without a break. The last model is a model with neither fixed effects nor a pooled constant.
+
+The following table gives an overview:
+
+| Model | Equation | xtbreak options |
+| --- | --- | --- | ---|
+|Fixed Effects   | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)   | |
+|Pooled OLS      | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     | nofixedeffects|
+|Pooled OLS      | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  | nofixedeffects breakconstant|
+|No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         | nofixedeffects noconstant|
+
+where b0 is the pooled constant without break, a(i) the fixed effects, b(1) a coefficient without break, s0(s) a pooled constant with break and s1(s) a coefficient with break.
+
+In the estimation of the breakpoints, cross-sectional averages are not taken into account.
+
+
+# 5. Saved Values
 
 ***xtbreak test*** stores the following in ***r()***:
 
@@ -199,9 +228,9 @@ Scalars | Description
 ***r(c95)*** | Critival value at 95%.
 ***r(c99)*** | Critival value at 99%.
 
-# 5. Examples
+# 6. Examples
 
-## 5.1 Examples using usmacro.dta
+## 6.1 Examples using usmacro.dta
 
 For example we want to find breaks in the US macro dataset supplied in Stata 16.  The dataset contains quarterly data on the inflation, GDP gap and the federal funds rate.  We load the data in as:
 
@@ -286,7 +315,7 @@ To change the minimal segment length to 5%:
 xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)
 ```
 
-## 5.2 Examples: Excess deaths in the UK due to COVID 19
+## 6.2 Examples: Excess deaths in the UK due to COVID 19
 
 An early version of ***xtbreak test*** was presented at the 2020 Swiss User Group meeting (see [slides](
 https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf),
@@ -327,7 +356,7 @@ Test for 1 vs. 2 breaks:
 xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)
 ```
 
-# 6. References
+# 7. References
 
 Andrews, D. W. K. (1993).  Tests for Parameter Instability and Structural Change With Unknown Change Point.  Econometrica, 61(4), 821–856. [link](https://www.jstor.org/stable/2951764).
 
@@ -340,7 +369,7 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural
 
 Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19.
 
-# 7. How to install
+# 8. How to install
 
 The latest version of the ***xtbreak*** package can be obtained by typing in Stata:
 
@@ -348,7 +377,7 @@ The latest version of the ***xtbreak*** package can be obtained by typing in Sta
 net from https://janditzen.github.io/xtbreak/
 ``` 
 
-# 8. Authors
+# 9. Authors
 
 #### Jan Ditzen (Free University of Bozen-Bolzano)
 
