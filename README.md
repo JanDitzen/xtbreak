@@ -177,7 +177,7 @@ Option | Description
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** suppresses constant.
-***nofixedeffects*** suppresses individual fixed effects (panel data only).
+***nofixedeffects*** | suppresses individual fixed effects (panel data only).
 ***nobreakvariables(varlist1)*** | defines variables with no structural break(s).  *varlist1* can contain time series operators.
 ***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc, np and nw.  For more see, covariance estimators.
 ***minlength(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
@@ -193,12 +193,12 @@ If a panel dataset is used, xtbreak differentiates between four models.  The fir
 
 The following table gives an overview:
 
-| Model | Equation | xtbreak options |
-| --- | --- | --- | ---|
-|Fixed Effects   | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)   | |
-|Pooled OLS      | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     | nofixedeffects|
-|Pooled OLS      | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  | nofixedeffects breakconstant|
-|No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         | nofixedeffects noconstant|
+Model | Equation  (xtbreak options)
+ --- | --- 
+Fixed Effects   | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)   
+Pooled OLS      | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     (nofixedeffects)
+Pooled OLS      | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  (nofixedeffects breakconstant)
+No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         (nofixedeffects noconstant)
 
 where b0 is the pooled constant without break, a(i) the fixed effects, b(1) a coefficient without break, s0(s) a pooled constant with break and s1(s) a coefficient with break.
 
