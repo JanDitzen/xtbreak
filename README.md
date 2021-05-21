@@ -176,7 +176,7 @@ Option | Description
 ***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
-***noconstant*** suppresses constant.
+***noconstant*** | suppresses constant.
 ***nofixedeffects*** | suppresses individual fixed effects (panel data only).
 ***nobreakvariables(varlist1)*** | defines variables with no structural break(s).  *varlist1* can contain time series operators.
 ***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc, np and nw.  For more see, covariance estimators.
