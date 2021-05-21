@@ -183,7 +183,7 @@ Option | Description
 ***minlength(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
 ***error(real)*** | define error margin for partial break model.
 ***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheis 2).
-***level(#)** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
+***level(#)*** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
 ***csa(varlist)*** | specifies the variables without breaks which are added as cross-sectional averages. xtbreak calculates internally the cross-sectional averages.
 ***csanobreak(varlist)*** | specifies the variables with  breaks which are added as cross-sectional averages. xtbreak calculates internally the cross-sectional averages.
 
