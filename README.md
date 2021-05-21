@@ -8,11 +8,12 @@ __Table of Contents__
 	1. [Testing known breakpoints](#21-testing-known-breakpoints)
 	2. [Testing unknown breakpoints](#22-testing-unknown-breakpoints)
 3. [Options](#3-options)
-4. [Saved Values](#4-saved-values)
-5. [Examples](#5-examples)
-6. [References](#6-references)
-7. [How to install](#7-how-to-install)
-8. [About](#8-authors)
+4. [Note on Panel Data](#4-note-on-panel-data)
+5. [Saved Values](#5-saved-values)
+6. [Examples](#6-examples)
+7. [References](#7-references)
+8. [How to install](#8-how-to-install)
+9. [About](#9-authors)
 
 # 1. Syntax
 
