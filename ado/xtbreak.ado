@@ -1,4 +1,4 @@
-*! xtbreak version 0.01a
+*! xtbreak version 0.02
 capture program drop xtbreak
 
 program define xtbreak, rclass
@@ -35,8 +35,8 @@ program define xtbreak, rclass
 	}
 
 	if "`version'" != "" {
-		local version 0.01
-		noi disp "This is version 0.01a - 04.05.2021"
+		local version 0.02
+		noi disp "This is version 0.02 - 14.05.2021"
 		xtbreak_tests , version
 		return local version "`version'"
 		exit

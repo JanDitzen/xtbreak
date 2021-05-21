@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: v. 0.01 - xx. xxxxx 2021}
+{hi:help xtbreak}{right: v. 0.02 - 21. May 2021}
 
 {hline}
 {title:Title}
@@ -16,7 +16,8 @@ for a detailed description on {bf:estimation} see {help xtbreak_estimate:xtbreak
 
 {p 4 13}{cmd:xtbreak} {cmd:test} {depvar} [{indepvars}]  {ifin} {cmd:,}
 {cmdab:breakp:oints(}{it:numlist}{cmd:[,index])} 
-{cmd:{help xtbreak_tests##options1:options1}}{p_end}
+{cmd:{help xtbreak##options1:options1}}
+{cmd:{help xtbreak##options4:options4}}{p_end}
 
 {p 8}{cmdab:breakp:oints(}{it:numlist}{cmd:[,index])} specifies the time period of the known 
 structural break.{p_end}
@@ -26,9 +27,10 @@ structural break.{p_end}
 {p 4 13}{cmd:xtbreak} {cmd:test} {depvar} [{indepvars}]  {ifin} {cmd:,}
 {cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} 
 {cmd:breaks(}{it:#}{cmd:)} 
-{cmd:{help xtbreak_tests##options1:options1}}
-{cmd:{help xtbreak_tests##options2:options2}}
-{cmd:{help xtbreak_tests##options3:options3}}
+{cmd:{help xtbreak##options1:options1}}
+{cmd:{help xtbreak##options2:options2}}
+{cmd:{help xtbreak##options3:options3}}
+{cmd:{help xtbreak##options4:options4}}
 {p_end}
 
 {p 8}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
@@ -39,8 +41,9 @@ structural break.{p_end}
 
 {p 4 13}{cmd:xtbreak} {cmdab:est:imate} {depvar} [{indepvars}] {ifin} {cmd:,} 
 {cmd:breaks(}{it:#}{cmd:)}
-{cmd:{help xtbreak_tests##options1:options1}}
-{cmd:{help xtbreak_tests##options2:options2}}
+{cmd:{help xtbreak##options1:options1}}
+{cmd:{help xtbreak##options2:options2}}
+{cmd:{help xtbreak##options4:options4}}
 {p_end}
 
 {p 8}{cmd:breaks(#)} sets the number of breaks.{p_end}

@@ -1,12 +1,12 @@
 *! xbtreak test program
-*! v. 0.01a 
+*! v. 0.02 
 capture program drop xtbreak_tests
 
 program define xtbreak_tests, rclass
 	if replay() {
 		syntax [, version *]
 		if "`version'" != "" {
-			noi disp "xtbreak test, v 0.01a - 04.05.2021"
+			noi disp "xtbreak test, v 0.02 - 14.05.2021"
 			exit
 		}
 	}
@@ -14,7 +14,7 @@ program define xtbreak_tests, rclass
 		syntax varlist(min=1 ts) [if] , [			///
 			Hypothesis(real 1)					/// which hypothesis to test
 			wdmax								/// if hypothesis 2, do weighted UDmax test instead of UDmax
-			csa(string)							/// cross-sectional averages to add
+			csa(string)							/// cross-sectional averages to add; support dynamic panel, i.e. csa removed
 			CSANObreak(string)					/// cross-sectional averages with no break
 			/// unknow breaks
 			breaks(string)						/// number of breaks under alternative
@@ -31,7 +31,8 @@ program define xtbreak_tests, rclass
 			vce(string)	varestimator(string)	/// empty for standard, kw/nw for newey west, np for non parametric (Pesaran 2006), HC for hc [only N=1], SSR for SSR [only N=1] 
 			/// internal options				
 			trace								/// show output
-			showindex							/// show index in output for  unknown breaks
+			showindex 							/// display index rather than breakpoint
+			forcefe								/// internal option: allows for fixed effects with constant
 		]
 
 
@@ -39,6 +40,10 @@ program define xtbreak_tests, rclass
 		noi disp ""
 		noi disp in red "THIS IS AN ALPHA VERSION!" 
 		noi disp in red "PLEASE CHECK FOR UPDATES PRIOR PUBLISHING ANY RESULTS OBTAINED WITH THIS VERSION!"
+
+		************************************************
+		**** Checks
+		************************************************
 
 		*** main check: are necessary options there?
 		if "`breakpoints'`breaks'" == "" {
@@ -52,12 +57,11 @@ program define xtbreak_tests, rclass
 			if _rc != 0 {
 				noi disp "Moremata is required. Please install:"
 				noi disp in smcl "{stata ssc install moremata}"
+				error 198
 			}
 		}
 
 		local cmd "`*'"
-
-
 
 		if "`trace'" == "" {
 			local trace "qui"
@@ -97,7 +101,7 @@ program define xtbreak_tests, rclass
 				error 100
 			}
 			if "`noconstant'" != "" & "`breakconstant'" != "" {
-				noi disp "Options noconstant and breakconstant"
+				noi disp "Options noconstant and breakconstant cannot be combined."
 				error 184
 			}
 			
@@ -174,18 +178,48 @@ program define xtbreak_tests, rclass
 			*** adjust touse
 			markout `touse' `indepdepvars'
 
-			*** remove fixed effects?
-			local demean = 0
-			if `IsPanel' == 1 & "`nofixedeffects'" == "" {
-				local demean = 1
-				local noconstant noconstant
-			}
+			*** fixed effects in panel data. cases:
+			/*
+				1. Only Fixed Effects 
+				2. Fixed Effects + Constant [no breaks] 
+				3. Fixed Effects + Constant [break in constant]
+				4. Only Constant [no break]
+				5. Only Constant [break]
+				6. No fixed effect and Constant
 
+
+			*/
+			local demean = 0
+			if `IsPanel' == 1 {
+
+				if  "`nofixedeffects'" == "" & "`breakconstant'" == "" {
+					/// fixed effects model
+					local demean = 1
+					local noconstant noconstant
+				}
+				
+				if "`nofixedeffects'" == "" & "`breakconstant'" != ""  & "`forcefe'" == "" {
+					noi disp "Fixed Effects Model cannot have break in constant."
+					error 184
+				}
+
+				if "`forcefe'" != "" {
+					local demean = 1
+				}
+
+				/* 
+				Alterantive is 
+				*/
+				*if "`noconstant'" == "" {
+				*	local noconstant noconstant
+				*} 
+			}
+			
 			*** create cross-sectional averages
 			if "`csa'" != "" {
 				tempname csa_name
 				local 0 `csa'
-				syntax varlist(ts) , [lags(numlist)]
+				syntax varlist(ts) , [lags(numlist) DYNamicpartial]
 				if "`lags'" == "" { 
 					local lags "0"
 				}
@@ -193,11 +227,14 @@ program define xtbreak_tests, rclass
 				get_csa `varlist' , idvar("`idvar'") tvar("`tvar'") cr_lags("`lags'") touse(`touse') csa("`csa_name'")
 				
 				local csa_list "`r(varlist)'"
+
+				if "`dynamicpartial'" != "" local dyn1 "dyn"
+
 			}
 			if "`csanobreak'" != "" {
 				tempname csa_name
-				local 0 `csa'
-				syntax varlist(ts) , [lags(numlist)]
+				local 0 `csanobreak'
+				syntax varlist(ts) , [lags(numlist) DYNamicpartial]
 				if "`lags'" == "" { 
 					local lags "0"
 				}
@@ -205,7 +242,19 @@ program define xtbreak_tests, rclass
 				get_csa `varlist' , idvar("`idvar'") tvar("`tvar'") cr_lags("`lags'") touse(`touse') csa("`csa_name'")
 				
 				local csanb_list "`r(varlist)'"
+
+				if "`dynamicpartial'" != "" local dyn2 "dyn"
 			}
+
+			*** internal use: dynamic panel forces dynamic program to remove CSA as well.
+			if "`dyn1'`dyn2'" != "" {
+				noi disp "WARNING: CSA will be removed in dynamic program to find breaks!"
+				local dynamicpartial = 1
+			}
+			else {
+				local dynamicpartial = 0
+			}
+
 			markout `touse' `indepdepvars' `nobreakvariables' `csa_list' `csanb_list'
 			
 			local num_s = 0
@@ -309,17 +358,17 @@ program define xtbreak_tests, rclass
 								
 				if "`hypothesis'" == "1" {
 					
-					`trace' mata `testh' = Test_Hi_unknown("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`minlength',`vce',`ConstantType',`demean',`error',1,`EstCoeff'=.,`EstCov'=.,`EstBreak'=.)
+					`trace' mata `testh' = Test_Hi_unknown("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`minlength',`vce',`ConstantType',`demean',`dynamicpartial',`error',1,`EstCoeff'=.,`EstCov'=.,`EstBreak'=.)
 
 					
 				}
 				else if "`hypothesis'" == "2" { 
 					tempname testh
-					`trace' mata `testh' = Test_Hii_unknown("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'","`breaks'",`minlength',`vce',`ConstantType',`error',1,`level',`wdmax',`EstCoeff'=.,`EstCov'=.,`EstBreak'=.)
+					`trace' mata `testh' = Test_Hii_unknown("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'","`breaks'",`minlength',`vce',`ConstantType',`demean',`dynamicpartial',`error',1,`level',`wdmax',`EstCoeff'=.,`EstCov'=.,`EstBreak'=.)
 				}
 				else if "`hypothesis'" == "3" {
 					tempname testh
-					`trace'  mata `testh' = Test_Hiii_unknown("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`minlength',`vce',`ConstantType',`error',`EstCoeff'=.,`EstCov'=.)
+					`trace'  mata `testh' = Test_Hiii_unknown("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`minlength',`vce',`ConstantType',`demean',`dynamicpartial',`error',`EstCoeff'=.,`EstCov'=.)
 				}
 				
 				
@@ -476,7 +525,7 @@ mata:
 				printf("\n{txt}Test for multiple breaks at unknown breakdates\n(Ditzen, Karavias & Westerlund. 2021)\n")
 			}
 			else {
-				printf("{txt}Test for multiple breaks at known breakdates\n(Karavias & Westerlund. 2021)\n")
+				printf("{txt}Test for multiple breaks at known breakdates\n(Karavias, Narayan & Westerlund. 2021)\n")
 			}
 			printf("{txt}H0: no breaks vs. H1: %s break(s)\n",strofreal(s))
 			displayas("txt")
@@ -509,28 +558,29 @@ mata:
 						real matrix EstCov				///
 						)
 	{
-		
+
 		partial_Bknown(Y,W,X,breakpoints,idt,partial,csa,csaNB,N,T,ConstantType,demean,Yt=.,Wt=.,R=.,s=.,q=.,p=.,num_partial=.)
+		
 		/// estimate ols and get variance
-		///ols(Yt,Wt,idt,N,beta_p=.,cov_p=.,varestimator)	
+		
 		SSR = SSR(Yt,Wt,idt,N,beta_p,cov_p=.,varestimator)	
-		"num paetial,q,p,s,varest"
-		num_partial,q,p,s,varestimator
 		
 		if (N > 1) {
 			/// cov_p is covariance with partialled out X variables
 			RCR1 =  m_xtdcce_inverter(R * cov_p  * R')
 			"beta"
 			beta_p
-
-			W_tau = (N * (T -1) - p - (s+1)*q) / (s*q) * (beta_p' * R' * RCR1 * R * beta_p)
-			df = (N * (T - 1) - p - (s+1)*q) / (s*q) 
+			/// adjust here if constant/fixed effects are removed; use demean
+			W_tau = (N * (T -demean) - p - (s+1)*q) / (s*q) * (beta_p' * R' * RCR1 * R * beta_p)
+			df = (N * (T - demean) - p - (s+1)*q) / (s*q) 
 			"df"
 			df
 			
 		}
 		else {
 			/// cov_p here is (Z'MxZ)^(-1) * SSR; Eq. 7 in Bai&Perron 1998
+"beta"
+			mean((Yt,Wt))
 			RCR1 = m_xtdcce_inverter(R * cov_p * R')			
 			W_tau = (T-(s+1) * q - p - num_partial) / (s*q) * (beta_p' * R' * RCR1 * R * beta_p)
 			df = T - (s+1)*q - p- num_partial
@@ -561,6 +611,7 @@ mata:
 					real scalar varestimator,	/// which variance estimator
 					real scalar ConstantType,	///
 					real scalar demean,			/// demean
+					real scalar dynamicpartial,	///
 					real scalar errror,			///
 					real scalar postmsg,		/// display message
 					real matrix EstCoeff,		/// matrix with estiamted coefficients
@@ -571,8 +622,8 @@ mata:
 	{
 		
 		/// Load Data
-		LoadData(varnames,Xvarn,csanames,csaNBnames,idtname,tousename,Y=.,Z=.,X=.,csa=.,csaNB=.,idt=.,N=.,T=.,partial=.)
-		
+		LoadData(varnames,Xvarn,csanames,csaNBnames,idtname,tousename,Y=.,Z=.,X=.,csa=.,csaNB=.,idt=.,N=.,T=.,partial=dynamicpartial)
+
 		GetBreakPoints(Y,X,Z,idt,csa,csaNB,numbreaks,errror,ConstantType,demean,partial,min,EstBreak=.,finaldelta=.,finalbeta=.,minSSR=.)
 
 		W_tauChi = Test_W_Tau(Y,Z,X,EstBreak',idt,partial,csa,csaNB,N,T,varestimator,ConstantType,demean,EstCoeff=.,EstCov=.)
@@ -595,7 +646,7 @@ mata:
 					printf("\n{txt}Test for multiple breaks at unknown breakdates\n(Ditzen, Karavias & Westerlund. 2021)\n")
 				}
 				else {
-					printf("{txt}Test for multiple breaks at known breakdates\n(Karavias & Westerlund. 2021)\n")
+					printf("{txt}Test for multiple breaks at known breakdates\n(Karavias, Narayan & Westerlund. 2021)\n")
 				}
 				printf("{txt}H0: no break(s) vs. H1: %s break(s)\n",strofreal(s))
 				displayas("txt")
@@ -627,6 +678,8 @@ mata:
 					real scalar minlength,			///
 					real scalar varestimator,	/// which variance estimator
 					real scalar ConstantType,	///
+					real scalar demean,			/// demean
+					real scalar dynamicpartial,	/// partial out CSA in dynamic program
 					real scalar errror,			///
 					real scalar postmsg,		/// display message
 					real scalar level,			/// level to test
@@ -639,7 +692,7 @@ mata:
 	{
 		
 		/// Load Data
-		LoadData(varnames,Xvarn,csanames,csaNBnames,idtname,tousename,Y=.,Z=.,X=.,csa=.,csaNB=.,idt=.,N=.,T=.,partial=.)
+		LoadData(varnames,Xvarn,csanames,csaNBnames,idtname,tousename,Y=.,Z=.,X=.,csa=.,csaNB=.,idt=.,N=.,T=.,partial=dynamicpartial)
 		
 		/// get all break point combinations
 		numbreaks = strtoreal(tokens(numbreaksi))
@@ -660,8 +713,8 @@ mata:
 		s = numbreaks[1]
 		si = 1
 		while (s <= numbreaks[2]) {	
-			GetBreakPoints(Y,X,Z,idt,csa,csaNB,s,errror,ConstantType,0,partial,minlength,breakpointsi=.,finaldelta=.,finalbeta=.,minSSR=.)
-			res = Test_W_Tau(Y,Z,X,breakpointsi,idt,partial,csa,csaNB,N,T,varestimator,ConstantType,0,EstCoeff=.,EstCov=.)
+			GetBreakPoints(Y,X,Z,idt,csa,csaNB,s,errror,ConstantType,demean,partial,minlength,breakpointsi=.,finaldelta=.,finalbeta=.,minSSR=.)
+			res = Test_W_Tau(Y,Z,X,breakpointsi,idt,partial,csa,csaNB,N,T,varestimator,ConstantType,demean,EstCoeff=.,EstCov=.)
 			
 			if (wdmax == 1) cs = GetCritVal(minlength,level,s,q,"WDmax")
 			
@@ -693,7 +746,7 @@ mata:
 					printf("\n{txt}Test for multiple breaks at unknown breakdates\n(Ditzen, Karavias & Westerlund. 2021)\n")
 				}
 				else {
-					printf("{txt}Test for multiple breaks at known breakdates\n(Karavias & Westerlund. 2021)\n")
+					printf("{txt}Test for multiple breaks at known breakdates\n(Karavias, Narayan & Westerlund. 2021)\n")
 				}
 				printf("{txt}H0: no break(s) vs. H1: %s <= s <= %s break(s)\n",strofreal(s0),strofreal(s))
 				displayas("txt")
@@ -725,6 +778,8 @@ mata:
 					real scalar min,			///
 					real scalar varestimator,	/// which variance estimator
 					real scalar ConstantType,	///
+					real scalar demean,			/// demean
+					real scalar dynamicpartial,	/// partial out CSA in dynamic program
 					real scalar errror,			///
 					real matrix EstCoeff,		/// matrix with estiamted coefficients
 					real matrix EstCov			/// variance / covariance matrix
@@ -733,14 +788,14 @@ mata:
 	{
 		
 		/// Load Data
-		LoadData(varnames,Xvarn,csanames,csaNBnames,idtname,tousename,Y=.,Z=.,X=.,csa=.,csaNB=.,idt=.,N=.,T=.,partial=.)
+		LoadData(varnames,Xvarn,csanames,csaNBnames,idtname,tousename,Y=.,Z=.,X=.,csa=.,csaNB=.,idt=.,N=.,T=.,partial=dynamicpartial)
 
 		/// null hypothesis (in BP "l" model)
-		GetBreakPoints(Y,X,Z,idt,csa,csaNB,numbreaks-1,errror,ConstantType,0,partial,min,breakpointsl=.,finaldelta=.,finalbeta=.,SSR_0=.)
+		GetBreakPoints(Y,X,Z,idt,csa,csaNB,numbreaks-1,errror,ConstantType,demean,partial,min,breakpointsl=.,finaldelta=.,finalbeta=.,SSR_0=.)
 		"ssr 0"
 		SSR_0
 		/// alternative (for sigma hat 2)
-		GetBreakPoints(Y,X,Z,idt,csa,csaNB,numbreaks,errror,ConstantType,0,partial,min,tmp1=.,tmp2=.,tmp2=.,SSR_a=.)
+		GetBreakPoints(Y,X,Z,idt,csa,csaNB,numbreaks,errror,ConstantType,demean,partial,min,tmp1=.,tmp2=.,tmp2=.,SSR_a=.)
 		/// adjust SSR to get sigma2 hat (i.e. )
 		sigma2_1 = SSR_a / T
 		
@@ -748,8 +803,7 @@ mata:
 		l = 1
 		"breakpoints under null"
 		breakpointsl
-		sum(breakpointsl)
-numbreaks
+
 		/// dv in Matlab code	
 		if (sum(breakpointsl)>0) {	
 			breakpointsl1 = 0,breakpointsl,T
@@ -758,7 +812,7 @@ numbreaks
 			breakpointsl = .
 			breakpointsl1 = 0,T
 		}
-		breakpointsl1
+		
 		while (l<=numbreaks) {
 			start = breakpointsl1[l]
 			ende = breakpointsl1[l+1]
@@ -771,7 +825,7 @@ numbreaks
 			csaNBi = csa[index,.]
 			idti = idt[index,.]
 
-			GetBreakPoints(Yi,Xi,Zi,idti,csai,csaNBi,1,errror,ConstantType,0,partial,min,breakpoints_i=.,tmp1=.,tmp2=.,tmp3=.)
+			GetBreakPoints(Yi,Xi,Zi,idti,csai,csaNBi,1,errror,ConstantType,demean,partial,min,breakpoints_i=.,tmp1=.,tmp2=.,tmp3=.)
 			if (sum(breakpoints_i) > 0 ) {
 				"additional breakpoint at"
 				breakpoints_i
@@ -784,7 +838,7 @@ numbreaks
 				breakpoints_ii
 				/// now we have the optimal set of breakpoints, now problem with known breakpoints
 				/// get SSR/F stat for entire dataset; Test_W_Tau returns F, SSR,df
-				results[l,(1,2,3)] = Test_W_Tau(Y,Z,X,breakpoints_ii,idt,partial,csa,csaNB,N,T,varestimator,ConstantType,0,EstCoeff=.,EstCov=.)
+				results[l,(1,2,3)] = Test_W_Tau(Y,Z,X,breakpoints_ii,idt,partial,csa,csaNB,N,T,varestimator,ConstantType,demean,EstCoeff=.,EstCov=.)
 				
 				/// add estimated additional breakpoint
 				breakpoints_i
@@ -806,16 +860,18 @@ numbreaks
 		/// Get points with minimal SSR
 		index = selectindex(results[.,2]:==min(results[.,2]))
 		minSSR_1 = results[index,2]
-		SSR_0,minSSR_1,sigma2_1
 		stat = (SSR_0 - minSSR_1) / (sigma2_1)
+		
 		/// make sure dimensions are correct
 		s = numbreaks
 		q = cols(Z)		
 		df = results[index,3]
 		p = cols(X)
+		
 		/// adjust F statistic (F-Stat is divided by 2*q and not by s*q and has q*(s+2)!
+		/// follows Eq. 5.14
 		if (N>1) {
-			stat = stat / df * (N * (T - p - q) - p - (s+2)*q) / (s*q)
+			stat = stat / df * (N * (T - p - q * (s+2)) - p - (s+2)*q) / (s*q)
 		}
 		
 

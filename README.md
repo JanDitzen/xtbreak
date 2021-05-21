@@ -196,9 +196,9 @@ The following table gives an overview:
 Model | Equation  (xtbreak options)
  --- | --- 
 Fixed Effects   | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)   
-Pooled OLS      | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     (nofixedeffects)
-Pooled OLS      | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  (nofixedeffects breakconstant)
-No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         (nofixedeffects noconstant)
+Pooled OLS      | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     (```nofixedeffects```)
+Pooled OLS      | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  (```nofixedeffects breakconstant```)
+No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         (```nofixedeffects noconstant```)
 
 where b0 is the pooled constant without break, a(i) the fixed effects, b(1) a coefficient without break, s0(s) a pooled constant with break and s1(s) a coefficient with break.
 
