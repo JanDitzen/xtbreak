@@ -4,13 +4,13 @@ mata:
   {
     /// critical values need to be divided by number of regressors with breaks for hypothesis 1 and 2. Not for hypothesis 3!
     if (strlower(type) == "fll1") {
-      res = critval_fll1(eps1,signif,max((l,10)),max((q,10))) 
+      res = critval_fll1(eps1,signif,min((l,10)),min((q,10))) 
     }
     else if (strlower(type) == "supf") {
-      res = critval_supF( eps1 ,  signif, max((l,10)), max((q,10))) / max((q,10))
+      res = critval_supF( eps1 ,  signif, min((l,10)), min((q,10))) / min((q,10))
     }
     else  {
-      res = critval_udwdmax(eps1,signif,max((q,10)),types) / max((q,10))
+      res = critval_udwdmax(eps1,signif,min((q,10)),types) / min((q,10))
     }
 
     return(res)
