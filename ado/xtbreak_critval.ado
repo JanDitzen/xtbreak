@@ -10,7 +10,7 @@ mata:
       res = critval_supF( eps1 ,  signif, min((l,10)), min((q,10))) / min((q,10))
     }
     else  {
-      res = critval_udwdmax(eps1,signif,min((q,10)),types) / min((q,10))
+      res = critval_udwdmax(eps1,signif,min((q,10)),type) / min((q,10))
     }
 
     return(res)
