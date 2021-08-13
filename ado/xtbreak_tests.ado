@@ -1,12 +1,12 @@
 *! xbtreak test program
-*! v. 0.02 
+*! v. 0.021 
 capture program drop xtbreak_tests
 
 program define xtbreak_tests, rclass
 	if replay() {
 		syntax [, version *]
 		if "`version'" != "" {
-			noi disp "xtbreak test, v 0.02 - 14.05.2021"
+			noi disp "xtbreak test, v 0.021 - 02.06.2021"
 			exit
 		}
 	}

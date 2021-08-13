@@ -15,7 +15,8 @@ __Table of Contents__
 6. [Examples](#6-examples)
 7. [References](#7-references)
 8. [How to install](#8-how-to-install)
-9. [About](#9-authors)
+9. [Questions?](#90-questions?)
+10. [About](#10-authors)
 
 # 1. Syntax
 
@@ -319,7 +320,11 @@ The latest version of the ***xtbreak*** package can be obtained by typing in Sta
 net from https://janditzen.github.io/xtbreak/
 ``` 
 
-# 9. Authors
+# 9. Questions?
+
+Questions? Feel free to write us an email, open an [issue](https://github.com/JanDitzen/xtbreak/issues) or [start a discussion](https://github.com/JanDitzen/xtbreak/discussions).
+
+# 10. Authors
 
 #### Jan Ditzen (Free University of Bozen-Bolzano)
 
