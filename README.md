@@ -296,7 +296,7 @@ estat scatter L.new_cases
 
 ```
 
-![scatter-plot](docs/ExcessMortalityCovid.jpg.jpg?raw=true "Scatter Plot")
+![scatter-plot](docs/ExcessMortalityCovid.jpg?raw=true "Scatter Plot")
 
 
 # 7. References
