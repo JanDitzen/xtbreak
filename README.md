@@ -1,22 +1,19 @@
-# xtbreak test
+# xtbreak
 
 ## estimating and testing for many known and unknown structural breaks in time series and panel data.
-
-For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and for **xtbreak estimate** see [xtbreak estimate](docs/xtbreak_estimate.md).
 
 __Table of Contents__
 1. [Syntax](#1-syntax)
 2. [Description](#2-description)
-        1. [Testing known breakpoints](#21-testing-known-breakpoints)
-        2. [Testing unknown breakpoints](#22-testing-unknown-breakpoints)
+	1. [Testing known breakpoints](#21-testing-known-breakpoints)
+	2. [Testing unknown breakpoints](#22-testing-unknown-breakpoints)
 3. [Options](#3-options)
 4. [Note on Panel Data](#4-note-on-panel-data)
 5. [Saved Values](#5-saved-values)
 6. [Examples](#6-examples)
 7. [References](#7-references)
 8. [How to install](#8-how-to-install)
-9. [Questions?](#90-questions?)
-10. [About](#10-authors)
+9. [About](#9-authors)
 
 # 1. Syntax
 
@@ -24,10 +21,10 @@ __Table of Contents__
 
 ```
 xtbreak test depvar [indepvars] [if] [in] , 
-        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options4
+        breakpoints(numlist| datelist [,index]) options1 options4
 ```
 
-***breakpoints()*** specifies the time period of the known structural break.
+***breakpoints(numlist[,index])*** specifies the time period of the known structural break.
 
 #### Testing for unknown structural breaks:
 
@@ -38,12 +35,6 @@ xtbreak test depvar [indepvars] [if] [in] ,
 
 ***hypothesis(1\2\3)*** specifies which hypothesis to test, see hypothesises. ***breaks(#)*** sets the number of breaks.
 
-#### Estimation of breakpoints
-
-```
-xtbreak estimate depvar [indepvars] [if] [in] , breaks(#) showindex options1 options2 options4
-```
-
 #### General Options
 
 options1 | Description
@@ -51,8 +42,6 @@ options1 | Description
 **breakconstant** | break in constant
 **noconstant** | suppresses constant
 **nobreakvariables(varlist1)** | variables with no structural break(s)
-**trend** | add trend to model (under construction!)
-**breaktrend** | add trend with breaks to model (under construction!)
 **vce(type)** | covariance matrix estimator, allowed: ssr, hac, np and nw
 
 #### Options for unknown breakdates
@@ -74,24 +63,27 @@ options3 | Description
 options4 | Description
 --- | ---
 ***nofixedeffects*** | suppresses fixed effects (only for panel data sets)
-***csa(options5)*** | Variables with breaks used to calculate cross-sectional averages
-***csanobreak(options5)*** | Variables without breaks used to calculate cross-sectional averages
+***csa(varlist)*** | Variables with breaks used to calculate cross-sectional averages
+***csanobreak(varlist)*** | Variables without breaks used to calculate cross-sectional averages
 
-#### Options for cross-section averages 
 
-options5 | Description
---- | ---
-**deterministic(varlist4)** | Treat variables in varlist4 as determinsitic cross-section averages
-**deterministic** | Treat all variables defined in varlist2/3 as deterministic
-**excludecsa** | **Excludes cross-section averages from being partialled out in the dynamic program.
+#### Maintenance:
 
+```
+xtbreak , [update version]
+```
+
+***xtbreak, version*** displays the current version.
+***xtbreak, update*** updates ***xtbreak*** from GitHub.
 
 # 2. Description
-**xtbreak test** implements multiple tests for structural breaks in time series and panel data models.  The number and period of occurence of structral breaks can be known and unknown.  In the case of a known    breakpoint xtbreak test can test if the break occurs at a specific point in time.  For unknown breaks, xtbreak test implements three different hypothesises.  The first is no break against the alterantive of *s* breaks, the second hypothesis is no breaks against a lower and upper limit of breaks.  The last hypothesis tests the null of s breaks against the alterantive of one more break *(s+1)*. For more details see [xtbreak test](docs/xtbreak_test.md).
+***xtbreak test*** implements multiple tests for structural breaks in time series and panel data models. The number and period of occurence of structral
+breaks can be known and unknown.  In the case of a known breakpoint ***xtbreak test*** can test if the break occurs at a specific point in time.  For
+unknown breaks, ***xtbreak test*** implements three different hypothesises.  The first is no break against the alterantive of *s* breaks, the second
+hypothesis is no breaks against a lower and upper limit of breaks.  The last hypothesis tests the null of *s* breaks against the alterantive of one
+more break (*s+1*).
 
-**xtbreak estimate** estimates the break points, that is, it estimates *T1*, *T2*, ..., *Ts*.  The underlying idea is that if the model with the true breakdates given a number of breaks has a smaller sum of squared residuals (SSR) than a model with incorrect breakdates.  To find the breakdates, xtbreak estimate uses the alogorthim (dynamic program) from Bai and Perron (2003).  All necessary SSRs are calculated and then the smalles one selected. For more details see [xtbreak estimate](docs/xtbreak_estimate.md).
-
-**xtbreak** implements the tests for and estimation of structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2021).
+***xtbreak test*** implements the tests for structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2021).
 
 For the remainder we assume the following model:
 
@@ -105,9 +97,75 @@ y(i,t) = sigma0(s) + sigma1(s) z(i,t) + beta0(1,i) + beta1 x(i,t) + e(it) for t 
 where *s* is the number of the segment/breaks, *z(i,t)* is a *NT1xq* matrix containing the variables whose relationship with y breaks.  A break in the
 constant is possible.  *x(i,t)* is a *NTxp* matrix with variables without a break.  *sigma0(s)*, *sigma1(s)* are the coefficients with structural breaks and T1,...,Ts are the periods of the breakpoints.
 
-In pure time series model breaks in the constant (or deterministics) are possible.  In this case sigma0(s) is a constant with a structural break. Fixed effects in panel data models cannot have a break.
+## 2.1 Testing known breakpoints
 
-xtbreak will automatically determine whether a time series or panel dataset is used.
+Assume that the numbers of breaks and their occurence is known.  ***xtbreak test*** can test the breakpoints.  The F-Statistic for the test with s breaks
+at known dates is:
+
+```
+F(s,q) = dof_adj sigma' R' (R V R')^(-1) R sigma
+```
+
+*dof_adj* is a degree of freedom adjustment, *sigma* a matrix containing the coefficient estimates of *sigma*, *R* is the convential matrix of a Wald test
+and *V* is a variance-covariance matrix. Under the null *F(s,q)* is F distributed.
+
+A known break date can be tested with ***xtbreak test*** using the option ***breakpoints(numlist|datelist,[index])***.  ***numlist|datelist*** defines the periods of
+the breaks.  If *numlist* is used, then the option ***index*** is required.
+
+## 2.2 Testing unknown breakpoints
+
+If the number and thus the time period of breaks is unknwon, ***xtbreak test*** offers three different hypothesises:
+
+## 2.2.1 No break against *s* breaks
+
+Formally the hypothesis are:
+
+```
+H_0: no break vs. H_1: s breaks at unknown dates
+```
+
+Bai & Perron (1998) suggest to take the supremum of the F-Statistics:
+
+```
+supF(s,q) = sup (l1,..,lq) F(l,q)
+```
+where *l1*, *lq* are the different sets of possible breakpoints.  Essentially the test is the test of a known break after estimation of the breakpoints given a number of breaks.  For a discussion of the estimation of the breakpoints see ***xtbreak estimate*** .
+
+The supremum F-Test is called in ***xtbreak test*** using the options breaks(#) hypothesis(1).  breaks(#) sets the number of breaks. Critical values can be found in Bai & Perron (1998, 2003) and are supplied by ***xtbreak test***.
+
+### 2.2.2 No break against s0<= s <=s1 breaks
+
+A test of the null hypothesis of no structural change against the alternative that an unknown number of structural breaks have occurred, where this unknown number of breaks lies between *s0* and *s1* is:
+
+```
+H_0: no break vs. H_1: s0 <= s <= s1 breaks at unknown dates
+```
+
+The so-called double maximum test statistic is:
+
+```
+supF = sup(s0,..s,..,s1) supF(s,q)
+```
+
+where ***supF(s,q)*** is as defined above.
+
+Generally speaking, the double maximum test estimates the breakdates for each number of breaks between *s0* and *s1*, calculates the corresponding test statistic and then selects the largest one.  Two versions of the double maximum test are available, an unweighted and a weighted test.  For the weighted test the test *supF(l,q)* test statistics are weighted by critical values.
+
+The double maximum test can be used if the options ***breaks(#) hypothesis(2)*** are used.  Critical values can be found in Bai & Perron (1998, 2003) and are supplied by ***xtbreak test***.
+
+### 2.2.3 s breaks against s+1 breaks
+
+A test of the null hypothesis that, *s* structural breaks have occurred, against the alternative that *s + 1* breaks have occurred is:
+
+```
+H_0: s breaks vs H_1 s+1 breaks
+
+F(s+1\s) = sup(s=1,..,s+1) sup(s0,..s,..,s1) supF(s,q)
+```
+
+The test is essentially comparing the SSR of the model with *s* breaks to the minimum of the SSR of the model with *s+1* breaks. 
+
+The *F(s+1\s)* test is integrated in ***xtbreak test*** with the options ***breaks(#) hypothesis(3)***.  Critical values can be found in Bai & Perron (1998, 2003) and are supplied by ***xtbreak test***.
 
 # 3. Options
 
@@ -115,9 +173,8 @@ xtbreak will automatically determine whether a time series or panel dataset is u
 
 Option | Description
  --- | --- 
-***breakpoints(numlist\datelist [,index|fmt(format)])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example ``breakpoints(2010Q1) , format(tq)`` specifies a break in Quarter 1 in 2010.  The option ***format()*** specifies the format and is required if a datelist is used.  The format set in **breakpoints()** and the time identifier needs to be the same.
+***breakpoints(numlist\datelist [,index])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example*** breakpoints(2010Q1)* specifies a break in Quarter 1 in 2010.  If a datelist is used, the format set in ***breakpoints()*** and the time identifer needs to be the same.
 ***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
-***showindex*** | show confidence intervals as index.
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** | suppresses constant.
@@ -128,176 +185,177 @@ Option | Description
 ***error(real)*** | define error margin for partial break model.
 ***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheis 2).
 ***level(#)*** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
-***csa(varlist [, deterministic[varlist] excludecsa])*** | specify the variables with and without breaks which are added as cross-sectional averages. ***xtbreak*** calculates internally the       cross-sectional average. ``deterministic[varlist]`` can be used if the variables in varlist are already cross-section averages and thus deterministic. ``excludecsa`` excludes the partialling out of cross-section averages in the dynamic program.
-***csanobreak()*** | same as ***csa()*** but for variables without a break.
+***csa(varlist)*** | specifies the variables without breaks which are added as cross-sectional averages. xtbreak calculates internally the cross-sectional averages.
+***csanobreak(varlist)*** | specifies the variables with  breaks which are added as cross-sectional averages. xtbreak calculates internally the cross-sectional averages.
+
+# 4. Note on panel data
+
+If a panel dataset is used, xtbreak differentiates between four models.  The first model is a fixed effects model. A break in the fixed effects is not possible. The second and third models arewith a pooled constant (pooled OLS) with and without a break. The last model is a model with neither fixed effects nor a pooled constant.
+
+The following table gives an overview:
+
+Model | Equation  (xtbreak options)
+ --- | --- 
+Fixed Effects   | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)   
+Pooled OLS (nobreak)     | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     (```nofixedeffects```)
+Pooled OLS (break)     | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  (```nofixedeffects breakconstant```)
+No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         (```nofixedeffects noconstant```)
+
+where b0 is the pooled constant without break, a(i) the fixed effects, b(1) a coefficient without break, s0(s) a pooled constant with break and s1(s) a coefficient with break.
+
+In the estimation of the breakpoints, cross-sectional averages are not taken into account.
 
 
-# 4. Examples
+# 5. Saved Values
 
-This example was presented at the Stata Conference [2021](https://www.stata.com/meeting/us21/). We will try to estimate the breakpoints in the relationship between COVID infections in the US and excess deaths in 2020 and 2021. Weekly data is available on [GitHub](https://github.com/JanDitzen/xtbreak/tree/main/data). The variable *ExcessMortality* has the excess mortality and the variable **new_cases** contains the number of new covid cases. The idea is that initally more people died from COVID because it was a new virus. Then medical treatment advanced and vaccines became more available which should decrease excess mortality. On the other hand COVID cases have likely been underreported during the first wave. We assume that there is a lag between the a positive test and death of one week. The mortality data is from [CDC](https://www.cdc.gov/nchs/nvss/deaths.htm), the data on the Covid cases from browse [Our World in Data](https://ourworldindata.org/).
+***xtbreak test*** stores the following in ***r()***:
 
-First we load the data into Stata:
+### Known Breakpoints
 
-```
-use https://github.com/JanDitzen/xtbreak/blob/main/data/US.dta
-```
+Scalars | Description
+---|---
+***r(Wtau)*** | Value of test statistic. 
+***r(p)*** | p-Value from F distribution. 
 
-We start with no prior knowledge of i) the number of breaks and ii) the exact date of each break. 
-Therefore before estimating the breakpoints we use Hypothesis 2 and assume up to 5 breaks:
+### Unknown Breakpoints
 
-```
-xtbreak test ExcessMortality L1.new_cases, hypothesis(2) breaks(5)
+Scalars | Description
+---|---
+***r(supWtau)*** | Value of supF statistic (hypothesis 1). 
+***r(Dmax)*** | Value of unweighted double maximum test (hypothesis 2). 
+***r(WDmax)*** | Value of weighted double maximum test (hypothesis 2).
+***r(f)*** | Value of supremum of supF statistic (hypothesis 3). 
+***r(c90)*** | Critival value at 90%. 
+***r(c95)*** | Critival value at 95%.
+***r(c99)*** | Critival value at 99%.
 
-Test for multiple breaks at unknown breakdates
-(Bai & Perron. 1998. Econometrica)
-H0: no break(s) vs. H1: 1 <= s <= 5 break(s)
+# 6. Examples
 
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- UDmax(tau)         130.10            12.37            8.88            7.46
---------------------------------------------------------------------------------
-Estimated break points:  2020w20  2021w8
-* evaluated at a level of 0.95.
+## 6.1 Examples using usmacro.dta
 
-```
-
-The test statistic is larger than the critical value and we reject the hypothesis of no breaks.
-``xtbreak test`` also reports two breaks. 
-
-Next we test the hypothesis of no breaks against 2 breaks using hypothesis 1:
-
-```
-xtbreak test ExcessMortality L1.new_cases, hypothesis(1) breaks(2)
-
-Test for multiple breaks at unknown breakdates
-(Bai & Perron. 1998. Econometrica)
-H0: no break(s) vs. H1: 2 break(s)
-
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- supW(tau)          130.10             9.36            7.22            6.28
---------------------------------------------------------------------------------
-Estimated break points:  2020w20  2021w8
+For example we want to find breaks in the US macro dataset supplied in Stata 16.  The dataset contains quarterly data on the inflation, GDP gap and the federal funds rate.  We load the data in as:
 
 ```
-
-The test statistic is the same, however the critical values are smaller placing a lower bound on the rejection of the hypothesis.
-
-Since we have an estimate of the breakpoints, we can test the two breakpoints 
-as known breakpoints:
-
-```
-xtbreak test ExcessMortality L1.new_cases, breakpoints(2020w20 2021w8 , fmt(tw))
-Test for multiple breaks at known breakdates
-(Bai & Perron. 1998. Econometrica)
-H0: no breaks vs. H1: 2 break(s)
-
- W(tau)        =      130.10
- p-value (F)   =        0.00
-
+use http://www.stata-press.com/data/r16/usmacro.dta, clear
 ```
 
-Since we are using a *datelist*, we need to specify the format of it.
-*datelist* also has to be the same format as the time identifier.
-
-We have established that we have found 2 breaks. We can test the hypothesis 3, i.e. 2 breaks against the alternative of 3 breaks:
+A simple model to estimate the GDP gap using the federal funds rate and inflation woudl be:
 
 ```
-xtbreak test ExcessMortality L1.new_cases, hypothesis(3) breaks(3)
-
-Test for multiple breaks at unknown breakpoints
-(Bai & Perron. 1998. Econometrica)
-H0: 2 vs. H1: 3 break(s)
-
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- F(s+1|s)*           10.26            14.80           11.14            9.41
---------------------------------------------------------------------------------
-* s = 2
-
+regress ogap inflation fedfunds
 ```
 
-First, note that we have to define in ``breaks()`` the alternative, that is we use ``breaks(3)``. Secondly we cannot reject the hypothesis of 2 breaks.
+### Test for known breaks
 
-After testing for breaks thoroughly we can estimate the breaks and construct confidence intervals:
+Assume we want to test for a break in Quarter 1 1970:
 
 ```
-xtbreak estimate ExcessMortality L1.new_cases, breaks(2)
+xtbreak test ogap inflation fedfunds, breakpoint(tq(1970q1))
+```
 
- Estimation of break points
-                                                           T    =     72
-                                                           SSR  =   1519.53
---------------------------------------------------------------------------------
-  #      Index     Date                          [95% Conf. Interval]
---------------------------------------------------------------------------------
-  1        16      2020w20                       2020w19        2020w21
-  2        56      2021w8                        2021w7         2021w9 
---------------------------------------------------------------------------------
+and if we want to test for a break in 1970q1 and 1990q4:
 
+```
+xtbreak test ogap inflation fedfunds, breakpoint(tq(1970q1) tq(1990q4))
+```
+
+If we want to test if breaks occurs after 10 and 20 periods:
+
+```
+xtbreak test ogap inflation fedfunds, breakpoint(10 20, index)
+```
+
+### Test for unknown breaks
+
+#### No vs. s breaks
+
+To test hypothesis 1 with for example 3 breaks:
+
+```
+xtbreak test ogap inflation fedfunds, hypothesis(1) breaks(3)
+```
+
+The default is to assume no break in the constant.  To add a break in the constant, the option breakconstant is added:
+
+```
+xtbreak test ogap inflation fedfunds, hypothesis(1) breaks(3) breakconstant}
+```
+
+#### No vs. s0 <= s <= s1 breaks
+
+Hypothesis 2 can be tested with:
+
+```
+xtbreak test ogap inflation fedfunds, hypothesis(2) breaks(3)
+```
+
+The test assumes that under the alternative, there are between 1 and 3 breaks.  To test if there are between 2 and 4 breaks under the alterantive:
+
+```
+xtbreak test ogap inflation fedfunds, hypothesis(2) breaks(2 4)
 
 ```
 
-If we want to see the index of the confidence interval rather than the date, the option {cmd:showindex} can be used:
+To use the weighted double maximum test we use the option wdmax
 
 ```
-xtbreak estimate ExcessMortality L1.new_cases, breaks(2) showindex
-
- Estimation of break points
-                                                 T    =     72
-                                                 SSR  =   1519.53
-----------------------------------------------------------------------
-  #      Index     Date                [95% Conf. Interval]
-----------------------------------------------------------------------
-  1        16      2020w20             15             17
-  2        56      2021w8              55             57
-----------------------------------------------------------------------
-
+xtbreak test ogap inflation fedfunds, hypothesis(2) breaks(2 4) wdmax
 ```
 
-We can split the variable L1.new_cases into the different values for each regime using ``estat split``. The variable list is saved in **r(varlist)** and we run a simple OLS regression on it:
+#### Testing s vs. s+1 breaks
+
+Hypothesis can be tested using option hypothesis(3):
 
 ```
-estat split
-New variables created: L_new_cases1 L_new_cases2 L_new_cases3
-
-reg ExcessMortality `r(varlist)'
-
-      Source |       SS           df       MS      Number of obs   =        72
--------------+----------------------------------   F(3, 68)        =    218.95
-       Model |  14678.1397         3  4892.71323   Prob > F        =    0.0000
-    Residual |  1519.52504        68  22.3459564   R-squared       =    0.9062
--------------+----------------------------------   Adj R-squared   =    0.9020
-       Total |  16197.6647        71  228.136123   Root MSE        =    4.7272
-
-------------------------------------------------------------------------------
-ExcessMort~y | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-L_new_cases1 |   .1517681   .0106782    14.21   0.000     .1304601    .1730761
-L_new_cases2 |   .0284604   .0013397    21.24   0.000     .0257871    .0311337
-L_new_cases3 |  -.0034063   .0040829    -0.83   0.407    -.0115537    .0047411
-       _cons |   8.910281   .9357773     9.52   0.000     7.042967     10.7776
-------------------------------------------------------------------------------
-
+xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2)
 ```
 
-Finally, we can draw a scatter plot of the variables with a different colour for each segement. 
-The command line is ``estat scatter varlist`` where *varlist* is the independent variable (X), 
-the dependent variable is automatically added on the y-axis.
+To change the minimal segment length to 5%:
 
 ```
-xtbreak estimate ExcessMortality L1.new_cases, breaks(2) showindex
-estat scatter L.new_cases
-
+xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)
 ```
 
-![scatter-plot](docs/ExcessMortalityCovid.jpg?raw=true "Scatter Plot")
+## 6.2 Examples: Excess deaths in the UK due to COVID 19
 
+An early version of ***xtbreak test*** was presented at the 2020 Swiss User Group meeting (see [slides](
+https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf),
+***NOTE*** The examples are on an early version of *xtbreak*. Results have changed!)
+The empircal example was on the question if can we identify structural breaks in the excess deaths in the
+UK in 2020 due to COVID19?
+Data from Office of National Statistics (ONS) for weekly deaths in the UK for 2020 was used.
+The data can be downloaded [here](https://github.com/JanDitzen/xtbreak/tree/main/data).
+
+To test for an unknown breakdate with up to for breaks:
+
+```
+xtbreak test ExcessDeaths , breakconstant breaks(1 4) hypothesis(2)
+```
+
+We can test if there is a break in weeks 13 and 20 against the
+hypothesis of no break.
+
+```
+xtbreak test ExcessDeaths , breakconstant hypothesis(1) breakpoints(13 20, index)
+```
+
+Using a HAC consistent estimator rather than the SSR. 
+
+```
+xtbreak test ExcessDeaths , breakconstant hypothesis(1) breakpoints(13 20, index) vce(hac)
+```
+
+Test for 2 breaks at unknown dates:
+
+```
+xtbreak test ExcessDeaths , breakconstant breaks(2) hypothesis(1)
+```
+
+Test for 1 vs. 2 breaks:
+
+```
+xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)
+```
 
 # 7. References
 
@@ -320,11 +378,7 @@ The latest version of the ***xtbreak*** package can be obtained by typing in Sta
 net from https://janditzen.github.io/xtbreak/
 ``` 
 
-# 9. Questions?
-
-Questions? Feel free to write us an email, open an [issue](https://github.com/JanDitzen/xtbreak/issues) or [start a discussion](https://github.com/JanDitzen/xtbreak/discussions).
-
-# 10. Authors
+# 9. Authors
 
 #### Jan Ditzen (Free University of Bozen-Bolzano)
 
