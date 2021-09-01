@@ -5,7 +5,7 @@ capture program drop issorted
 program define issorted
 	syntax	varlist 
 	
-	local sorted : dis "`:sortedby'"
+	local sorted : sortedby
 	if "`sorted'" != "`varlist'" {
 	    noi disp "sort data"
 	    sort `varlist'
@@ -15,7 +15,7 @@ end
 
 capture program drop transbreakpoints
 program define transbreakpoints, rclass
-syntax anything , [Index] tvar(varlist) touse(varlist) 
+syntax anything , [Index] tvar(varlist) touse(varlist) [format(string)]
 	tokenize `tvar'
 	* tvar with 1...10
 	local tvar1 `1'
@@ -24,6 +24,15 @@ syntax anything , [Index] tvar(varlist) touse(varlist)
 
 	local fmt : format `tvar2'
 	
+
+	if "`format'" != "" {
+		local inp `anything'
+		local anything ""
+		foreach el in `inp' {
+			local anything `anything' `format'(`el')
+		}
+	}
+
 	foreach ii in `anything' {
 		disp "`ii'"
 		if "`index'" != "" {
@@ -74,6 +83,7 @@ end
 capture program drop get_csa
 program define get_csa, rclass
 	syntax varlist(ts) , idvar(varlist) tvar(varlist) cr_lags(numlist) touse(varlist) csa(string) [cluster(varlist) numberonly tousets(varlist)]
+
 		tsrevar `varlist'
 		
 		if "`tousets'" == "" {
@@ -179,14 +189,25 @@ end
 // -------------------------------------------------------------------------------------------------
 capture mata mata drop xtbreak_demean()
 mata:
-	function xtbreak_demean(real matrix mat, real matrix idt, real scalar N)
+	function xtbreak_demean(real matrix mat, real matrix idt, real scalar N,|real matrix shapeMat)
 	{
-		ids = uniqrows(idt[.,1])
-		i = N
-		while (i>0) {
-			tousei = selectindex(idt[.,1]:==ids[i])				
-			mat[tousei,.] = xtbreak_demeani(mat[tousei,.])
-			i--
+		"cols shapemat"
+		cols(shapeMat)
+		if (args()==3 | cols(shapeMat) == 1) {
+			i = N
+			while (i>0) {
+				mati = panelsubmatrix(mat,i,idt)	
+				mat[|idt[i,1],. \ idt[i,2],.|] = xtbreak_demeani(mati)
+				i--
+			}
+		}
+		else {
+			i = N
+			while (i>0) {
+				mati = panelsubmatrix(mat,i,idt)	
+				mat[|idt[i,1],. \ idt[i,2],.|] = xtbreak_demeani(mati,shapeMat)
+				i--
+			}
 		}
 		return(mat)
 	}
@@ -194,10 +215,13 @@ end
 
 capture mata mata drop xtbreak_demeani()
 mata:
-	function xtbreak_demeani(real matrix mat)
+	function xtbreak_demeani(real matrix mat,|real matrix shapeMat)
 	{
 		Ti = rows(mat)			
 		ei = J(Ti,1,1)
+		if (args()==2) {
+			ei = ei:*shapeMat
+		}		
 		Mi = I(Ti) - ei*m_xtdcce_inverter(quadcross(ei,ei)) * ei'
 		Mi = Mi * mat
 		return(Mi)	
@@ -218,8 +242,6 @@ mata:
 								real matrix idt,			///	
 								real scalar N,				///
 								real scalar T,				///
-								real scalar NT,				///
-								real scalar ConstantType,	/// need to remove
 								real scalar demean,			///
 								real scalar p,				///
 								real scalar s,				///
@@ -236,26 +258,39 @@ mata:
 		Yt = Y
 		Xt = X
 		Wt = W
+		
 		"start partial out"
 		num_partial = 0
-
-		
-		if (demean == 1) {
+		demean
+		if (demean > 0) {
+			if (demean==1) {
+				point = &T
+			}
+			else {
+				point = &shapeMat
+			}
 			"Demean individual fixed effects"
-			Yt = xtbreak_demean(Yt,idt,N)
-			Wt = xtbreak_demean(Wt,idt,N)
+			Yt = xtbreak_demean(Yt,idt,N,(*point))
+			Wt = xtbreak_demean(Wt,idt,N,(*point))
+			WtXt = Wt
 			if (p > 0) {
 				"demean X"
-				Xt = xtbreak_demean(Xt,idt,N)
+				Xt = xtbreak_demean(Xt,idt,N,(*point))
+				WtXt = WtXt,Xt
+			}
+		}
+		else {
+			WtXt = Wt
+			if (p>0) {
+				WtXt = Wt,Xt
 			}
 		}
 
 		/// partial out cross-sectional averages, assumption the CSA have heterogenous 
-		ToCSA = J(N,0,.)
+		ToCSA = J(rows(Wt),0,.)
 		if (partialCsa[1,1] == 1) {
 			"partial out CSA of variables with breaks"
 			ToCSA = (J(N,1,1)#shapeMat#J(1,cols(csa),1)) :* (J(1,(s+1),1)#csa)
-			
 			if (demean==1) {
 				ToCSA = xtbreak_demean(ToCSA,idt,N) 				
 			}			
@@ -264,22 +299,19 @@ mata:
 		if (partialCsa[1,2] == 1) {
 			"partial out CSA of variables without breaks"
 			csaNBt = csaNB
-
 			if (demean==1) {
 				csaNBt = xtbreak_demean(csaNBt,idt,N)
 			}
 			ToCSA = ToCSA, csaNBt
 			
 		}
-
+		
 		if (partialCsa[1,1] == 1 | partialCsa[1,2] == 1) {
 			"partialling out CSA"
-			tilde = m_partialout((Yt,Wt,Xt),ToCSA,idt[.,1],0,num_partialCSA=.)
-						
+			tilde = m_partialout((Yt,WtXt),ToCSA,idt,0,num_partialCSA=.)
 			Yt = tilde[.,1]
 			/// correct Wt for zero columns, should only use blockdiagonal matrix, but this is faster and equivalent?
-			Wt = tilde[.,2..1+cols(Wt)]
-			
+			Wt = tilde[.,2..1+cols(Wt)]			
 			if (p > 0) {
 				Xt = tilde[.,1+cols(Wt)+1..cols(tilde)]
 			}
@@ -307,6 +339,48 @@ end
 ** quadcross automatically removes missing values and therefore only uses (and updates) entries without missing values
 ** X1 variable which is partialled out
 ** id_n is the id identifier
+
+capture mata mata drop m_partialout()
+mata:
+	function m_partialout ( real matrix X2,
+									real matrix X1, 
+									real matrix index,
+									real scalar useold,
+									real scalar num_partial,
+									| real scalar rk)	
+	{
+		real scalar rks, running
+		real matrix ids, tousei, X1_i, X2_i, X1X2, X1X1
+
+		rk = 0
+		idnum = panelstats(index)[1]
+
+		running = idnum
+		"start loop"
+		outX2 = X2
+		while (running>0) {
+					
+			panelsubview(X1_i,X1,running,index)
+			panelsubview(X2_i,X2,running,index)
+
+			X1X1 = quadcross(X1_i,X1_i)
+			X1X2 = quadcross(X1_i,X2_i)
+
+			/// use solver
+			outX2[|index[running,1],. \ index[running,2],.|] = (X2_i - X1_i*m_xtdcce_solver(X1X1,X1X2,useold,rks=.))
+
+			if (rks[1] < rks[2]) {
+				rk = 1
+			}
+			running--
+			num_partial = num_partial + cols(X1X1)
+		}
+		
+		return(outX2)
+	}
+end
+/*
+
 capture mata mata drop m_partialout()
 mata:
 	function m_partialout ( real matrix X2,
@@ -349,7 +423,7 @@ mata:
 		return(X2)
 	}
 end
-
+*/
 capture mata mata drop m_partialout_i()
 mata:
 	function m_partialout_i ( real matrix X2,real matrix X1)	
@@ -359,10 +433,10 @@ mata:
 
 		X1X1 = quadcross(X1,X1)
 		X1X2 = quadcross(X1,X2)
-
+		timer_on(60)
 		/// use solver
 		X2 = (X2 - X1*m_xtdcce_solver(X1X1,X1X2,0,rks=.))
-		
+		timer_off(60)
 		return(X2)
 	}
 end
@@ -578,7 +652,8 @@ mata:
 					real matrix idt,			///
 					real scalar N,				///
 					real scalar T,				///
-					real matrix partial
+					real matrix partial,|		/// 1: csa, 2: csaNB, 3: csa removed in dynamic program, 4: num csa without break not to be part of dynamic program
+					real matrix idtc
 					)
 	{
 		
@@ -611,12 +686,30 @@ mata:
 			csaNB = J(rows(Y),0,.)
 		}
 		
-		idt = st_data(.,idtname,tousename)
-		Nuniq = uniqrows(idt[.,1])
-		N = rows(Nuniq)
+		idtc = st_data(.,idtname,tousename)
+
+		idt = panelsetup(idtc,1)
+
+
 		
-		Tuniq = uniqrows(idt[.,2])
-		T = rows(Tuniq)	
+		N = panelstats(idt)[1]
+
+		/// check if panel data or time series
+		if (N==rows(X)) {
+			"time series dataset"
+			idt = (1,idt[N,2])
+			N = 1
+		}
+
+		/// assume balanced panel
+		T = (panelstats(idt)[2])/N
+
+		/// 
+		"data loaded"
+		"N,T,partial"
+		N,T,partial
+		"panel stats"
+		panelstats(idt)
 	}
 end
 
@@ -671,16 +764,16 @@ mata:
 			K = cols(X)
 			XX = J(K,K,0)
 			XY = J(K,1,0)
-			idi = uniqrows(idt[.,1])
-			i = 1
-			while (i<=N) {
-				indexi = selectindex((idt[.,1]:==idi[i]))
-				xi = X[indexi,.]
-				yi = Y[indexi,.]
+			
+			i = N
+			while (i>0) {
+				
+				xi = panelsubmatrix(X,i,idt)
+				yi = panelsubmatrix(Y,i,idt)
 
 				XX = XX + quadcross(xi,xi)
 				XY = XY + quadcross(xi,yi)
-				i++
+				i--
 			}
 		}
 		betaP = m_xtdcce_inverter(XX) * XY
@@ -783,7 +876,7 @@ mata:
 								real matrix W,					/// var with breaks
 								real matrix X,					/// var without breaks
 								real matrix breakpoints,		///
-								real matrix idt,				///
+								real matrix idt,				/// panelsetup matrix
 								real matrix partial,			///
 								real matrix csa,				///
 								real matrix csaNB,				///
@@ -819,11 +912,10 @@ mata:
 		
 		/// bring W and CSA in shape with break structure
 		
-		shapeMat = BreakMat(breakpointsI,T,s)
-		
-		"breakpoints,p,s,q,partial,ctype,demean"
+		shapeMat = BreakMat(breakpointsI,T,s)		
+		"breakpoints,p,s,q,partial,ctype,demean,N,T"
 		breakpoints
-		p,s,q,partial,ConstantType,demean
+		p,s,q,partial,ConstantType,demean,N,T
 
 		Wt1 = (J(N,1,1)#shapeMat#J(1,q,1)) :* (J(1,(s+1),1)#W)
 
@@ -835,7 +927,7 @@ mata:
 			}
 		}
 
-		mult_partialout(Y,X,Wt1,csa,csaNB,idt,N,T,NT,ConstantType,demean,p,s,shapeMat,partial,partialX,Yt,Wt,Xt=.,num_partial)
+		mult_partialout(Y,X,Wt1,csa,csaNB,idt,N,T,demean,p,s,shapeMat,partial,partialX,Yt,Wt,Xt=.,num_partial)
 
 		/// update q if constant is included
 		///if (ConstantType==2) q = q + 1			
@@ -944,7 +1036,7 @@ mata:
 								real scalar error,			///
 								real scalar ConstantType,	///
 								real scalar demean,			/// demean
-								real matrix partialCSA,		///
+								real matrix partialCSA,		/// 1: has CSA 2: has CSANB 3: remove CSA in dynamic prog. 4: num CSA (non det) 5: num csaNB (non det)
 								real scalar minlength,		///
 								/// output
 								real matrix finalbreaks,	///
@@ -958,6 +1050,60 @@ mata:
 		
 		unknown_checks(q,s+1,minlength)
 
+		"partial setting"
+		strofreal(partialCSA'), ("has CSA", "has CSANB", "remove CSA in dynamic prog", "num CSA (non det)", "num csaNB (non det)")'
+
+		/// split CSA
+		if ((partialCSA[4] == cols(csa)) & (partialCSA[4] > 0)) {
+			/// no deterministics
+			"csa breaks - no determinstics"
+			csaW = csa
+			csaDet = J(rows(csa),0,.)
+		}
+		else if ((partialCSA[4] < cols(csa)) & (partialCSA[4] > 0)) {
+			/// determinstics and CSA
+			"csa breaks - csa + determinstics"
+			csaW = csa[.,1..partialCSA[4]]
+			csaDet = csa[.,partialCSA[4]+1..cols(csa)]
+		}
+		else if ((cols(csa) > 0) & (partialCSA[4] == 0)) {
+			"csa breaks - determinstics only"
+			csaW = J(rows(csa),0,.)
+			csaDet = csa
+		}
+		else {
+			/// no CSA and no determinstics
+			"csa breaks - no csa and no determinstics"
+			csaW = J(rows(csa),0,.)
+			csaDet = J(rows(csa),0,.)
+		}
+
+
+		/// csa without breaks
+		if ((partialCSA[5] == cols(csaNB)) & (partialCSA[5] > 0)) {
+			/// no deterministics
+			"ncsa breaks - no determinstics"
+			csaNBX = csaNB
+			csaNBDet = J(rows(csaNB),0,.)
+		}
+		else if ((partialCSA[5] < cols(csaNB)) & (partialCSA[5] > 0)) {
+			/// determinstics and CSA
+			"ncsa breaks - csa + determinstics"
+			csaNBX = csaNB[.,1..partialCSA[5]]
+			csaNBDet = csaNB[.,partialCSA[5]+1..cols(csaNB)]
+		}
+		else if ((cols(csaNB) > 0) & (partialCSA[5] == 0)) {
+			"ncsa breaks - determinstics only"
+			csaNBX = J(rows(csaNB),0,.)
+			csaNBDet = csaNB
+		}
+		else {
+			/// no CSA and no determinstics
+			"ncsa breaks - no csa and no determinstics"
+			csaNBX = J(rows(csaNB),0,.)
+			csaNBDet = J(rows(csaNB),0,.)
+		}
+
 		/// variables with fixed slopes
 		if (cols(X) != 0 ) {
 			p = cols(X)
@@ -968,44 +1114,31 @@ mata:
 			p = 0
 		}
 				
-		Ni = uniqrows(idt[.,1])
-		N = rows(Ni)
-		Ti = uniqrows(idt[.,2])
-		T = rows(Ti)
-		
-		/// panelindex
-		index = panelsetup(idt[.,1],1)	
+		N = panelstats(idt)[1]
+		T = panelstats(idt)[4]
+		(N,T)
 		
 		if (p:==0) {
 			/// full change model
 			"full change model"
-			/// first partial out
-			/// always demean = 0; demeaning will be in dynamic program
-			/// remove CSA of variables without breaks
-			/// CSA with breaks will be in dynamic program
-			/// number of breaks not important here
-			///mult_partialout(Y,Xi,Z,csa,csaNB,idt,N,T,N*T,ConstantType,0,p,0,.,(0,partialCSA[2]),0,Y0=.,Z0=.,X0=.,tmp=.)
-			/// remove CSAnb from CSA
 
-			dynamicprog(Y,Z, (csa,csaNB) , N,T, s, index ,minlength,demean,partialCSA[3],  minSSR=.,finalbreaks=. )	
+			dynamicprog(Y,Z, (csa,csaNB) , N,T, s, idt ,minlength,demean,partialCSA[3],  minSSR=.,finalbreaks=. )	
 			"final breaks are"
 			finalbreaks		
 			minSSR	
 		}	
 		else {
 			/// partial change model
-			"first search"
-			/// keep X vars
-			/// only remove constant
-			//mult_partialout(Y,Xi,Z,.,csaNB,idt,N,T,N*T,ConstantType,0,p,s,(T,T,0),(0,partialCSA[2]),0,Y0=.,Z0=.,X0=.,tmp=.)
-		
-			/// inital breaks with X and Z
-			///dynamicprog(Y0,(X0,Z0), csa,N,T, s, index ,minlength,demean,partialCSA[1],  minSSR=.,truebreaks=. )
-
-			/// search for inital breaks. Here X and Z have breaks, all CSA have breaks
-			dynamicprog(Y,(Xi,Z), (csa,csaNB) ,N,T, s, index ,minlength,demean,partialCSA[3],  minSSR=.,truebreaks=. )
-
-			"inital breaks with X and Z having breaks"
+			"partial change model"
+			
+			"step 1"
+			/// Step 1.
+			/// search for inital breaks. Here X and Z have breaks, all CSA have breaks, use csaNB
+			dynamicprog(Y,(Xi,Z), (csa,csaNB) ,N,T, s, idt ,minlength,demean,partialCSA[3],  minSSR=.,truebreaks=. )
+			///dynamicprog(Y,(Xi,Z), (csa,csaNB) ,N,T, s, idt ,minlength,0,partialCSA[3],  minSSR=.,truebreaks=. )
+			
+			"inital breaks with X and Z having breaks at" 
+			/// correct
 			truebreaks	
 			/// inital estimate can lead to no breaks
 			if (sum(truebreaks) > 0) {
@@ -1019,75 +1152,100 @@ mata:
 				sv=0
 			}
 
+			"step 2"
+			/// Step 2.
 			Zblk = (J(N,1,1)#shapeMat#J(1,q,1)) :* (J(1,(sv+1),1)#Z)
 			Xblk = (J(N,1,1)#shapeMat#J(1,p,1)) :* (J(1,(sv+1),1)#Xi)
 
-			tmp = SSR(Y,(Xblk,Zblk),idt,N,beta_p=.,tmp1=.,0)
+			/// here remove CSA (all with breaks) and demean data
+			mult_partialout(Y,.,(Xblk,Zblk),(csa,csaNB),.,idt,N,T,demean*2,0,s,shapeMat,((partialCSA[1]+partialCSA[2])>0,0,0),0,Yt=.,Wt=.,tmp=.,tmp=.)
+			tmp = SSR(Yt,Wt,idt,N,beta_p=.,tmp1=.,0)
 
 			/// inital estimate for beta
 			/// beta_p has var1(b1), var2(b2); all in blockidag form for breaks
+			"first delta"
+			beta_p
+
 			deltahatblock = colshape(beta_p,sv+1)		
 			delta2hat = deltahatblock[p+1..p+q,.]		
 			splitcoef_flat = colshape(delta2hat,1)
 
-			/// Yn excludes all CSA and FE
-			Yn = Y - Zblk * splitcoef_flat
-
-			ols(Yn,X,idt,N,betahat0=.,tmp1=.,0)
+			"step 3"
+			/// Step 3
+			/// Yn excludes CSA without breaks and fixed effects (with break!)
 			
+			Y2 = Y - Zblk * splitcoef_flat
+			"Y2" 
+			/// Y2 is correct
+			mean(Y2)
+			mult_partialout(Y2,X,Zblk,csaDet,csaNB,idt,N,T,demean*2,p,s,shapeMat,(partialCSA[4]>0,partialCSA[2]),0,Yn=.,Wt=.,Xt=.,tmp=.)
+
+			ols(Yn,Xt,idt,N,betahat0=.,tmp1=.,0)
+
 
 			SSRT = 0
-			SSRlast = 0
+			
 			count = 0
 			errori = 1
 			deltahat = J((s+1)*q,0,.)
-		
-			while (errori >= error) {
-				count = count + 1
-				/// use inital values with partialled out constant and CSA, can use X0
+			
+			
+			"step 4"
+			while (errori > error) {
+				
+				count = count + 1				
+				"start step 4, run"
+				count
+				
+				/// Step 4.
+				/// use Y, X and Z here, csa, csaNB (and fe/constant) are partialled out in the dynamic program
 				Yn = Y - X * betahat0[.,count]
+				dynamicprog(Yn, Z, (csa,csaNBDet), N,T, s, idt ,minlength,demean,partialCSA[3]*partialCSA[1], minSSR=.,truebreaks=.)
 
-				/// here partial out CSA NB
+				
 
-				dynamicprog(Yn, Z, (csa,csaNB), N,T, s, index ,minlength,demean,partialCSA[3], minSSR=.,truebreaks=. )
-				"break in i"
+				"break in error run i"
 				truebreaks
 				if (sum(truebreaks) > 0) {
 					truebreaksIL = (truebreaks , T)
 					shapeMat = BreakMat(truebreaksIL,T,s)
 					sv = s
 					
+					"step 5"					
+					/// Step 5.
 					Z0t = (J(N,1,1)#shapeMat#J(1,q,1)) :* (J(1,(sv+1),1)#Z)
 
 					/// constant and CSA are partialled out in every step
-					///mult_partialout(Y,Xi,Z0t,csa,csaNB,idt,N,T,N*T,ConstantType,p,sv,shapeMat,partialCSA,0,Yt=.,Zt=.,Xt=.,tmp=.)
-
+					mult_partialout(Y,X,Z0t,csa,csaNB,idt,N,T,demean*2,p,s,shapeMat,partialCSA,0,Yt=.,Wt=.,Xt=.,tmp=.)
 					/// SSR program returns beta as well
-					SSR = SSR(Y,(X,Z0t),idt,N,thetahat_i=.)
+					SSR = SSR(Yt,(Xt,Wt),idt,N,thetahat_i=.)
 
 					/// beta_p has var1(b1), var2(b2); only Z in  blockidag form for breaks
 					betahat0 = betahat0,thetahat_i[1..p]
 					deltahat = deltahat , thetahat_i[p+1..p+q*(sv+1)]
+					
 
 				}
 				else {
-					"no breaks found!"
-					/// make SSR artifically high
-					
+					/// make SSR artifically high	
 					SSR = 0
 					sv = 0
 					truebreaksIL = .
 				}				
 				SSRT = SSRT, SSR
-
+				"last SSR"
+				SSR
 				errori = SSRT[count+1] - SSRT[count]
 							
 				if (errori>=error) {
 					truebreaksI = truebreaksIL
-					SSRlast = SSR
-				}
+				}	
+				"count, error,next"
+			count,errori,errori > error
 				
 			}
+			
+			
 			if (sv > 0) {
 				minSSR = SSRT[count+1]
 				finalbreaks = truebreaksI[1..sv]
@@ -1102,9 +1260,7 @@ mata:
 				finalbeta = .
 				/// get normal SSR
 				minSSR = SSR(Y,(X,Z),idt,N,beta_p=.,tmp=.,0)
-			}
-			"breaks are"
-			finalbreaks
+			}			
 		}
 	}
 end
@@ -1120,9 +1276,11 @@ capture mata mata drop quadcrossdev2()
 mata:
 	function quadcrossdev2(real matrix X1, real matrix X2,x3,x4,x5,x6,x7)
 	{	
+		timer_on(90)
 		tmp1 = xtbreak_demeani(X1)
 		tmp2 = xtbreak_demeani(X2)
 		tmp = quadcross(tmp1,tmp2)
+		timer_off(90)
 		return(tmp)
 	}
 end
@@ -1132,8 +1290,9 @@ capture mata mata drop qcrossdemeanpartial()
 mata: 
 	function qcrossdemeanpartial(real matrix X1, real matrix X2, real matrix CSA, real matrix index, real scalar ii,real scalar i, real scalar j)
 	{
-		
+		timer_on(91)
 		CSAi = panelsubmatrix(CSA,ii,index)
+
 		CSAi = CSAi[|i,. \ j,.|]
 
 		tmp1 = xtbreak_demeani(X1)
@@ -1144,7 +1303,7 @@ mata:
 		tmp22 = m_partialout_i(tmp2,tmp3)
 
 		ret = quadcross(tmp11,tmp22)
-
+		timer_off(91)
 		return(ret)
 	}
 end
@@ -1153,13 +1312,13 @@ capture mata mata drop quadcrosspartial()
 mata: 
 	function quadcrosspartial(real matrix X1, real matrix X2, real matrix CSA, real matrix index, real scalar ii,real scalar i, real scalar j)
 	{
-		
+
 		CSAi = panelsubmatrix(CSA,ii,index)
 		CSAi = CSAi[|i,. \ j,.|]
-		
-		tmp11 = m_partialout_i(X1t,CSAi)
-		tmp22 = m_partialout_i(X2t,CSAi)
-
+		timer_on(92)
+		tmp11 = m_partialout_i(X1,CSAi)
+		tmp22 = m_partialout_i(X2,CSAi)
+timer_off(92)
 		ret = quadcross(tmp11,tmp22)
 		
 		return(ret)
@@ -1187,13 +1346,11 @@ mata:
 							real scalar csaIndex,		///
 							/// Output
 							real matrix minSSR,			///
-							real matrix truebreaks )	
+							real matrix truebreaks , | SStar, Breakary,S)	
 	{
 		"start dynamicprog"
 		///lambda = cols(zstar)		
 		lambda = cols(Z)
-		"Y,Z,CSA"
-		
 		zstar = Z
 		rcZ = cols(zstar)
 		
@@ -1209,33 +1366,34 @@ mata:
 		///}
 
 		q= floor(T*minlength)
-		"q,minlength,T,demean,CSAindex,Nbreaks,lambda"
+		"	q,minlength,N,T,demean,CSAindex,Nbreaks,lambda"
 		q,minlength,N,T,demean,csaIndex,Nbreaks,lambda
+
 		/// demean, use pointer to quadcross or quadcrossdev2 function. Input for both is X1, X2
 		pointer(function) cross_fun
 		if (demean==1 & csaIndex == 0) {
-			"only demean"
+			"	only demean"
 			cross_fun = &quadcrossdev2()
 		}
 		else if (demean== 1 & csaIndex == 1) {
-			"demean and partial out CSA"
+			"	demean and partial out CSA"
 			cross_fun = &qcrossdemeanpartial()
 		}
 		else if (demean==0 & csaIndex == 1) {
-			"only partial out CSA"
+			"	only partial out CSA"
 			cross_fun = &quadcrosspartial()
 		}
 		else {
-			"quadcross"
+			"	quadcross"
 			cross_fun = &myquadcross()
 		}
-		"means"
+		"	means"
 mean(mean(zstar)'),mean(Y)
-
-
 		/// SSRm has partial SSRs. Rows indicate start of segment, column end.
 		/// Element (4,10) is segment starting at period 4 and ending at period 10
-		"start build ssr"
+		"	start build ssr"
+
+		real matrix Yi, Zi
 
 		SSRm = J(T,T,.)	
 		l = 0
@@ -1248,37 +1406,30 @@ mean(mean(zstar)'),mean(Y)
 				j_end = T-(Nbreaks-l)*q
 				while (j<=j_end) {					
 
-					ii = 1
+					ii = N
 					SSRii = 0
-					xx = J(rcZ,rcZ,0)
-					xy = J(rcZ,1,0)
+					zz = J(rcZ,rcZ,0)
+					zy = J(rcZ,1,0)
 					yy = J(1,1,0)
-					/// inefficient method, build matrix with used rows
-					///Yt = J(0,1,.)
-					///Zt = J(0,cols(zstar),.)
+					
+					while (ii > 0) {
 
-					while (ii <=N) {
 						Yi = panelsubmatrix(Y,ii,index)
 						Zi = panelsubmatrix(zstar,ii,index)
-						///CSAi = panelsubmatrix(CSA,ii,index)
+
 						Yi = Yi[|i,1 \ j,1|]
 						Zi = Zi[|i,. \ j,.|]
-						///CSAi = CSAi[|i,. \ j,.|]
-
-						xx = xx + (*cross_fun)(Zi,Zi,CSA,index,ii,i,j)
-						xy = xy + (*cross_fun)(Zi,Yi,CSA,index,ii,i,j)
-						yy = yy + (*cross_fun)(Yi,Yi,CSA,index,ii,i,j)
 						
-						///Yt = Yt \ Yi
-						///Zt = Zt \ Zi
+						zz = zz + (*cross_fun)(Zi,Zi,CSA,index,ii,i,j)
+						zy = zy + (*cross_fun)(Zi,Yi,CSA,index,ii,i,j)
+						yy = yy + (*cross_fun)(Yi,Yi,CSA,index,ii,i,j)
 
-						ii++
+
+						ii--
 						
 					}
-					///b = m_xtdcce_inverter(xx) * xy
-					///e = Yt - Zt*b 
-					///SSRii =  quadcross(e,e)
-					SSRii = yy - xy' *m_xtdcce_inverter(xx)*xy
+					///(l,i,j,ii,j_end)
+					SSRii = yy - zy' *m_xtdcce_inverter(zz)*zy
 					SSRm[i,j] = SSRii
 					j++
 				}
@@ -1286,69 +1437,55 @@ mean(mean(zstar)'),mean(Y)
 			}
 			l++
 		}
-
+"first part done"
 		i = q*Nbreaks + 1
 		i_end = T-q+1
-		"N"
-		N
 		while (i<=i_end) {
 			if (q>0) {
 				j = q+i -1
 			}
 			else {
-				j = 1+i -1
+				///j = 1+i -1
+				j = q+i -1
 			}
 			j_end = T
 			while (j<=j_end) {	
 
 				SSRii = 0
-				ii = 1
-				xx = J(rcZ,rcZ,0)
-				xy = J(rcZ,1,0)
+				ii = N
+				zz = J(rcZ,rcZ,0)
+				zy = J(rcZ,1,0)
 				yy = J(1,1,0)
 
-				/// inefficient method, build matrix with used rows
-				///Yt = J(0,1,.)
-				///Zt = J(0,cols(zstar),.)
-				while (ii <= N) {
-					
+				while (ii > 0) {
+
 					Yi = panelsubmatrix(Y,ii,index)
 					Zi = panelsubmatrix(zstar,ii,index)
-					///CSAi = panelsubmatrix(CSA,ii,index)
+			
 
 					Yi = Yi[|i,1 \ j,1|]
-					Zi = Zi[|i,. \ j,.|]
-					///CSAi = CSAi[|i,. \ j,.|]
+					Zi = Zi[|i,. \ j,.|]					
 
-					xx = xx + (*cross_fun)(Zi,Zi,CSA,index,ii,i,j)
-					xy = xy + (*cross_fun)(Zi,Yi,CSA,index,ii,i,j)
+					zz = zz + (*cross_fun)(Zi,Zi,CSA,index,ii,i,j)
+					zy = zy + (*cross_fun)(Zi,Yi,CSA,index,ii,i,j)
 					yy = yy + (*cross_fun)(Yi,Yi,CSA,index,ii,i,j)
 
-					///Yt = Yt \ Yi
-					///Zt = Zt \ Zi
-
-					ii++
-						
+					ii--						
 				}
 
-				///b = m_xtdcce_inverter(xx) * xy
-				///e = Yt - Zt*b 
-				///SSRii =  quadcross(e,e)
-				SSRii = yy - xy' *m_xtdcce_inverter(xx)*xy
+
+				SSRii = yy - zy' *m_xtdcce_inverter(zz)*zy
 				SSRm[i,j] = SSRii
 				j++
 			}
 			i++
 		}
-		"last vals"
-		
-		SSRm[1.,]
+		///"SSR"
+		///(SSRm)
+		mean(mean(editmissing(SSRm,0))')
 		/// Dynamic programming
 		if (Nbreaks:== 1) {
-						"last b"
-			
-			SSRii
-			"one break case"
+			"	one break case"
 			/// special case: only one break, no array needed			
 			/// j is the start element
 			if (q > 0) {
@@ -1356,8 +1493,10 @@ mean(mean(zstar)'),mean(Y)
 				j_end = T-q	
 			}
 			else {
-				j = 1
-				j_end = T-1
+			///	j = 1
+			///	j_end = T-1
+			j = q
+				j_end = T-q	
 			}
 					
 			v=1
@@ -1368,33 +1507,34 @@ mean(mean(zstar)'),mean(Y)
 				j++	
 				v++			
 			}			
-			SSRm[1,.]'
 			minindex(S_j,1,EstBreakDate=.,w=.)
+			S_j
+			EstBreakDate
 			minSSR = S_j[EstBreakDate]	
 			truebreaks = EstBreakDate
 			
 		}
 		else if (Nbreaks > 1) {
-		    "general case"
+		    "	general case"
 			/// general case; Nbreaks number of breaks
 			S = asarray_create("real",1)
 			SStar = asarray_create("real",1)
 			EstBreakDate = asarray_create("real",1)
 
 			/// hack; use minlength instead of q (number of variables with breaks)
-			lambda = q
+			///lambda = q
 
 			/// first break point
 			l = 0
 			///k = (l+1)*lambda
-			k = l*lambda + 1
-			k_end = T - (Nbreaks-l-1) * lambda
+			k = (l+2)*q + 2
+			k_end = T - (Nbreaks-l-1) * q
 			
 			S_j = J(T,T,.)
 			/// inital problem
 			while (k<=k_end) {
-				j = (l+1)*lambda
-				j_end = k - lambda				
+				j = (l+1)*q
+				j_end = k - q				
 				while (j<=j_end) {
 					S_j[j,k] = SSRm[1,j] + SSRm[j+1,k]
 					j++
@@ -1415,12 +1555,12 @@ mean(mean(zstar)'),mean(Y)
 				S_j = J(T,T,.)
 				
 				///k = (l+1)*lambda
-				k = l*lambda + 1
-				k_end = T- (Nbreaks-l-1)*lambda
+				k = (l+2)*q 
+				k_end = T- (Nbreaks-l-1)*q
 							
 				while (k<=k_end) {					
-					j = (l+1)*lambda
-					j_end = k - lambda
+					j = (l+1)*q
+					j_end = k - q
 					Sstar_i = asarray(SStar,l)'
 					while (j<=j_end) {						
 						S_j[j,k] = Sstar_i[.,j] + SSRm[j+1,k]
@@ -1434,22 +1574,28 @@ mean(mean(zstar)'),mean(Y)
 				asarray(EstBreakDate,l+1,breakdate_i)				
 				l++
 			}
-			"final prob"
+			"	final prob"
 			/// final problem
 			l = Nbreaks-1
 			k = T
-			j = (l+1)*lambda
-			j_end = k - lambda
+
 			S_j = J(T,T,.)
 			
 			Sstar_i = asarray(SStar,l)'
 			
+
+			j = (l+1)*q
+			j_end = k - q
 			while (j<=j_end) {
 				S_j[j,k] = Sstar_i[.,j] + SSRm[j+1,T]
 				j++
 			}
 			asarray(S,l+1,S_j)
 			minindex2(S_j,minSSR=.,breakdate_i=.)
+			///"S_j"
+			///S_j
+			///"breakdate"
+			///breakdate_i
 			asarray(SStar,l+1,minSSR)
 			asarray(EstBreakDate,l+1,breakdate_i)
 			
@@ -1461,12 +1607,13 @@ mean(mean(zstar)'),mean(Y)
 			truebreaks = J(1,Nbreaks,.)
 			truebreaks[1,Nbreaks] = (asarray(EstBreakDate,Nbreaks))[T,1]		
 			
-			tt = 1
-			while (tt<=Nbreaks) {
-				tt
-				asarray(SStar,tt),asarray(EstBreakDate,tt)
-				tt++
-			}
+Breakary = EstBreakDate
+
+			///tt = 1
+			///while (tt<=Nbreaks) {
+			///	asarray(SStar,tt),asarray(EstBreakDate,tt)
+			///	tt++
+			///}
 
 
 			i = 1			
@@ -1481,17 +1628,17 @@ mean(mean(zstar)'),mean(Y)
 			
 			/// check if truebreaks only missings, if so, test cannot be done
 			if (missing(truebreaks) == cols(truebreaks)) {
-			    "missings, too many break points"
+			    "	missings, too many break points"
 			    truebreaks = .
 				exit(0)
 			}
 		}
 		else {
 			/// special case no break; just use SSR and no breaks
-			"no break case"
+			"	no break case"
 			truebreaks = 0
-			minSSR = SSR(Y,zstar,.,N)
-			"SSR is"
+			minSSR = SSR(Y,zstar,index,N)
+			"	SSR is"
 			minSSR
 		}
 	"dynamic prog done"
@@ -1555,3 +1702,39 @@ mata:
 
 
 end
+
+
+// -------------------------------------------------------------------------------------------------
+// has common factors
+// -------------------------------------------------------------------------------------------------
+
+capture program drop hascommonfactors
+program define hascommonfactors
+	syntax [varlist(ts)] [if] , tvar(varname) idvar(varname) localname(string)
+
+	foreach var in `varlist' {
+		tempvar check check2
+		by `tvar' (`idvar'), sort: gen `check' = `var'[_n]==`var'[_n-1] `if'
+		by `tvar' (`idvar'), sort: gen `check2' = `var'[1]
+		by `tvar' (`idvar'), sort: replace `check' = 1 if `var' == `check2'
+
+		sum `check', meanonly
+
+		if r(mean) == 1 {
+			local commfac "`commfac' `var'"
+		}
+		else {
+			local csa "`csa' `var'"
+		}
+		drop `check' `check2'
+	}
+
+	if "`commfac'" != "" {
+		c_local `localname' "`csa' , deter(`commfac') "
+	}
+	else {
+		c_local `localname' "`csa'"
+	}
+
+end
+

@@ -53,7 +53,7 @@ mata:
 	}
 end
 
-/// SSR instead of variance/covariance time (X'X)^(-1)
+/// variance/covariance time based on SSR, SSR * (X'X)^(-1)
 capture mata mata drop VarCov_SSR()
 mata:
 	function VarCov_SSR(real matrix Y, real matrix X, real matrix betaP)
@@ -62,6 +62,7 @@ mata:
 		tmp_xx = quadcross(X,X)
 		tmp_xx = m_xtdcce_inverter(tmp_xx)
 		cov = quadcross(e,e) * tmp_xx
+		///cov = quadcross(e,e)
 		return(cov)
 				
 	}
@@ -84,9 +85,12 @@ mata:
 		i = 1
 		while ( i <= N) {					
 			/// select data
-			indic = (idt[.,1] :== uniqueid[i])
-			tmp_x = select(X,indic)
-			tmp_e = select(e,indic)
+			///indic = (idt[.,1] :== uniqueid[i])
+			///tmp_x = select(X,indic)
+			///tmp_e = select(e,indic)
+			tmp_x = panelsubmatrix(X,i,idt)
+			tmp_e = panelsubmatrix(e,i,idt)
+
 			tmp_xe = tmp_e :* tmp_x
 			Ti = rows(tmp_x)	
 			

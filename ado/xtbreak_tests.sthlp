@@ -1,18 +1,18 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: v. 0.02 - 21. May 2021}
+{hi:help xtbreak test}{right: v. 0.03 - 12. August 2021}
 
 {hline}
 {title:Title}
 
-{p 4 4}{cmd:xtbreak} - estimating and testing for many known and unknown structural breaks in time series and panel data.{p_end}
+{p 4 4}{cmd:xtbreak test} - testing for many known and unknown structural breaks in time series and panel data.{p_end}
 
 {title:Syntax}
 
 {p 4}Testing for {bf:known} structural breaks:{p_end}
 
 {p 4 13}{cmd:xtbreak} test {depvar} [{indepvars}]  {ifin} {cmd:,}
-{cmdab:breakp:oints(}{help numlist}| {help datelist}{cmd: [,index])} 
+{cmdab:breakp:oints(}{help numlist}| {help datelist}{cmd: [,index|fmt(}{help format}{cmd:)])} 
 {cmd:{help xtbreak_tests##options1:options1}}
 {cmd:{help xtbreak_tests##options4:options4}}{p_end}
 
@@ -88,6 +88,7 @@ Fixed effects in panel data models cannot have a break.{p_end}
 {p 4 4}{cmd:xtbreak} will automatically determine whether a time series or panel dataset
 is used.{p_end}
 
+{marker h1k}
 {p 4}{ul:{bf:Testing a known break point}}{p_end}
 
 {p 4 4}Assume that the numbers of breaks and their occurrence is known.
@@ -139,6 +140,7 @@ Critical values can be found in Bai & Perron ({help xtbreak_tests##BP1998:1998},
 and are supplied by {cmd:xtbreak test}.
 {p_end}
 
+{marker h2}
 {p 4}{ul:No break against {it:s0<= s <=s1} breaks}
 
 {p 4 4}A test of the null hypothesis of no structural change against the alternative that 
@@ -163,7 +165,7 @@ For the weighted test the test supF(l,q) test statistics are weighted by critica
 Critical values can be found in Bai & Perron ({help xtbreak_tests##BP1998:1998}, {help xtbreak_tests##BP2003:2003}) 
 and are supplied by {cmd:xtbreak test}.{p_end}
 
-{p 4}{ul: {it:s} breaks against {it:s+1} breaks}{p_end}
+{marker h3}{p 4}{ul: {it:s} breaks against {it:s+1} breaks}{p_end}
 {p 4 4}A test of the null hypothesis that, {it:s} structural breaks have occurred, 
 against the alternative that {it:s + 1} breaks have occurred is:{p_end}
 
@@ -180,46 +182,16 @@ and are supplied by {cmd:xtbreak test}.{p_end}
 
 {marker options}{title:Options}
 
-{p 4 8 12}{cmdab:breakp:oints(}{help numlist}| {help datelist}{cmd: [,index])} specifies the known 
+{p 4 8 12}{cmdab:breakp:oints(}{help numlist}| {help datelist}{cmd: [,index|fmt(}{help format}{cmd:)]} specifies the known 
 breakpoints. 
 Kown breakpoints can be set by either the number of observation or by the value of the 
 time identifier.
 If a {help numlist} is used, option index is required. 
 For example {cmd:breakpoints(10,index)} specifies that the one break occurs at the 10th observation in time.
 {help datelist} takes a list of dates.
-For example {cmd:breakpoints(2010Q1)} specifies a break in Quarter 1 in 2010. 
-If a datelist is used, 
-the format set in {cmd:breakpoints()} and the time identifier needs to be the same.{p_end}
-
-{p 4 8 12}{cmd:breaks(}{it:#}{cmd:)} specifies the number of unknown breaks under the alternative. 
-For hypothesis 2, {cmd:breaks()} can take two values, 
-for example {cmd:breaks(4 6)} test for no breaks against 4-6 breaks.
-If only one value specified, then the lower limit is set to 1.{p_end}
-
-{p 4 8 12}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##DefUnknown}. 
-{cmd:h(1)} test for no breaks vs. {it:s} breaks, 
-{cmd:h(2)} for no break vs. {it:s0 <= s <= s1} breaks and
-{cmd:h(3)} for {it:s} vs. {it:s+1} breaks.{p_end}
-
-{p 4 8 12}{cmdab:breakc:onstant} break in constant. 
-Default is no breaks in deterministics.{p_end}
-
-{p 4 8 12}{cmdab:noconst:ant} suppresses constant.{p_end}
-
-{p 4 8 12}{cmdab:nofixed:effects} suppresses individual fixed effects (panel data only).{p_end}
-
-{p 4 8 12}{cmdab:nobreakvar:iables(}{it:varlist1}{cmd:)} defines variables with no structural break(s).
-{it:varlist1} can contain time series operators. {p_end}
-
-{p 4 8 12}{cmd:vce(type)} covariance matrix estimator, allowed: ssr, hac, hc, np and nw.
-For more see,{help xtbreak_tests##cov: covariance estimators}.{p_end} 
-
-{p 4 8 12}{cmdab:min:length(}{it:real}{cmd:)} minimal segment length in percent.
-The minimal segment length is the minimal time periods between two breaks. 
-The default is 15% (0.15).
-Critical values are available for %5, 10%, 15%, 20% and 25%.{p_end}
-
-{p 4 8 12}{cmd:error(}{it:real}{cmd:)} define error margin for partial break model.{p_end}
+For example {cmd:breakpoints(2010Q1) , format(tq)} specifies a break in Quarter 1 in 2010.
+The option {cmd:format()} specifies the format and is required if a datelist is used.
+The format set in {cmd:breakpoints()} and the time identifier needs to be the same.{p_end}
 
 {p 4 8 12}{cmd:wdmax} Use weighted test statistic instead of 
 unweighted for the double maximum test (hypothesis 2).{p_end}
@@ -227,39 +199,14 @@ unweighted for the double maximum test (hypothesis 2).{p_end}
 {p 4 8 12}{cmd:level(#)} set level for critical values for weighted double maximum test.
 If a value is chosen for which no critical values exits, {cmd:xtbreak test} will choose the closest level.{p_end}
 
-{p 4 8 12}{cmd:csa({varlist})} and {cmd:csanobreak({varlist})} specifies the variables with and without breaks which are added as cross-sectional averages. {cmd:xtbreak} calculates internally the cross-sectional averages.
-{p_end}
+{p 4 8 12}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##DefUnknown:xtbreak test - unknown break dates}.{break} 
+{cmd:h(1)} test for no breaks vs. {it:s} breaks, {break}
+{cmd:h(2)} for no break vs. {it:s0 <= s <= s1} breaks and {break}
+{cmd:h(3)} for {it:s} vs. {it:s+1} breaks.{p_end}
 
-{p 4 8 12}{cmd:update} Update {cmd:xtbreak} from Github. 
-This is essentially the following call:
-{stata `"net install xtbreak , from("https://janditzen.github.io/xtbreak/") force replace"'}
-{p_end}
+INCLUDE help xtbreak_options_detail
 
-{p 4 8 12}{cmd:version} Displays version.{p_end}
-
-{marker note_panel}{title:Note on panel data}
-
-{p 4 4}If a panel dataset is used, {cmd:xtbreak} differentiates between four models. 
-The first model is a fixed effects model. A break in the fixed effects is not possible.
-The second and third models arewith a pooled constant (pooled OLS) with and without a break.
-The last model is a model with neither fixed effects nor a pooled constant.{p_end}
-
-{p 4 4}The following table gives an overview:{p_end}
-
-{col 8}Model  {col 24}{c |} Equation  {col 79}{c |} {cmd:xtbreak} options
-{col 8}{hline 16}{c +}{hline 54}{c +}{hline 30}
-{col 8}Fixed Effects {col 24}{c |} y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)  {col 79}{c |}
-{col 8}Pooled OLS {col 24}{c |} y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it) {col 79}{c |} {cmd:nofixedeffects}
-{col 8}Pooled OLS {col 24}{c |} y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it) {col 79}{c |} {cmd:nofixedeffects breakconstant}
-{col 8}No FE or POLS {col 24}{c |} y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it) {col 79}{c |} {cmd:nofixedeffects noconstant}
-
-{p 4 4}where b0 is the pooled constant without break, a(i) the fixed effects, 
-b(1) a coefficient without break, s0(s) a pooled constant with break 
-and s1(s) a coefficient with break.{p_end}
-
-{p 4 4}In the estimation of the breakpoints, cross-sectional averages are not taken into account.{p_end}
-
-{marker cov}{title:Covariance Estimators}
+INCLUDE help xtbreak_PanelVarCov
 
 {marker saved_vales}{title:Saved Values}
 
@@ -383,33 +330,6 @@ hypothesis of no break.{p_end}
 
 {col 8}{stata xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)}
 
-{marker references}{title:References}
-
-{marker Andrews1993}{p 4}Andrews, D. W. K. (1993). 
-Tests for Parameter Instability and Structural Change With Unknown Change Point. 
-Econometrica, 61(4), 821–856.
-{browse "https://www.jstor.org/stable/2951764":link}.
-{p_end}
-
-{marker BP1998}{p 4}Bai, B. Y. J., & Perron, P. (1998). 
-Estimating and Testing Linear Models with Multiple Structural Changes. 
-Econometrica, 66(1), 47–78.
-{browse "http://www.columbia.edu/~jb3064/papers/1998_Estimating_and_testing_linear_models_with_multiple_structural_changes.pd":link}.
-{p_end}
-
-{marker BP2003}{p 4}Bai, J., & Perron, P. (2003). 
-Computation and analysis of multiple structural change models. 
-Journal of Applied Econometrics, 18(1), 1–22.
-{browse "https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659":link}.{p_end}
-
-{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021)
-Testing for Multiple Structural Breaks in Panel Data. 
-{browse "https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf":Slides 2020 Swiss Stata User Group Meeting}.
-{p_end}
-
-{marker KNW2021}{p 4}Karavias, Y, Narayan P. & Westerlund, J. (2021)
-Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. {p_end}
-
 INCLUDE help xtbreak_about
 
 {marker ChangLog}{title:Version History}
@@ -418,4 +338,4 @@ INCLUDE help xtbreak_about
 {p 4 8}- added maintenance options{p_end}
 
 {title:Also see}
-{p 4 4}See also: {help estat sbcusum}, {help estat sbknown}  {help estat sbsingle} {p_end} 
+{p 4 4}See also: {help xtbreak}, {help xtbreak_estimate:xtbreak estimate}, {help estat sbcusum}, {help estat sbknown}  {help estat sbsingle} {p_end} 

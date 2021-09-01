@@ -3,7 +3,10 @@ mata:
   function GetCritVal(real scalar eps1, real scalar signif, real scalar l, real scalar q, string scalar type)
   {
     /// critical values need to be divided by number of regressors with breaks for hypothesis 1 and 2. Not for hypothesis 3!
-    if (strlower(type) == "fll1") {
+   
+   /// restrict q and l to be max 10
+
+   if (strlower(type) == "fll1") {
       res = critval_fll1(eps1,signif,min((l,10)),min((q,10))) 
     }
     else if (strlower(type) == "supf") {
