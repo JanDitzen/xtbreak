@@ -39,12 +39,6 @@ program define xtbreak_tests, rclass
 			CSANObreak(string)					/// cross-sectional averages with no break
 		]
 
-
-
-		*noi disp ""
-		*noi disp in red "THIS IS AN ALPHA VERSION!" 
-		*noi disp in red "PLEASE CHECK FOR UPDATES PRIOR PUBLISHING ANY RESULTS OBTAINED WITH THIS VERSION!"
-		*noi disp ""
 		
 		************************************************
 		**** Checks

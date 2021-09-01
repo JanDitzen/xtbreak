@@ -31,12 +31,6 @@ program define xtbreak_estimate, eclass
 		*** mark sample
 		tempname touse
 		marksample touse
-
-
-		*noi disp ""
-		*noi disp in red "THIS IS AN ALPHA VERSION!" 
-		*noi disp in red "PLEASE CHECK FOR UPDATES PRIOR PUBLISHING ANY RESULTS OBTAINED WITH THIS VERSION!"
-		*noi disp ""
 		
 		************************************************
 		**** Checks
