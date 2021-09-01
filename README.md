@@ -5,6 +5,7 @@
 __Table of Contents__
 1. [Syntax](#1-syntax)
 2. [Description](#2-description)
+<<<<<<< Updated upstream
 	1. [Testing known breakpoints](#21-testing-known-breakpoints)
 	2. [Testing unknown breakpoints](#22-testing-unknown-breakpoints)
 3. [Options](#3-options)
@@ -14,6 +15,14 @@ __Table of Contents__
 7. [References](#7-references)
 8. [How to install](#8-how-to-install)
 9. [About](#9-authors)
+=======
+3. [Options](#3-options)
+4. [Examples](#4-examples)
+5. [References](#5-references)
+6. [How to install](#6-how-to-install)
+7. [Questions?](#7-questions?)
+8. [About](#8-authors)
+>>>>>>> Stashed changes
 
 # 1. Syntax
 
@@ -357,7 +366,7 @@ Test for 1 vs. 2 breaks:
 xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)
 ```
 
-# 7. References
+# 5. References
 
 Andrews, D. W. K. (1993).  Tests for Parameter Instability and Structural Change With Unknown Change Point.  Econometrica, 61(4), 821–856. [link](https://www.jstor.org/stable/2951764).
 
@@ -370,7 +379,7 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural
 
 Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19.
 
-# 8. How to install
+# 6. How to install
 
 The latest version of the ***xtbreak*** package can be obtained by typing in Stata:
 
@@ -378,7 +387,15 @@ The latest version of the ***xtbreak*** package can be obtained by typing in Sta
 net from https://janditzen.github.io/xtbreak/
 ``` 
 
+<<<<<<< Updated upstream
 # 9. Authors
+=======
+# 7. Questions?
+
+Questions? Feel free to write us an email, open an [issue](https://github.com/JanDitzen/xtbreak/issues) or [start a discussion](https://github.com/JanDitzen/xtbreak/discussions).
+
+# 8. Authors
+>>>>>>> Stashed changes
 
 #### Jan Ditzen (Free University of Bozen-Bolzano)
 
