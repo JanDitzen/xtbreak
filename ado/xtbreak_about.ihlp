@@ -20,7 +20,8 @@ Journal of Applied Econometrics, 18(1), 1–22.
 {marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021)
 Testing for Multiple Structural Breaks in Panel Data. Slides Stata User Group meetings:
 {browse "https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf":2020 Swiss},
-{browse "https://www.stata.com/meeting/germany21/slides/Germany21_Ditzen.pdf":2021 German}.
+{browse "https://www.stata.com/meeting/germany21/slides/Germany21_Ditzen.pdf":2021 German},
+{browse "https://www.stata.com/meeting/us21/slides/US21_Ditzen.pdf": 2021 US}.
 {p_end}
 
 {marker KNW2021}{p 4}Karavias, Y, Narayan P. & Westerlund, J. (2021)

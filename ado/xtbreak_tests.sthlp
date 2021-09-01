@@ -333,7 +333,7 @@ hypothesis of no break.{p_end}
 INCLUDE help xtbreak_about
 
 {marker ChangLog}{title:Version History}
-{p 4 8}This version: 0.02 - 21. May 2021{p_end}
+{p 4 8}This version: 0.03 - August 2021{p_end}
 {p 4 8}- added panel data support and support for CSA.{p_end}
 {p 4 8}- added maintenance options{p_end}
 
