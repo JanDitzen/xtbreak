@@ -800,7 +800,7 @@ mata:
 		q = cols(Z)
 		c1 = 1
 		cs = 1
-		if (wdmax == 1) c1 = GetCritVal(minlength,level,numbreaks[1],q,"WDmax")	
+		if (wdmax == 1) c1 = GetCritVal(minlength,level,numbreaks[1],q,"supf")	
 
 		s = numbreaks[1]
 		si = 1
@@ -808,7 +808,7 @@ mata:
 			GetBreakPoints(Y,X,Z,idt,csa,csaNB,s,errror,ConstantType,demean,partial,minlength,breakpointsi=.,finaldelta=.,finalbeta=.,minSSR=.)
 			res = Test_W_Tau(Y,Z,X,breakpointsi,idt,partial,csa,csaNB,N,T,varestimator,ConstantType,demean,EstCoeff=.,EstCov=.)
 			
-			if (wdmax == 1) cs = GetCritVal(minlength,level,s,q,"WDmax")
+			if (wdmax == 1) cs = GetCritVal(minlength,level,s,q,"supf")
 			
 			supW[si,1] = res[1,1] * c1 / cs
 			asarray(EstBreaki,si,breakpointsi)
