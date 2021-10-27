@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak estimate}{right: v. 0.03 - 12. August 2021}
+{hi:help xtbreak estimate}{right: v. 1.0 - 23. October 2021}
 
 {hline}
 {title:Title}
@@ -16,7 +16,7 @@
 {cmd:showindex}
 {cmd:{help xtbreak_estimate##options1:options1}}
 {cmd:{help xtbreak_estimate##options2:options2}}
-{cmd:{help xtbreak_estimate##options4:options4}}
+{cmd:{help xtbreak_estimate##options5:options5}}
 {p_end}
 
 INCLUDE help xtbreak_options
@@ -26,6 +26,7 @@ INCLUDE help xtbreak_options
 {p 4}{help xtbreak_estimate##description:Description}{p_end}
 {p 4}{help xtbreak_estimate##options:Options}{p_end}
 {p 4}{help xtbreak_estimate##note_panel:Notes on Panel Data}{p_end}
+{p 4}{help xtbreak##cov:Covariance Estimator}{p_end}
 {p 4}{help xtbreak_estimate##saved_vales:Saved Values}{p_end}
 {p 4}{help xtbreak_estimate##postest:Postestimation}{p_end}
 {p 4}{help xtbreak_estimate##examples:Examples}{p_end}
@@ -65,7 +66,7 @@ incorrect breakdates.
 To find the breakdates, {cmd:xtbreak estimate} uses the alogorthim (dynamic program) from {help xtbreak_estimate##BP2003:Bai and Perron (2003)}.
 All {it:necessary} SSRs are calculated and then the smalles one selected.{p_end}
 
-{p 4 4}{cmd:xtbreak estiamte}also construct confidence intervals around the
+{p 4 4}{cmd:xtbreak estiamte} also construct confidence intervals around the
 estimates for break dates.{p_end}
 
 {p 4 4}In case of variables without breaks, {cmd:xtbreak} will remove those before
@@ -73,9 +74,9 @@ calculating the SSRs.
 The procedure follows the {it:partial dynamic program} algorithm in {help xtbreak_estimate##BP2003:Bai and Perron (2003)}.{p_end}
 
 {p 4 4}
-In pure time series model breaks in the constant (or deterministics) are possible.
+In pure time series model breaks in only the constant (or deterministics) are possible.
 In this case {it:sigma0(s)} is a constant with a structural break. 
-Fixed effects in panel data models cannot have a break.{p_end}
+{p_end}
 
 {p 4 4}{cmd:xtbreak} will automatically determine whether a time series or panel dataset
 is used.{p_end}
@@ -95,7 +96,8 @@ INCLUDE help xtbreak_PanelVarCov
 
 {col 4} Matrices 
 {col 8}{cmd: e(breaks)}{col 27}Matrix with break dates. First row indicates the index (t=1,..,T), second the value of the time identifier (for example 2000, 2001, ...).
-{col 8}{cmd: e(CI)}{col 27}Confidence intervals with dimension {it:4 x number_breaks}.  The first two rows are the lower and upper 95% intervals using time indices, the second two rows are in the value of the time identifier.
+{col 8}{cmd: e(CI)}{col 27}Confidence intervals with dimension {it:4 x number_breaks}.  
+{col 27}The first two rows are the lower and upper 95% intervals using time indices, the second two rows are in the value of the time identifier.
 
 {col 4} Macros
 {col 8}{cmd: e(sample)}{col 27}sample
@@ -151,11 +153,6 @@ We load the data in as:{p_end}
 {col 8}{stata estat split inflation fedfunds}
 
 INCLUDE help xtbreak_about
-
-{marker ChangLog}{title:Version History}
-{p 4 8}This version: 0.03 - August 2021{p_end}
-{p 4 8}- added panel data support and support for CSA.{p_end}
-{p 4 8}- added maintenance options{p_end}
 
 {title:Also see}
 {p 4 4}See also: {help xtbreak}, {help xtbreak_test:xtbreak test}, {help estat sbcusum}, {help estat sbknown}  {help estat sbsingle} {p_end} 

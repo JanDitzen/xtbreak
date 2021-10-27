@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak test}{right: v. 0.03 - 12. August 2021}
+{hi:help xtbreak test}{right: v. 1.0 - 23. October 2021}
 
 {hline}
 {title:Title}
@@ -14,7 +14,7 @@
 {p 4 13}{cmd:xtbreak} test {depvar} [{indepvars}]  {ifin} {cmd:,}
 {cmdab:breakp:oints(}{help numlist}| {help datelist}{cmd: [,index|fmt(}{help format}{cmd:)])} 
 {cmd:{help xtbreak_tests##options1:options1}}
-{cmd:{help xtbreak_tests##options4:options4}}{p_end}
+{cmd:{help xtbreak_tests##options5:options5}}{p_end}
 
 {p 8}{cmdab:breakp:oints(}{it:numlist}{cmd:[,index])} specifies the time period of the known 
 structural break.{p_end}
@@ -28,6 +28,7 @@ structural break.{p_end}
 {cmd:{help xtbreak_tests##options2:options2}}
 {cmd:{help xtbreak_tests##options3:options3}}
 {cmd:{help xtbreak_tests##options4:options4}}
+{cmd:{help xtbreak_tests##options5:options5}}
 {p_end}
 
 {p 8}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
@@ -41,6 +42,7 @@ INCLUDE help xtbreak_options
 {p 4}{help xtbreak_tests##description:Description}{p_end}
 {p 4}{help xtbreak_tests##options:Options}{p_end}
 {p 4}{help xtbreak_tests##note_panel:Notes on Panel Data}{p_end}
+{p 4}{help xtbreak##cov:Covariance Estimator}{p_end}
 {p 4}{help xtbreak_tests##saved_vales:Saved Values}{p_end}
 {p 4}{help xtbreak_tests##examples:Examples}{p_end}
 {p 4}{help xtbreak_tests##references:References}{p_end}
@@ -80,10 +82,9 @@ and T1,...,Ts are the periods of the breakpoints.
 {p_end}
 
 {p 4 4}
-In pure time series model breaks in the constant (or deterministics) are possible.
+In pure time series model breaks in only the constant (or deterministics) are possible.
 In this case {it:sigma0(s)} is a constant with a structural break.
-{break}
-Fixed effects in panel data models cannot have a break.{p_end}
+{p_end}
 
 {p 4 4}{cmd:xtbreak} will automatically determine whether a time series or panel dataset
 is used.{p_end}
@@ -202,9 +203,13 @@ If a value is chosen for which no critical values exits, {cmd:xtbreak test} will
 {p 4 8 12}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##DefUnknown:xtbreak test - unknown break dates}.{break} 
 {cmd:h(1)} test for no breaks vs. {it:s} breaks, {break}
 {cmd:h(2)} for no break vs. {it:s0 <= s <= s1} breaks and {break}
-{cmd:h(3)} for {it:s} vs. {it:s+1} breaks.{p_end}
+{cmd:h(3)} for {it:s} vs. {it:s+1} breaks.
+Default is hypothesis 3.{p_end}
 
 INCLUDE help xtbreak_options_detail
+
+{p 4 8 12}{cmdab:seq:uential} sequential F-Test to determine number of breaks.  
+The number of breaks is varied from s = 0 to breaks()-1 or floor(1/trimming).{p_end}
 
 INCLUDE help xtbreak_PanelVarCov
 
@@ -298,7 +303,7 @@ To test if there are between 2 and 4 breaks under the alternative:{p_end}
 
 {p 4 4}To change the minimal segment length to 5%:{p_end}
 
-{col 8}{stata xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)}
+{col 8}{stata xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) trimming(0.05)}
 
 {p 4 4}{ul:Examples: Excess deaths in the UK due to COVID 19}
 
@@ -331,11 +336,6 @@ hypothesis of no break.{p_end}
 {col 8}{stata xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)}
 
 INCLUDE help xtbreak_about
-
-{marker ChangLog}{title:Version History}
-{p 4 8}This version: 0.03 - August 2021{p_end}
-{p 4 8}- added panel data support and support for CSA.{p_end}
-{p 4 8}- added maintenance options{p_end}
 
 {title:Also see}
 {p 4 4}See also: {help xtbreak}, {help xtbreak_estimate:xtbreak estimate}, {help estat sbcusum}, {help estat sbknown}  {help estat sbsingle} {p_end} 

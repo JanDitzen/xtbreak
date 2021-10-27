@@ -17,15 +17,27 @@ Computation and analysis of multiple structural change models.
 Journal of Applied Econometrics, 18(1), 1–22.
 {browse "https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659":link}.{p_end}
 
-{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021)
-Testing for Multiple Structural Breaks in Panel Data. Slides Stata User Group meetings:
+{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021) 
+Testing for Multiple Structural Breaks in Panel Data.
+Available upon request.{p_end}
+
+{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021) 
+Testing and Estimating Structural Breaks in
+Time Series and Panel Data in Stata.
+ Slides Stata User Group meetings:
 {browse "https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf":2020 Swiss},
 {browse "https://www.stata.com/meeting/germany21/slides/Germany21_Ditzen.pdf":2021 German},
 {browse "https://www.stata.com/meeting/us21/slides/US21_Ditzen.pdf": 2021 US}.
 {p_end}
 
 {marker KNW2021}{p 4}Karavias, Y, Narayan P. & Westerlund, J. (2021)
-Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. {p_end}
+Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. 
+Available upon request.{p_end}
+
+{marker Pesaran2006}{p 4}Pesaran, H. (2006)
+Estimation and inference in large heterogeneous panels with a multifactor error structure.
+Econometrica, 74(4), 967-1012.
+{browse "https://doi.org/10.1111/j.1468-0262.2006.00692.x":link}.{p_end}
 
 {marker about}{title:Authors}
 
@@ -42,9 +54,13 @@ Structural breaks in Interactive Effects Panels and the Stock Market Reaction to
 {p 4}Web: {browse "https://sites.google.com/site/perjoakimwesterlund/":https://sites.google.com/site/perjoakimwesterlund/}{p_end}
 
 {p 4 8}Please cite as follows:{break}
-Ditzen, J, Y. Karavias and J. Westerlund. 2021. xtbreak: Estimating and testing for structural breaks in Stata{p_end}
+Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in
+Time Series and Panel Data in Stata.{p_end}
 
 {title:How to install}
 
 {p 4 8}The latest versions can be obtained via {stata "net from https://github.com/JanDitzen/xtbreak"}.{p_end}
 
+{title:Notes}
+
+{p 4 8}{cmd:xtbreak} requires Stata version 15 or higher.{p_end}

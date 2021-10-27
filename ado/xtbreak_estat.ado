@@ -111,7 +111,7 @@ program define indicator
 end
 
 
-program define scatter
+program define scatter, rclass
 	syntax varlist( ts)
 	qui {
 		local rhs `varlist'
@@ -152,6 +152,8 @@ program define scatter
 			local legend `legend' label(`i' `start' - `ende')
 		}
 
-		twoway `scati' , legend(`legend') xtitle(`rhs')
+		twoway `scati' , legend(`legend') xtitle(`rhs') ytitle(`lhs') name(xtbreak_estat,replace)
+
+		return local NameGraph = "`xtbreak_estat'"
 	}
 end

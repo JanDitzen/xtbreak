@@ -1,9 +1,12 @@
-*! xtbreak version 0.02
+*! xtbreak version 1.0 - 23.10.2021
+
 capture program drop xtbreak
 
 program define xtbreak, rclass
 	syntax [anything] [if], [* version update] 
-	
+		
+		version 15
+
 		if "`update'" != "" {
 			qui xtbreak, version
 			local v_installed "`r(version)'"	
@@ -35,21 +38,33 @@ program define xtbreak, rclass
 		}
 
 		if "`version'" != "" {
-			local version 0.02
-			noi disp "This is version 0.02 - 14.05.2021"
-			xtbreak_tests , version
+			local version 1.0
+			noi disp "This is version 1.0 - 23. October 2021"
 			return local version "`version'"
 			exit
 		}
 
-		noi disp ""
-		noi disp in red "THIS IS AN ALPHA VERSION!" 
-		noi disp in red "PLEASE CHECK FOR UPDATES PRIOR PUBLISHING ANY RESULTS OBTAINED WITH THIS VERSION!"
-		noi disp ""
+		*** check that mata library is installed
+		qui mata mata mlib index
+		tempname mataversion
+		cap mata st_numscalar("`mataversion'",xtbreak_m_version())
+		if _rc != 0 {
+			noi disp "mata library for xtbreak not found."
+			exit
+ 		}
+ 		else {
+			if `mataversion' < 1 {
+				noi disp "mata library outdated. Pleae update xtbreak:"
+				noi disp as smcl "{stata:xtbreak, update}"
+				exit
+			}
+		}
+
+		*** now start main program
 
 		tokenize `anything' 
 		
-		if "`1'" == "test" {
+		if "`1'" == "test" { 
 			macro shift
 			xtbreak_tests `*' `if' , `options'
 			return add
@@ -58,6 +73,48 @@ program define xtbreak, rclass
 			macro shift
 			xtbreak_estimate `*' `if', `options'
 			return add
+		}
+		else {
+			timer on 1
+			local 0 `*' , `options'
+			syntax anything [if] , [Breaks(string) BREAKPoints(string)] * 
+
+			if  "`breakpoints'" != "" {
+				noi disp as smcl "Option breakpoints() requires xtbreak test. Please run:"
+				noi disp as smcl "{stata xtbreak test `anything' `if', breakpoints(`breakpoints') `options'}"
+				exit
+			}
+			if "`breaks'" != "" {
+				noi disp as smcl "Option breaks() requires xtbreak test or xtbreak estimate. Please run:"
+				noi disp as smcl "{stata xtbreak test `anything' `if', breaks(`breaks') `options'}"
+				noi disp as smcl "or"
+				noi disp as smcl "{stata xtbreak estimate `anything' `if', breaks(`breaks') `options'}"
+				exit
+			}
+
+			xtbreak_tests `anything' `if' ,`options' donotdisptrim
+
+			tempname estBreak
+
+			if `c(level)' == 99 { 
+				local estBreak == r(Nbreaks)[1,1]
+			}
+			else if `c(level)' == 90 {
+				local estBreak == r(Nbreaks)[1,3]
+			}
+			else {
+				local estBreak = r(Nbreaks)[1,2]
+			}
+			return add
+
+			if `estBreak' == . {
+				noi disp ""
+				noi disp in smcl as error "No breaks found, cannot estimate breakpoints."
+				exit
+			}
+
+			xtbreak_estimate `anything' `if', `options' breaks(`estBreak')
+			timer off 1
 		}
 	
 end

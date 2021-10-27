@@ -22,8 +22,8 @@ __Table of Contents__
 #### Testing for known structural breaks:
 
 ```
-xtbreak test depvar [indepvars] [if] [in] , 
-        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options4
+xtbreak test depvar [indepvars] [if] , 
+        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options5
 ```
 
 ***breakpoints()*** specifies the time period of the known structural break.
@@ -31,8 +31,8 @@ xtbreak test depvar [indepvars] [if] [in] ,
 #### Testing for unknown structural breaks:
 
 ```
-xtbreak test depvar [indepvars] [if] [in] , 
-        hypothesis(1|2|3) breaks(#) options1 options2 options3 options4
+xtbreak test depvar [indepvars] [if] , 
+        hypothesis(1|2|3) breaks(#) options1 options2 options3 options4 options5
 ```
 
 ***hypothesis(1\2\3)*** specifies which hypothesis to test, see hypothesises. ***breaks(#)*** sets the number of breaks.
@@ -44,16 +44,13 @@ options1 | Description
 **breakconstant** | break in constant
 **noconstant** | suppresses constant
 **nobreakvariables(varlist1)** | variables with no structural break(s)
-**trend** | add trend to model (under construction!)
-**breaktrend** | add trend with breaks to model (under construction!)
-**vce(type)** | covariance matrix estimator, allowed: ssr, hac, np and nw
+**vce(type)** | covariance matrix estimator, allowed: ssr, hac, hc and np
 
 #### Options for unknown breakdates
 
 options2 | Description
 --- | ---
-**minlength(real)** | minimal segment length
-**error(real)** | error margin for partial break model
+**trimming(real)** | minimal segment length
 
 #### Options for testing with unknown breakdates and hypothesis(2)
 
@@ -62,22 +59,23 @@ options3 | Description
 **wdmax** | Use weighted test statistic instead of unweighted
 **level(#)** | set level for critical values
 
-#### Options for panel data
+#### Options for testing with unknown breakdates and hypothesis(3)
 
 options4 | Description
 --- | ---
-***nofixedeffects*** | suppresses fixed effects (only for panel data sets)
-***csa(options5)*** | Variables with breaks used to calculate cross-sectional averages
-***csanobreak(options5)*** | Variables without breaks used to calculate cross-sectional averages
+**sequential** | Sequential F-Test to obtain number of breaks
 
-#### Options for cross-section averages 
+#### Options for panel data
 
 options5 | Description
 --- | ---
-**deterministic(varlist4)** | Treat variables in varlist4 as determinsitic cross-section averages
-**deterministic** | Treat all variables defined in varlist2/3 as deterministic
-**excludecsa** | **Excludes cross-section averages from being partialled out in the dynamic program.
-
+***nofixedeffects*** | suppresses fixed effects (only for panel data sets)
+***breakfixedeffects*** | break in fixed effects
+***csd*** |  adds cross-section averages of variables with and without breaks.
+***csa(varlist)*** | Variables with breaks used to calculate cross-sectional averages
+***csanobreak(varlist)*** | Variables without breaks used to calculate cross-sectional averages
+***kfactors(varlist)*** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
+***nbkfactors(varlist)*** | same as above but without breaks.
 
 # 2. Description
 ***xtbreak test*** implements multiple tests for structural breaks in time series and panel data models. The number and period of occurence of structral
@@ -182,20 +180,25 @@ The *F(s+1\s)* test is integrated in ***xtbreak test*** with the options ***brea
 
 Option | Description
  --- | --- 
-***breakpoints(numlist\datelist [,index\fmt(format)])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example ``breakpoints(2010Q1) , format(tq)`` specifies a break in Quarter 1 in 2010.  The option ***format()*** specifies the format and is required if a datelist is used.  The format set in **breakpoints()** and the time identifier needs to be the same.
+***breakpoints(numlist\datelist [,index\fmt(format)])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example ``breakpoints(2010Q1) , fmt(tq)`` specifies a break in Quarter 1 in 2010.  The option ***fmt()*** specifies the format and is required if a datelist is used.  The format set in **breakpoints()** and the time identifier needs to be the same.
 ***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
-***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks.
+***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks. Hypothesis 3 is the default.
+***sequential*** | sequential F-Test to determin number of breaks.  The number of breaks is varied from s = 0 to breaks()-1 or floor(1/min_length).
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** | suppresses constant.
 ***nofixedeffects*** | suppresses individual fixed effects (panel data only).
+***breakfixedeffects*** | break in fixed effects.
 ***nobreakvariables(varlist1)*** | defines variables with no structural break(s).  *varlist1* can contain time series operators.
-***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc, np and nw.  For more see, covariance estimators.
-***minlength(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
+***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc and np.
+***trimming(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
 ***error(real)*** | define error margin for partial break model.
 ***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheis 2).
-***level(#)*** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exits, ***xtbreak test*** will choose the closest level.
-***csa(varlist [, deterministic[varlist] excludecsa])*** | specify the variables with and without breaks which are added as cross-sectional averages. ***xtbreak*** calculates internally the       cross-sectional average. ``deterministic[varlist]`` can be used if the variables in varlist are already cross-section averages and thus deterministic. ``excludecsa`` excludes the partialling out of cross-section averages in the dynamic program.
+***level(#)*** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exists, ***xtbreak test*** will choose the closest level.
+***csd*** |  adds cross-section averages of variables with and without breaks.
+***csa(varlist)*** | specify the variables with and without breaks which are added as cross-sectional averages. ***xtbreak*** calculates internally the       cross-sectional average.
 ***csanobreak()*** | same as ***csa()*** but for variables without a break.
+***kfactors(varlist)*** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
+***nbkfactors(varlist)*** | same as above but without breaks.  
 
 # 4. Note on panel data
 
@@ -205,7 +208,8 @@ The following table gives an overview:
 
 Model | Equation  (xtbreak options)
  --- | --- 
-Fixed Effects   | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)   
+Fixed Effects (nobreak)  | y(i,t) =  a(i) + b1 x(i,t) +s1(s) z(i,t,s) + e(it) 
+Fixed Effects(break) |  y(i,t) =  a(i,s) + b1 x(i,t) +s1(s) z(i,t,s) + e(it)    (```breakfixedeffects```)    
 Pooled OLS (nobreak)     | y(i,t) =  b0 + b1 x(i,t) +s1(s) z(i,t,s) + e(it)     (```nofixedeffects```)
 Pooled OLS (break)     | y(i,t) =  b1 x(i,t) +s0(s) + s1(s) z(i,t,s) + e(it)  (```nofixedeffects breakconstant```)
 No FE or POLS   | y(i,t) =  b1 x(i,t) + s1(s) z(i,t,s) + e(it)         (```nofixedeffects noconstant```)
@@ -322,7 +326,7 @@ xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2)
 To change the minimal segment length to 5%:
 
 ```
-xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) minlength(0.05)
+xtbreak test ogap inflation fedfunds, hypothesis(3) breaks(2) trimming(0.05)
 ```
 
 ## 6.2 Examples: Excess deaths in the UK due to COVID 19
@@ -374,9 +378,11 @@ Bai, B. Y. J., & Perron, P. (1998).  Estimating and Testing Linear Models with M
 
 Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural change models.  Journal of Applied Econometrics, 18(1), 1–22. [link](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659).
 
-Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural Breaks in Panel Data. 
+Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural Breaks in Panel Data. Available upon request. 
 
-Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19.
+Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. Available upon request.
+
+Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. Available upon request.
 
 ## Slides
 1. [Slides 2020 Swiss Stata User Group Meeting](https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf)
@@ -391,6 +397,8 @@ The latest version of the ***xtbreak*** package can be obtained by typing in Sta
 ```
 net from https://janditzen.github.io/xtbreak/
 ``` 
+
+``xtbreak`` requires Stata 15 or newer.
 
 # 9. Authors
 
@@ -413,5 +421,5 @@ Email: joakim.westerlund@nek.lu.se
 Web: https://sites.google.com/site/perjoakimwesterlund/
 
 ## Please cite as follows:
-Ditzen, J, Y. Karavias and J. Westerlund. 2021. xtbreak: Estimating and testing for structural breaks in Stata
+Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata.
 
