@@ -79,12 +79,12 @@ INCLUDE help xtbreak_options
 {marker description}{title:Description}
 {p 4 4}
 {cmd:xtbreak test} implements multiple tests for structural breaks in time series and panel data models.
-The number and period of occurence of structral breaks can be known and unknown.
+The number and period of occurrence of structural breaks can be known and unknown.
 In the case of a known breakpoint {cmd:xtbreak test} can test if the break occurs at a specific point in time.
 For unknown breaks, {cmd:xtbreak test} implements three different hypothesises. 
-The first is no break against the alterantive of {it:s} breaks,
+The first is no break against the alternative of {it:s} breaks,
 the second hypothesis is no breaks against a lower and upper limit of breaks. 
-The last hypothesis tests the null of {it:s} breaks against the alterantive of
+The last hypothesis tests the null of {it:s} breaks against the alternative of
 one more break ({it:s+1}). 
 For a further explanation see {help xtbreak_tests:xtbreak test}.{p_end}
 
@@ -93,8 +93,8 @@ For a further explanation see {help xtbreak_tests:xtbreak test}.{p_end}
 The underlying idea is that if the model with the true breakdates given a number of breaks
 has a smaller sum of squared residuals (SSR) than a model with 
 incorrect breakdates. 
-To find the breakdates, {cmd:xtbreak estimate} uses the alogorthim (dynamic program) from {help xtbreak_estimate##BP2003:Bai and Perron (2003)}.
-All {it:necessary} SSRs are calculated and then the smalles one selected.
+To find the breakdates, {cmd:xtbreak estimate} uses the algorithm (dynamic program) from {help xtbreak_estimate##BP2003:Bai and Perron (2003)}.
+All {it:necessary} SSRs are calculated and then the smallest one selected.
 For a further explanation see {help xtbreak_estimate:xtbreak estimate}.{p_end}
 
 {p 4 4}{cmd:xtbreak} implements the tests for and estimation of structural breaks discussed in 
@@ -159,10 +159,10 @@ between COVID infections in the US and deaths from the virus in 2020 and 2021.
 Weekly data is available on {browse "https://github.com/JanDitzen/xtbreak/tree/main/data":GitHub}.
 The variable {it:deaths} are deaths from COVID and the variable {it:cases} contains
 the number of new covid cases. 
-The idea is that initally more people died from COVID because it was a new virus. 
+The idea is that initially more people died from COVID because it was a new virus. 
 Then medical treatment advanced and vaccines became more available which should
 decrease deaths.
-On the other hand COVID cases have likely been underreported during the first wave.
+On the other hand COVID cases have likely been under-reported during the first wave.
 We assume that there is a lag between the a positive test and death of one week. 
 The data is from the {browse "https://data.cdc.gov/Case-Surveillance/United-States-COVID-19-Cases-and-Deaths-by-State-o/9mfq-cb36":CDC}.{p_end}
 

@@ -67,9 +67,9 @@ y(i,t) = sigma0(s) + sigma1(s) z(i,t) + beta0(1,i) + beta1 x(i,t) + e(it) for t 
 ```
 where *s* is the number of the segment/breaks, *z(i,t)* is a *NT1xq* matrix containing the variables whose relationship with y breaks.  A break in the constant is possible.  *x(i,t)* is a *NTxp* matrix with variables without a break.  *sigma0(s)*, *sigma1(s)* are the coefficients with structural breaks and T1,...,Ts are the periods of the breakpoints.
 
-xtbreak estimate estimates the break points, that is, it estimates T1, T2, ..., Ts.  It implements the methods for detection ofstructural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2021).  The underlying idea is that if the model with the true breakdates given a number of breaks has a smaller sum of squared residuals (SSR) than a model with incorrect breakdates.  To find the breakdates, xtbreak estimate uses the alogorthim (dynamic program) from Bai and Perron (2003).  All necessary SSRs are calculated and then the smalles one selected.
+xtbreak estimate estimates the break points, that is, it estimates T1, T2, ..., Ts.  It implements the methods for detection of structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2021).  The underlying idea is that if the model with the true breakdates given a number of breaks has a smaller sum of squared residuals (SSR) than a model with incorrect breakdates.  To find the breakdates, xtbreak estimate uses the alogorthim (dynamic program) from Bai and Perron (2003).  All necessary SSRs are calculated and then the smallest one selected.
 
-xtbreak estiamte also construct confidence intervals around the estimates for break dates.
+xtbreak estimate also construct confidence intervals around the estimates for break dates.
 
 In case of variables without breaks, xtbreak will remove those before calculating the SSRs.  The procedure follows the partial dynamic program algorithm in Bai and Perron (2003).
 
@@ -83,7 +83,7 @@ xtbreak will automatically determine whether a time series or panel dataset is u
 
 Option | Description
  --- | --- 
-***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
+***breaks(#)*** |  specifies the number of unknown breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specified, then the lower limit is set to 1.
 ***showindex*** | show confidence intervals as index.
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** | suppresses constant.

@@ -5,7 +5,7 @@ capture program drop xtbreak
 program define xtbreak, rclass
 	syntax [anything] [if], [* version update] 
 		
-		version 15
+		version 15.1
 
 		if "`update'" != "" {
 			qui xtbreak, version

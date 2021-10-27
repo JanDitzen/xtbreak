@@ -4,7 +4,7 @@
 
 For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and for **xtbreak estimate** see [xtbreak estimate](docs/xtbreak_estimate.md).
 
-Please cite as `Ditzen, J, Y. Karavias and J. Westerlund. 2021. xtbreak: Estimating and testing for structural breaks in Stata`
+Please cite as `Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata`
 
 __Table of Contents__
 1. [Syntax](#1-syntax)

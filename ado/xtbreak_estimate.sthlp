@@ -56,17 +56,17 @@ and T1,...,Ts are the periods of the breakpoints.
 
 {p 4 4}{cmd:xtbreak estimate} estimates the break points, that is, it estimates 
 T1, T2, ..., Ts.
-It implements the methods for detection ofstructural breaks discussed in 
+It implements the methods for detection of structural breaks discussed in 
 Bai & Perron ({help xtbreak_estimate##BP1998:1998}, {help xtbreak_estimate##BP2003:2003}),
 Karavias, Narayan, Westerlund ({help xtbreak_estimate##KNW2021:2021})
 and Ditzen, Karavias, Westerlund ({help xtbreak_estimate##DKW2021:2021}). 
 The underlying idea is that if the model with the true breakdates given a number of breaks
 has a smaller sum of squared residuals (SSR) than a model with 
 incorrect breakdates. 
-To find the breakdates, {cmd:xtbreak estimate} uses the alogorthim (dynamic program) from {help xtbreak_estimate##BP2003:Bai and Perron (2003)}.
-All {it:necessary} SSRs are calculated and then the smalles one selected.{p_end}
+To find the breakdates, {cmd:xtbreak estimate} uses the algorithm (dynamic program) from {help xtbreak_estimate##BP2003:Bai and Perron (2003)}.
+All {it:necessary} SSRs are calculated and then the smallest one selected.{p_end}
 
-{p 4 4}{cmd:xtbreak estiamte} also construct confidence intervals around the
+{p 4 4}{cmd:xtbreak estimate} also construct confidence intervals around the
 estimates for break dates.{p_end}
 
 {p 4 4}In case of variables without breaks, {cmd:xtbreak} will remove those before

@@ -78,10 +78,10 @@ options5 | Description
 ***nbkfactors(varlist)*** | same as above but without breaks.
 
 # 2. Description
-***xtbreak test*** implements multiple tests for structural breaks in time series and panel data models. The number and period of occurence of structral
+***xtbreak test*** implements multiple tests for structural breaks in time series and panel data models. The number and period of occurrence of structural
 breaks can be known and unknown.  In the case of a known breakpoint ***xtbreak test*** can test if the break occurs at a specific point in time.  For
-unknown breaks, ***xtbreak test*** implements three different hypothesises.  The first is no break against the alterantive of *s* breaks, the second
-hypothesis is no breaks against a lower and upper limit of breaks.  The last hypothesis tests the null of *s* breaks against the alterantive of one
+unknown breaks, ***xtbreak test*** implements three different hypothesises.  The first is no break against the alternative of *s* breaks, the second
+hypothesis is no breaks against a lower and upper limit of breaks.  The last hypothesis tests the null of *s* breaks against the alternative of one
 more break (*s+1*).
 
 ***xtbreak test*** implements the tests for structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2021).
@@ -112,7 +112,7 @@ at known dates is:
 F(s,q) = dof_adj sigma' R' (R V R')^(-1) R sigma
 ```
 
-*dof_adj* is a degree of freedom adjustment, *sigma* a matrix containing the coefficient estimates of *sigma*, *R* is the convential matrix of a Wald test
+*dof_adj* is a degree of freedom adjustment, *sigma* a matrix containing the coefficient estimates of *sigma*, *R* is the conventional matrix of a Wald test
 and *V* is a variance-covariance matrix. Under the null *F(s,q)* is F distributed.
 
 A known break date can be tested with ***xtbreak test*** using the option ***breakpoints(numlist|datelist,[index|fmt()])***.  ***numlist|datelist*** defines the periods of
@@ -181,9 +181,9 @@ The *F(s+1\s)* test is integrated in ***xtbreak test*** with the options ***brea
 Option | Description
  --- | --- 
 ***breakpoints(numlist\datelist [,index\fmt(format)])*** |  specifies the known breakpoints.  Known breakpoints can be set by either the number of observation or by the value of the time identifier.  If a numlist is used, option index is required.  For example ***breakpoints(10,index)*** specifies that the one break occurs at the 10th observation in time.  datelist takes a list of dates.  For example ``breakpoints(2010Q1) , fmt(tq)`` specifies a break in Quarter 1 in 2010.  The option ***fmt()*** specifies the format and is required if a datelist is used.  The format set in **breakpoints()** and the time identifier needs to be the same.
-***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1.
+***breaks(#)*** |  specifies the number of unknown breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specified, then the lower limit is set to 1.
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks. Hypothesis 3 is the default.
-***sequential*** | sequential F-Test to determin number of breaks.  The number of breaks is varied from s = 0 to breaks()-1 or floor(1/min_length).
+***sequential*** | sequential F-Test to determine number of breaks.  The number of breaks is varied from s = 0 to breaks()-1 or floor(1/min_length).
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** | suppresses constant.
 ***nofixedeffects*** | suppresses individual fixed effects (panel data only).
@@ -202,7 +202,7 @@ Option | Description
 
 # 4. Note on panel data
 
-If a panel dataset is used, xtbreak differentiates between four models.  The first model is a fixed effects model. A break in the fixed effects is not possible. The second and third models arewith a pooled constant (pooled OLS) with and without a break. The last model is a model with neither fixed effects nor a pooled constant.
+If a panel dataset is used, xtbreak differentiates between four models.  The first model is a fixed effects model. A break in the fixed effects is not possible. The second and third models are with a pooled constant (pooled OLS) with and without a break. The last model is a model with neither fixed effects nor a pooled constant.
 
 The following table gives an overview:
 
@@ -252,7 +252,7 @@ For example we want to find breaks in the US macro dataset supplied in Stata 16.
 use http://www.stata-press.com/data/r16/usmacro.dta, clear
 ```
 
-A simple model to estimate the GDP gap using the federal funds rate and inflation woudl be:
+A simple model to estimate the GDP gap using the federal funds rate and inflation would be:
 
 ```
 regress ogap inflation fedfunds
@@ -302,7 +302,7 @@ Hypothesis 2 can be tested with:
 xtbreak test ogap inflation fedfunds, hypothesis(2) breaks(3)
 ```
 
-The test assumes that under the alternative, there are between 1 and 3 breaks.  To test if there are between 2 and 4 breaks under the alterantive:
+The test assumes that under the alternative, there are between 1 and 3 breaks.  To test if there are between 2 and 4 breaks under the alternative:
 
 ```
 xtbreak test ogap inflation fedfunds, hypothesis(2) breaks(2 4)
