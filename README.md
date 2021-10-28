@@ -4,7 +4,7 @@
 
 For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and for **xtbreak estimate** see [xtbreak estimate](docs/xtbreak_estimate.md).
 
-Please cite as `Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata`
+Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
 
 __Table of Contents__
 1. [Syntax](#1-syntax)
@@ -181,7 +181,7 @@ We start with no prior knowledge of i) the number of breaks and ii) the exact da
 Therefore before estimating the breakpoints we use the sequential F-Test based on hypothesis 2:
 
 ```
-xtbreak test deaths L1.cases
+xtbreak deaths L1.cases
 
 Sequential test for multiple breaks at unknown breakpoints
 (Ditzen, Karavias & Westerlund. 2021)
@@ -600,7 +600,7 @@ Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural c
 
 Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural Breaks in Panel Data. Available upon request. 
 
-Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. Available upon request.
+Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM]. [link](https://arxiv.org/abs/2110.14550).
 
 Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. Available upon request.
 
@@ -654,7 +654,7 @@ Email: joakim.westerlund@nek.lu.se
 Web: https://sites.google.com/site/perjoakimwesterlund/
 
 ## Please cite as follows:
-Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata
+Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].
 
 # 11. Changes
 

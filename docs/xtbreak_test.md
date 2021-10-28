@@ -380,7 +380,7 @@ Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural c
 
 Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural Breaks in Panel Data. Available upon request. 
 
-Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. Available upon request.
+Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM]. [link](https://arxiv.org/abs/2110.14550).
 
 Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. Available upon request.
 
@@ -421,5 +421,5 @@ Email: joakim.westerlund@nek.lu.se
 Web: https://sites.google.com/site/perjoakimwesterlund/
 
 ## Please cite as follows:
-Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata.
+Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].
 

@@ -21,9 +21,11 @@ Journal of Applied Econometrics, 18(1), 1–22.
 Testing for Multiple Structural Breaks in Panel Data.
 Available upon request.{p_end}
 
-{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021) 
+{p 4 8}Ditzen, J., Karavias, Y. & Westerlund, J. (2021) 
 Testing and Estimating Structural Breaks in
 Time Series and Panel Data in Stata.
+arXiv:2110.14550 [econ.EM].{break} 
+{browse "https://arxiv.org/abs/2110.14550":Working paper},
  Slides Stata User Group meetings:
 {browse "https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf":2020 Swiss},
 {browse "https://www.stata.com/meeting/germany21/slides/Germany21_Ditzen.pdf":2021 German},
@@ -55,7 +57,7 @@ Econometrica, 74(4), 967-1012.
 
 {p 4 8}Please cite as follows:{break}
 Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in
-Time Series and Panel Data in Stata.{p_end}
+Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":arXiv:2110.14550} [econ.EM].{p_end}
 
 {title:How to install}
 
