@@ -139,6 +139,13 @@ program define xtbreak_estimate, eclass
 			}			
 			issorted `idvars' `tvar_o'
 			
+			*** Additional check if panel model used and only breakconstant specified, assumption is no fixed effects
+			if "`breakconstant'" != "" & `IsPanel' == 1 & "`nofixedeffects'" == "" {
+				noi disp "Option {cmd:nofixedeffects} assumed."
+				local nofixedeffects "nofixedeffects"				
+			}
+
+
 			*** generate new tvar from 1...T
 			tempvar tvar
 			egen `tvar' = group(`tvar_o') if `touse'

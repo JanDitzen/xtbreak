@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: v. 1.0 - 23. October 2021}
+{hi:help xtbreak}{right: xtbreak v. 1.01 - 15. November 2021}
 
 {hline}
 {title:Title}
@@ -272,12 +272,4 @@ Next we are going to estimate the break points and run a fixed effects regressio
 
 INCLUDE help xtbreak_about
 
-{title:Changelog}
-{p 4 4}This version 1.0 - 23.10.2021{p_end}
-{p 4 4}Changes 0.02 to 1.0:{p_end}
-{p 6 6}- fixed error in wdmax test. Used wrong critical values.{p_end}
-{p 6 6}- added sequential F-Test and general xtbreak y x syntax.{p_end}
-{p 6 6}- bug fixes in var/cov estimators.{p_end}
 
-{title:Also see}
-{p 4 4}See also: {help xtbreak_estimate:xtbreak estimate}, {help xtbreak_test:xtbreak test}, {help estat sbcusum}, {help estat sbknown},  {help estat sbsingle} {p_end} 

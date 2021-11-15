@@ -153,6 +153,3 @@ We load the data in as:{p_end}
 {col 8}{stata estat split inflation fedfunds}
 
 INCLUDE help xtbreak_about
-
-{title:Also see}
-{p 4 4}See also: {help xtbreak}, {help xtbreak_test:xtbreak test}, {help estat sbcusum}, {help estat sbknown}  {help estat sbsingle} {p_end} 

@@ -1,4 +1,9 @@
-*! xtbreak version 1.0 - 23.10.2021
+*! xtbreak version 1.01 - 15.11.2021
+/*
+Changelog
+- 15.11.2021 - but when variable name contained "est". 
+
+*/
 
 capture program drop xtbreak
 
@@ -63,13 +68,13 @@ program define xtbreak, rclass
 		*** now start main program
 
 		tokenize `anything' 
-		
+				
 		if "`1'" == "test" { 
 			macro shift
 			xtbreak_tests `*' `if' , `options'
 			return add
 		}
-		else if regexm("`1'","est") {
+		else if regexm("`1'","^est") {
 			macro shift
 			xtbreak_estimate `*' `if', `options'
 			return add

@@ -336,6 +336,3 @@ hypothesis of no break.{p_end}
 {col 8}{stata xtbreak test ExcessDeaths , breakconstant breaks(1) hypothesis(3)}
 
 INCLUDE help xtbreak_about
-
-{title:Also see}
-{p 4 4}See also: {help xtbreak}, {help xtbreak_estimate:xtbreak estimate}, {help estat sbcusum}, {help estat sbknown}  {help estat sbsingle} {p_end} 

@@ -602,7 +602,7 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural
 
 Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM]. [link](https://arxiv.org/abs/2110.14550).
 
-Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. Available upon request.
+Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. arXiv:2111.03035 [econ.EM]. [link](https://arxiv.org/abs/2111.03035)
 
 ## Slides
 1. [Slides 2020 Swiss Stata User Group Meeting](https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf)
@@ -658,8 +658,9 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structur
 
 # 11. Changes
 
-This version 1.0 - 23.10.2021
-
+This version 1.01 - 15.11.2021
+Changes 1.0 to 1.01:
+- bug when variable name contained "est"{p_end}
 Changes 0.02 to 1.0:
 - fixed error in wdmax test. Used wrong critical values.
 - added sequential F-Test and general xtbreak y x syntax.
