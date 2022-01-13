@@ -675,6 +675,7 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structur
 # 11. Changes
 
 This version 1.1 - 10.01.2022
+
 Changes 1.0 to 1.01:
 - added min and max to sequential test
 - bug when variable name contained "est"
