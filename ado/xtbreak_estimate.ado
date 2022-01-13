@@ -425,7 +425,7 @@ program define xtbreak_estimate, eclass
 			}
 		}
 
-
+		return clear
 		ereturn clear
 
 		ereturn post , esample(`touse')
@@ -434,7 +434,7 @@ program define xtbreak_estimate, eclass
 		gettoken lhs rhs: vars
 		ereturn hidden local breakvars "`rhs'"
 		ereturn hidden local depvar "`lhs'"
-		ereturn hidden local cmd "estimate"
+		ereturn local cmd "`cmd'"
 		
 		ereturn matrix breaks = breaks
 		ereturn matrix CI = CI

@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak estimate}{right: v. 1.0 - 23. October 2021}
+{hi:help xtbreak estimate}{right: v. 1.1 - 10. January 2022}
 
 {hline}
 {title:Title}

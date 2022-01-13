@@ -1,17 +1,9 @@
 *! xbtreak test program
-*! v. 0.04 
+*! v. 1.1 
 capture program drop xtbreak_tests
 
 program define xtbreak_tests, rclass
-	if replay() {
-		syntax [, version *]
-		if "`version'" != "" {
-			noi disp "xtbreak test, v 0.04 - 11.10.2021"
-			exit
-		}
-	}
-	else {
-		syntax varlist(min=1 ts) [if] , [			///
+	syntax varlist(min=1 ts) [if] , [			///
 			Hypothesis(real 1)					/// which hypothesis to test
 			wdmax								/// if hypothesis 2, do weighted UDmax test instead of UDmax	
 			/// unknow breaks
@@ -477,10 +469,13 @@ issorted `idvars' `tvar_o'
 			local last_reject95 = .
 			local last_reject99 = .
 
+			tempname m_breaks 
+			mata `m_breaks' = J(`SeqN',3,.)
+ 
 			forvalues i = 1(1)`SeqN' {
 				tempname testhi
 				mata `testhi' = `testh'[`i',.]
-
+				
 
 				tempname stat c90 c95 c99 s 
 				mata st_numscalar("`stat'",`testhi'[1,1])
@@ -490,11 +485,9 @@ issorted `idvars' `tvar_o'
 
 				mata st_numscalar("`c95'", xtbreak_GetCritVal(`trimming',0.95,`testhi'[1,2],`testhi'[1,3],"`typename'"))
 
-				mata st_numscalar("`c99'", xtbreak_GetCritVal(`trimming',0.99,`testhi'[1,2],`testhi'[1,3],"`typename'"))
+				mata st_numscalar("`c99'", xtbreak_GetCritVal(`trimming',0.99,`testhi'[1,2],`testhi'[1,3],"`typename'"))				
 				
-				if `c90' < `stat' local last_reject90 = `s'
-				if `c95' < `stat' local last_reject95 = `s'
-				if `c99' < `stat' local last_reject99 = `s'
+				mata `m_breaks'[`i',.] = (`=`c99' < `stat'',`=`c95' < `stat'',`=`c90' < `stat'')
 
 				if `SeqN' > 1 {
 					local statname "F(`i'|`=`i'-1')"
@@ -550,31 +543,94 @@ issorted `idvars' `tvar_o'
 				else {
 
 					noi disp as text "{hline 80}" 
+					*** Get optimals
 					
-					if `auto' == 1 {
-						if `last_reject99' == `breaks' & `last_reject95' == `breaks' & `last_reject90'  == `breaks' {
-							local  GotMax = 1
+					mata `m_breaks' =  ((`m_breaks'[2..rows(`m_breaks'),.]:== 0) :* (`m_breaks'[1..rows(`m_breaks')-1,.]:==1 )) \  `m_breaks'[rows(`m_breaks'),.]
+
+					local c_Vals 99 95 90
+
+					forvalues i = 1(1)3 {
+						local c_valsi = word("`c_Vals'",`i')
+						tempname zeros
+						mata `zeros' = mm_which(`m_breaks'[.,`i']:==1)
+
+						mata st_local("all_1_`c_valsi'",strofreal(sum(`zeros':==1):==rows(`zeros')))
+						mata st_local("all_0_`c_valsi'",strofreal(rows(`zeros'):==0))
+						
+
+						if "`all_0_`c_valsi''" != "1" {
+							mata st_local("opt`c_valsi'_min",strofreal(`zeros'[1]))	
+							mata st_local("opt`c_valsi'_max",strofreal(`zeros'[rows(`zeros')]))	
 						}
-					}	
-					noi disp as text "Detected number of breaks: " _col(35) %9.0f  `last_reject99'  _col(51)  %9.0f  `last_reject95' _col(67) %9.0f  `last_reject90'
-				
+						else {
+							local opt`c_valsi'_min = .
+							local opt`c_valsi'_max = .
+						}
+						mata mata drop `zeros'
+					}
+
+					tempname Nbreaks
+					
+					
+
+					if `opt90_min' == `opt90_max' & `opt95_min' == `opt95_max' & `opt99_min' == `opt99_max' {
+						noi disp as text "Detected number of breaks: " _col(35) %9.0f  `opt99_min'  _col(51)  %9.0f  `opt95_min' _col(67) %9.0f  `opt90_min'
+						matrix `Nbreaks' = (`opt99_min', `opt95_min', `opt90_min')
+						matrix colnames `Nbreaks' = 99 95 90
+
+					}
+					else {
+						noi disp as text "Detected number of breaks: (min)" _col(35) %9.0f  `opt99_min'  _col(51)  %9.0f  `opt95_min' _col(67) %9.0f  `opt90_min'
+						noi disp as text _col(28) "(max)" _col(35) %9.0f  `opt99_max'  _col(51)  %9.0f  `opt95_max' _col(67) %9.0f  `opt90_max'
+
+						matrix `Nbreaks' = (`opt99_min', `opt95_min', `opt90_min' \ `opt99_max', `opt95_max', `opt90_max')
+						matrix colnames `Nbreaks' = 99 95 90
+						matrix rownames `Nbreaks' = min max
+
+					}
 					noi disp as text "{hline 80}" 
 
-					if `GotMax' == 0 {
+					*mata st_local("end_sum",strofreal(sum(`m_breaks'[rows(`m_breaks'),.])))
+
+					*if `auto' == 1 {
+					*	if `opt99' == `breaks' & `opt95' == `breaks' & `opt90'  == `breaks' & `end_sum' == 3 {
+					*		local  GotMax = 1
+					*	}
+					*}	
+					*noi disp as text "Detected number of breaks: " _col(35) %9.0f  `opt99'  _col(51)  %9.0f  `opt95' _col(67) %9.0f  `opt90'
+				
+					if `all_1_99' == 1 & `all_1_95' == 1 & `all_1_90' == 1 {
+						noi disp as text _col(3) "Maximum number of breaks reached with null always rejected. "
+					}
+					else if `all_0_99' == 1 & `all_0_95' == 1 & `all_0_90' == 1 {
+						noi disp as text _col(3) "No breaks detected. "
+					}
+					else if `opt90_min' == `opt90_max' & `opt95_min' == `opt95_max' & `opt99_min' == `opt99_max' {
 						noi disp as text "The detected number of breaks indicates the highest number of"
 						noi disp as text " breaks for which the null hypothesis is rejected."
 					}
 					else {
+						noi disp as text "Null hypothesis rejected more than once after non-rejection."
+						noi disp as text " The detected number of breaks indicates the minimum and maximum"
+						noi disp as text " number of breaks for which the null hypothesis is rejected."
+					}
+					/*
+					if `GotMax' == 0 {
+						if `end_sum' < 3 {
+							noi disp as text "The detected number of breaks indicates the highest number of"
+							noi disp as text " breaks for which the null hypothesis is rejected."
+						}
+						else {
+							noi disp as text "The detected number of breaks indicates the highest number of"
+							noi disp as text " breaks for which the null hypothesis is first rejected."							
+						}
+					}
+					else {
 						noi disp as text _col(3) "Maximum number of breaks reached with null always rejected. "
 					}
-
+					*/
 					mata st_matrix("f",`testh'[.,1])
 					return matrix f = f
-
-					tempname Nbreaks
-					matrix `Nbreaks' = (`last_reject99', `last_reject95', `last_reject90')
-					matrix colnames `Nbreaks' = 99 95 90
-
 					return matrix Nbreaks = `Nbreaks'
 
 				}
@@ -601,7 +657,6 @@ issorted `idvars' `tvar_o'
 			mata mata drop `testh' `testhi' `EstBreak'
 		}
 
-	}
 end
 
 ** auxiliary file with auxiliary programs

@@ -1,4 +1,6 @@
 *** Time Series Examples
+adopath + "C:\Users\jan\Dropbox (Personal)\DKW\Stata\ado\_archive\v1_1"
+
 use  https://github.com/JanDitzen/xtbreak/raw/main/data/US.dta
 
 xtbreak deaths L.cases
@@ -18,7 +20,7 @@ xtbreak estimate deaths L1.cases, breaks(2) showindex
 estat split
 reg deaths `r(varlist)'
 
-xtbreak estimate deaths L1.cases, breaks(2) showindex
+xtbreak estimate deaths L1.cases, breaks(3) showindex
 estat scatter L.cases
 
 *** Graph with CI

@@ -1,4 +1,4 @@
-*! xtbreak version 1.01 - 15.11.2021
+*! xtbreak version 1.1 - 10.01.2022
 /*
 Changelog
 - 15.11.2021 - but when variable name contained "est". 
@@ -8,9 +8,11 @@ Changelog
 capture program drop xtbreak
 
 program define xtbreak, rclass
-	syntax [anything] [if], [* version update] 
+	syntax [anything] [if], [* version update ] 
 		
 		version 15.1
+
+		local cmd "`*'"
 
 		if "`update'" != "" {
 			qui xtbreak, version
@@ -43,8 +45,8 @@ program define xtbreak, rclass
 		}
 
 		if "`version'" != "" {
-			local version 1.0
-			noi disp "This is version 1.0 - 23. October 2021"
+			local version 1.1
+			noi disp "This is version 1.1 - 07.01.2022"
 			return local version "`version'"
 			exit
 		}
@@ -58,7 +60,7 @@ program define xtbreak, rclass
 			exit
  		}
  		else {
-			if `mataversion' < 1 {
+			if `mataversion' < 1.01 {
 				noi disp "mata library outdated. Pleae update xtbreak:"
 				noi disp as smcl "{stata:xtbreak, update}"
 				exit
@@ -80,9 +82,10 @@ program define xtbreak, rclass
 			return add
 		}
 		else {
-			timer on 1
 			local 0 `*' , `options'
-			syntax anything [if] , [Breaks(string) BREAKPoints(string)] * 
+			syntax anything [if] , [Breaks(string) BREAKPoints(string) ] * 
+
+			
 
 			if  "`breakpoints'" != "" {
 				noi disp as smcl "Option breakpoints() requires xtbreak test. Please run:"
@@ -102,24 +105,35 @@ program define xtbreak, rclass
 			tempname estBreak
 
 			if `c(level)' == 99 { 
-				local estBreak == r(Nbreaks)[1,1]
+				local estBreak = r(Nbreaks)[1,1]
+				if `estBreak' == 0 {
+					local estBreak = r(Nbreaks)[2,1] 
+				}
 			}
 			else if `c(level)' == 90 {
-				local estBreak == r(Nbreaks)[1,3]
+				local estBreak = r(Nbreaks)[1,3]
+				if `estBreak' == 0 {
+					local estBreak = r(Nbreaks)[2,3] 
+				}
 			}
 			else {
 				local estBreak = r(Nbreaks)[1,2]
+				if `estBreak' == 0 {
+					local estBreak = r(Nbreaks)[2,2] 
+				}
 			}
 			return add
 
-			if `estBreak' == . {
+			if `estBreak' == . | `estBreak'== 0{
 				noi disp ""
 				noi disp in smcl as error "No breaks found, cannot estimate breakpoints."
 				exit
 			}
 
 			xtbreak_estimate `anything' `if', `options' breaks(`estBreak')
-			timer off 1
+
+			return local cmd "xtbreak `cmd'"
+			return hidden local seq "1"
 		}
 	
 end

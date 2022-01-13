@@ -69,9 +69,11 @@ Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":
 {p 4 8}{cmd:xtbreak} requires Stata version 15 or higher.{p_end}
 
 {title:Changelog}
-{p 4 4}This version 1.01 - 15.11.2021{p_end}
-{p 4 4}Changes 1.0 to 1.01:{p_end}
+{p 4 4}This version 1.1 - 10.01.2022{p_end}
+{p 4 4}Changes 1.0 to 1.1:{p_end}
+{p 4 4}- added min and max to sequential test{p_end}
 {p 4 4}- bug when variable name contained "est"{p_end}
+{p 4 4}- error in scaling critical values (ts + xt) and test statistic (ts + xt) when using hypothesis 3{p_end}
 {p 4 4}Changes 0.02 to 1.0:{p_end}
 {p 6 6}- fixed error in wdmax test. Used wrong critical values.{p_end}
 {p 6 6}- added sequential F-Test and general xtbreak y x syntax.{p_end}

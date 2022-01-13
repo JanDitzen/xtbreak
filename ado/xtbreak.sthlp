@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: xtbreak v. 1.01 - 15. November 2021}
+{hi:help xtbreak}{right: xtbreak v. 1.1 - 10. January 2022}
 
 {hline}
 {title:Title}
@@ -175,19 +175,29 @@ Therefore before estimating the breakpoints we use the sequential F-Test based o
 
 {col 8}{stata xtbreak deaths L1.cases}
 
-{p 4 4}We find two breaks, the first in week 20 in 2020 and the second in week 11 in 2021.{break}
+{p 4 4}We find three breaks, the first in week 20 in 2020, the second at the end of 2020 
+and the last in week 11 in 2021.
+However, we note that the second break has very wide confidence intervals.
+This can be caused by the break being very small.
+We thus proceed with only 2 breaks.{break}
+We estimate the model with just two breaks:{p_end}
+
+{col 8}{stata xtbreak estimate deaths L1.cases, breaks(2)}
+
+{p 4 4}We find the same breakpoints and the confidence intervals are small.{break}
 Next we test the hypothesis of no breaks against 2 breaks using hypothesis 1 
 (see {help xtbreak_test##DefUnknown:details}):{p_end}
 
 {col 8}{stata xtbreak test deaths L1.cases, hypothesis(1) breaks(2)}
 
-{p 4 4}The test statistic is the same, however the critical values are smaller placing a lower 
+{p 4 4}The test statistic is close to the one for the test of an additional break,
+ however the critical values are smaller placing a lower 
 bound on the rejection of the hypothesis.{p_end}
 
 {p 4 4}Since we have an estimate of the breakpoints, we can test the two breakpoints 
 as known breakpoints (see {help xtbreak_test##h1k:details}):{p_end}
 
-{col 8}{stata xtbreak test deaths L1.cases, breakpoints(2020w20 2021w8 , fmt(tw))}
+{col 8}{stata xtbreak test deaths L1.cases, breakpoints(2020w20 2021w11 , fmt(tw))}
 
 {p 4 4}Since we are using a {help datelist}, we need to specify the format of it.
 {help datelist} also has to be the same format as the time identifier.{p_end}
@@ -197,7 +207,11 @@ as known breakpoints (see {help xtbreak_test##h1k:details}):{p_end}
 
 {col 8}{stata xtbreak test deaths L1.cases, hypothesis(3) breaks(3)}
 
-{p 4 4}First, note that we have to define in {cmd:breaks()} the alternative, that is we use {cmd:breaks(3)}. Secondly we cannot reject the hypothesis of 2 breaks.{p_end}
+{p 4 4}First, note that we have to define in {cmd:breaks()} the alternative, that is we use {cmd:breaks(3)}. 
+Secondly we are able to reject the hypothesis of 2 breaks. 
+However as discussed before, the thrid break is estimated unprecisly. 
+Panel data can contribute additional information for a better estimate
+as discussed in the next section.{p_end}
 
 {p 4 4}So far we have assumed no break in the constant, only in the number of COVID cases. 
 We can test for only a break in the constant and keep the coefficient of the cases fixed. 

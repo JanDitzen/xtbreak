@@ -4,6 +4,8 @@
 
 For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and for **xtbreak estimate** see [xtbreak estimate](docs/xtbreak_estimate.md).
 
+Current Version: **1.1** (10.01.2022)
+
 Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
 
 __Table of Contents__
@@ -181,7 +183,7 @@ We start with no prior knowledge of i) the number of breaks and ii) the exact da
 Therefore before estimating the breakpoints we use the sequential F-Test based on hypothesis 2:
 
 ```
-xtbreak deaths L1.cases
+xtbreak deaths L.cases
 
 Sequential test for multiple breaks at unknown breakpoints
 (Ditzen, Karavias & Westerlund. 2021)
@@ -190,29 +192,50 @@ Sequential test for multiple breaks at unknown breakpoints
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- F(1|0)             107.50            12.29            8.58            7.04
- F(2|1)              31.25            13.89           10.13            8.51
- F(3|2)               6.96            14.80           11.14            9.41
- F(4|3)               1.18            15.28           11.83           10.04
- F(5|4)               4.95            15.76           12.25           10.58
+ F(1|0)             111.74            12.29            8.58            7.04
+ F(2|1)              65.88            13.89           10.13            8.51
+ F(3|2)              22.32            14.80           11.14            9.41
+ F(4|3)               5.11            15.28           11.83           10.04
+ F(5|4)              27.28            15.76           12.25           10.58
 --------------------------------------------------------------------------------
-Detected number of breaks:                2               2               2
+Detected number of breaks: (min)          3               3               3
+                           (max)          5               5               5
 --------------------------------------------------------------------------------
-Number indicate highest number of breaks the null hypothesis is rejected.
+Null hypothesis rejected more than once after non-rejection.
+ The detected number of breaks indicates the minimum and maximum
+ number of breaks for which the null hypothesis is rejected.
+
+Estimation of break points
+                                                           T    =     82
+                                                           SSR  =    148.42
+                                                      Trimming  =      0.15
+--------------------------------------------------------------------------------
+  #      Index     Date                          [95% Conf. Interval]
+--------------------------------------------------------------------------------
+  1        16      2020w20                       2020w19        2020w21
+  2        47      2020w51                       2020w19        2021w31
+  3        59      2021w11                       2021w10        2021w12
+--------------------------------------------------------------------------------
+```
+
+We find three breaks, the first in week 20 in 2020 , the second at the end of 2020 and the third in week 11 in 2021. The second break has however large confidence intervals. This indicates that the change in the coefficients is small. We estimate the model with two breaks:
+
+```
+xtbreak estimate deaths L1.cases, breaks(2)
 
 Estimation of break points
                                                            T    =     82
                                                            SSR  =    226.85
+                                                      Trimming  =      0.15
 --------------------------------------------------------------------------------
   #      Index     Date                          [95% Conf. Interval]
 --------------------------------------------------------------------------------
-
   1        16      2020w20                       2020w19        2020w21
   2        59      2021w11                       2021w9         2021w13
 --------------------------------------------------------------------------------
 ```
 
-We find two breaks, the first in week 20 in 2020 and the second in week 11 in 2021.
+We find the same two break points.
 
 Next we test the hypothesis of no breaks against 2 breaks using hypothesis 1:
 
@@ -266,23 +289,18 @@ H0: 2 vs. H1: 3 break(s)
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- F(s+1|s)*            6.96            14.80           11.14            9.41
+ F(s+1|s)*           22.32            14.80           11.14            9.41
 --------------------------------------------------------------------------------
 * s = 2
 Trimming: 0.15
-
 ```
 
-First, note that we have to define in ``breaks()`` the alternative, that is we use ``breaks(3)``. Secondly we cannot reject the hypothesis of 2 breaks.
+First, note that we have to define in ``breaks()`` the alternative, that is we use ``breaks(3)``. Secondly we can not reject the hypothesis of 2 breaks. However as discussed before, the 3rd break is very small. Using panel data models might add further information and improve the estimation.
 
 So far we have assumed no break in the constant, only in the number of COVID cases. We can test for only a break in the constant and keep the coefficient of the cases fixed. To do so, the options ``nobreakvar(L.cases)`` and ``breakconstant`` are required.
 
 ```
 xtbreak test deaths , breakconstant nobreakvar(L1.cases) breaks(3) h(1)
-
-THIS IS AN ALPHA VERSION!
-PLEASE CHECK FOR UPDATES PRIOR PUBLISHING ANY RESULTS OBTAINED WITH THIS VERSION!
-
 
 Test for multiple breaks at unknown breakdates
 (Bai & Perron. 1998. Econometrica)
@@ -304,33 +322,33 @@ After testing for breaks thoroughly we can estimate the breaks and construct con
 ```
 xtbreak estimate deaths L1.cases, breaks(2)
 
-
 Estimation of break points
-                                                 T    =     82
-                                                 SSR  =    226.85
-----------------------------------------------------------------------
-  #      Index     Date                [95% Conf. Interval]
-----------------------------------------------------------------------
-  1        16      2020w20             15             17
-  2        59      2021w11             57             61
-----------------------------------------------------------------------
-
+                                                           T    =     82
+                                                           SSR  =    226.85
+                                                      Trimming  =      0.15
+--------------------------------------------------------------------------------
+  #      Index     Date                          [95% Conf. Interval]
+--------------------------------------------------------------------------------
+  1        16      2020w20                       2020w19        2020w21
+  2        59      2021w11                       2021w9         2021w13
+--------------------------------------------------------------------------------
 ```
 
 If we want to see the index of the confidence interval rather than the date, the option {cmd:showindex} can be used:
 
 ```
+xtbreak estimate deaths L1.cases, breaks(2) showindex
 
 Estimation of break points
                                                  T    =     82
                                                  SSR  =    226.85
+                                            Trimming  =      0.15
 ----------------------------------------------------------------------
   #      Index     Date                [95% Conf. Interval]
 ----------------------------------------------------------------------
   1        16      2020w20             15             17
   2        59      2021w11             57             61
 ----------------------------------------------------------------------
-
 ```
 
 We can split the variable L1.cases into the different values for each regime using ``estat split``. The variable list is saved in **r(varlist)** and we run a simple OLS regression on it:
@@ -402,31 +420,30 @@ Sequential test for multiple breaks at unknown breakpoints
  F(4|3)              21.38            15.28           11.83           10.04
  F(5|4)               8.29            15.76           12.25           10.58
 --------------------------------------------------------------------------------
-Detected number of breaks:                4               4               4
+Detected number of breaks: (min)          2               2               4
+                           (max)          4               4               4
 --------------------------------------------------------------------------------
-The detected number of breaks indicates the highest number of
- breaks for which the null hypothesis is rejected.
+Null hypothesis rejected more than once after non-rejection.
+ The detected number of breaks indicates the minimum and maximum
+ number of breaks for which the null hypothesis is rejected.
 
 Estimation of break points
                                                            N    =     60
                                                            T    =     82
-                                                           SSR  =     37.78
+                                                           SSR  =     52.33
                                                       Trimming  =      0.15
 --------------------------------------------------------------------------------
   #      Index     Date                          [95% Conf. Interval]
 --------------------------------------------------------------------------------
   1        15      2020w19                       2020w18        2020w20
-  2        34      2020w38                       2020w37        2020w39
-  3        47      2020w51                       2020w50        2020w52
-  4        59      2021w11                       2021w10        2021w12
+  2        59      2021w11                       2021w10        2021w12
 --------------------------------------------------------------------------------
-
 ```
 
-We find evidence for 2 and 4 breaks. As this is a panel data set, we account for cross-section dependence as well using ``csa(L.cases)`` and we set the minimal length to 10% with ``minlength(0.1)``:
+We find evidence for 2 and 4 breaks. ``xtbreak`` displays the number of breaks the first time the hypothesis is not rejected, in this case 2 breaks. As this is a panel data set, we account for cross-section dependence as well using ``csa(L.cases)`` and we set the minimal length to 10% with ``minlength(0.1)``:
 
 ```
-. xtbreak deaths L.cases, vce(hac) csa(L.cases) trimming(0.1)
+xtbreak deaths L.cases, vce(hac) csa(L.cases) trimming(0.1)
 
 Sequential test for multiple breaks at unknown breakpoints
 (Ditzen, Karavias & Westerlund. 2021)
@@ -445,29 +462,28 @@ Sequential test for multiple breaks at unknown breakpoints
  F(8|7)               5.61            16.90           14.12           12.26
  F(9|8)               4.89            16.99           14.45           12.57
 --------------------------------------------------------------------------------
-Detected number of breaks:                .               3               3
+Detected number of breaks: (min)          .               1               1
+                           (max)          .               3               3
 --------------------------------------------------------------------------------
-The detected number of breaks indicates the highest number of
- breaks for which the null hypothesis is rejected.
+Null hypothesis rejected more than once after non-rejection.
+ The detected number of breaks indicates the minimum and maximum
+ number of breaks for which the null hypothesis is rejected.
 
 Estimation of break points
                                                            N    =     60
                                                            T    =     82
-                                                           SSR  =     25.99
+                                                           SSR  =     54.06
                                                       Trimming  =      0.10
 --------------------------------------------------------------------------------
   #      Index     Date                          [95% Conf. Interval]
 --------------------------------------------------------------------------------
   1        15      2020w19                       2020w18        2020w20
-  2        47      2020w51                       2020w50        2020w52
-  3        57      2021w9                        2021w8         2021w10
 --------------------------------------------------------------------------------
 Cross-section averages:
   with breaks: L.cases
-
 ```
 
-Using this we observe that the values of the test stastic across all F-Statistics are relatively low. We are never able to reject the hypothesis of no break at a level of 1\%. Using a level of 5\%, we are able to reject F(1|0) and F(3|2), which implies either no break or 2 breaks. We will investigate this next.
+Using this we observe that the values of the test stastic across all F-Statistics are relatively low. We are never able to reject the hypothesis of no break at a level of 1\%. Using a level of 5\%, we are able to reject F(1|0) and F(3|2), which implies either no break (indicated by .), 1 break or 3 breaks. We will investigate this next.
 
 We test the null of no breaks against up to 5 breaks and abbreviate hypothesis with ``h``:
 
@@ -539,7 +555,7 @@ Cross-section averages:
 Given that we are just about to reject the null hypothesis in the case of 1 break, we will assume 3 breaks. Next we are going to estimate the break points and run a fixed effects regression:
 
 ```
-. xtbreak estimate deaths L.cases, breaks(3) trim(0.1) vce(hac) csa(L.cases)
+xtbreak estimate deaths L.cases, breaks(3) trim(0.1) vce(hac) csa(L.cases)
 
 Estimation of break points
                                                            N    =     60
@@ -658,9 +674,12 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structur
 
 # 11. Changes
 
-This version 1.01 - 15.11.2021
+This version 1.1 - 10.01.2022
 Changes 1.0 to 1.01:
-- bug when variable name contained "est"{p_end}
+- added min and max to sequential test
+- bug when variable name contained "est"
+- error in scaling critical values (ts + xt) and test statistic (ts + xt) when using hypothesis 3
+
 Changes 0.02 to 1.0:
 - fixed error in wdmax test. Used wrong critical values.
 - added sequential F-Test and general xtbreak y x syntax.
