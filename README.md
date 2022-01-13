@@ -392,7 +392,7 @@ estat scatter L.cases
 
 With a bit more of codeing, see [example.do](https://github.com/JanDitzen/xtbreak/tree/main/examples/xtbreak_example.do), we can create a plot with confidence intervals:
 
-![scatter-plot](docs/DeathsEstCI.jpg?raw=true "Confidence Intervals")
+![scatter-plot](docs/DeathsEstCI.png?raw=true "Confidence Intervals")
 
 ## Panel Exampels
 
