@@ -4,7 +4,7 @@
 
 For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and for **xtbreak estimate** see [xtbreak estimate](docs/xtbreak_estimate.md).
 
-Current Version: **1.1** (10.01.2022)
+Current Version: **1.1** (07.02.2022)
 
 Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
 
@@ -674,9 +674,12 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structur
 
 # 11. Changes
 
-This version 1.1 - 10.01.2022
+This version 1.11 - 07.02.2022
 
-Changes 1.0 to 1.01:
+Changes 1.1 to 1.11:
+- fixed error when using Stata 15 and xtbreak, seq (thanks to Zachary Elkins).
+
+Changes 1.0 to 1.1:
 - added min and max to sequential test
 - bug when variable name contained "est"
 - error in scaling critical values (ts + xt) and test statistic (ts + xt) when using hypothesis 3

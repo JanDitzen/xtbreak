@@ -1,6 +1,4 @@
-// -------------------------------------------------------------------------------------------------
-// xtbreak_estimate
-// -------------------------------------------------------------------------------------------------
+*! xbtreak estimate program
 capture program drop xtbreak_estimate
 program define xtbreak_estimate, eclass
 	syntax varlist(min=1 ts) [if] , [			///

@@ -1,5 +1,5 @@
 *! xbtreak test program
-*! v. 1.1 
+*! v. 1.15 
 capture program drop xtbreak_tests
 
 program define xtbreak_tests, rclass
@@ -213,11 +213,13 @@ program define xtbreak_tests, rclass
 
 			*** main csd option - will overwrite csa and csanobreak!
 			if "`csd'" != "" {
+				issorted `idvars' `tvar_o'
 				*** use gettoken to get only RHS vars
 				gettoken tmp1 tmp2: indepdepvars
 				*local csa "`tmp2'"
 				*local csanobreak "`nobreakvariables'"
 				hascommonfactors `tmp2' if `touse' , tvar(`tvar') idvar(`idvar') localname(csa)
+				issorted `idvars' `tvar_o'
 				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar') idvar(`idvar') localname(csanobreak)
 				
 			}

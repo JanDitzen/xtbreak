@@ -1,6 +1,4 @@
 *** Time Series Examples
-adopath + "C:\Users\jan\Dropbox (Personal)\DKW\Stata\ado\_archive\v1_1"
-
 use  https://github.com/JanDitzen/xtbreak/raw/main/data/US.dta
 
 xtbreak deaths L.cases

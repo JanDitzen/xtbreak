@@ -1,8 +1,8 @@
-*! xtbreak version 1.1 - 10.01.2022
+*! xtbreak version 1.11 - 07.02.2022
 /*
 Changelog
 - 15.11.2021 - but when variable name contained "est". 
-
+- 07.02.2021 - error when using Stata 15 and xtbreak, local cannot access r() matrix.
 */
 
 capture program drop xtbreak
@@ -45,8 +45,8 @@ program define xtbreak, rclass
 		}
 
 		if "`version'" != "" {
-			local version 1.1
-			noi disp "This is version 1.1 - 07.01.2022"
+			local version 1.11
+			noi disp "This is version 1.11 - 07.01.2022"
 			return local version "`version'"
 			exit
 		}
@@ -102,24 +102,24 @@ program define xtbreak, rclass
 
 			xtbreak_tests `anything' `if' ,`options' donotdisptrim
 
-			tempname estBreak
-
+			tempname estBreak Nbreaksmat
+			matrix `Nbreaksmat' = r(Nbreaks)
 			if `c(level)' == 99 { 
-				local estBreak = r(Nbreaks)[1,1]
+				local estBreak = `Nbreaksmat'[1,1]
 				if `estBreak' == 0 {
-					local estBreak = r(Nbreaks)[2,1] 
+					local estBreak = `Nbreaksmat'[2,1] 
 				}
 			}
 			else if `c(level)' == 90 {
-				local estBreak = r(Nbreaks)[1,3]
+				local estBreak = `Nbreaksmat'[1,3]
 				if `estBreak' == 0 {
-					local estBreak = r(Nbreaks)[2,3] 
+					local estBreak = `Nbreaksmat'[2,3] 
 				}
 			}
 			else {
-				local estBreak = r(Nbreaks)[1,2]
+				local estBreak = `Nbreaksmat'[1,2]
 				if `estBreak' == 0 {
-					local estBreak = r(Nbreaks)[2,2] 
+					local estBreak = `Nbreaksmat'[2,2] 
 				}
 			}
 			return add
