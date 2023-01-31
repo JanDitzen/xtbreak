@@ -617,7 +617,7 @@ Bai, B. Y. J., & Perron, P. (1998).  Estimating and Testing Linear Models with M
 
 Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural change models.  Journal of Applied Econometrics, 18(1), 1–22. [link](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659).
 
-Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing for Multiple Structural Breaks in Panel Data. Available upon request. 
+Ditzen, J., Karavias, Y. & Westerlund, J. (2023) Multiple Structural Breaks in Interactive Effects Panel Data and the Impact of Quantitative Easing on Bank Lending. arXiv:2211.06707v2 [econ.EM] [download](https://arxiv.org/abs/2211.06707v2)
 
 Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM]. [link](https://arxiv.org/abs/2110.14550).
 
@@ -642,11 +642,19 @@ net from https://janditzen.github.io/xtbreak/
 
 # 8. Citations
 
-``xtbreak`` has been used in:
+``xtbreak`` has been used in (selection):
 
 1. Regulator, E., Fallon, J., Cunningham, M. and da Silva Rosa, R., 2021. Methodological issues in estimating the equity beta for Australian network energy businesses. [Link](https://www.aer.gov.au/system/files/Report%20to%20the%20AER%20-%20Methodological%20issues%20in%20estimating%20the%20equity%20beta%20for%20Australian%20network%20energy%20businesses%20-%2030%20June%202021.pdf)
 
 2. Gabriel Chodorow-Reich, Adam M. Guren, and Timothy J. McQuade, 2021. "The 2000s Housing Cycle With 2020 Hindsight: A Neo-Kindlebergerian View". NBER Working Paper No. 29140. [Link](https://www.nber.org/papers/w29140)
+
+3. Rohne Till, E, 2022. Is this time different? Social capability and catch-up growth in Ethiopia, 1950–2020. Journal of International Development, 34( 7), 1259– 1281. [Link](https://doi.org/10.1002/jid.3630)
+
+4. Thai-Ha Le, Manh-Tien Bui, Gazi Salah Uddin, 2022. Economic and social impacts of conflict: A cross-country analysis, Economic Modelling, Volume 115. [Link](https://doi.org/10.1016/j.econmod.2022.105980).
+
+5. Rekha R, Suresh Babu M. 2022. Premature deindustrialisation and growth slowdowns in middle-income countries. Structural Change and Economic Dynamics. Volume 62. [Link](https://doi.org/10.1016/j.strueco.2022.04.001).
+
+6. Kenneth S. Rogoff, Barbara Rossi, and Paul Schmelzing. 2022. Long-Run Trends in Long-Maturity Real Rates 1311-2021. NBER Working Paper No. 30475. [Link](https://www.nber.org/papers/w30475)
 
 # 9. Questions?
 
