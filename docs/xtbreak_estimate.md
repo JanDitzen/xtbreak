@@ -31,7 +31,7 @@ options1 | Description
 **breakconstant** | break in constant
 **noconstant** | suppresses constant
 **nobreakvariables(varlist1)** | variables with no structural break(s)
-**vce(type)** | covariance matrix estimator, allowed: ssr, hac, hc and np
+**vce(type)** | covariance matrix estimator, allowed: ssr, hac, hc and np   
 
 #### Options for unknown breakdates
 

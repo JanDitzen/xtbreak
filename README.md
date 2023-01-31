@@ -8,6 +8,9 @@ Current Version: **1.1** (07.02.2022)
 
 Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
 
+A working paper describing the panel data theory of xtbreak is available as `Ditzen, J., Karavias, Y. & Westerlund, J. (2023) Multiple Structural Breaks in Interactive Effects Panel Data and the Impact of Quantitative Easing on Bank Lending. arXiv:2211.06707v2 [econ.EM]` [download](https://arxiv.org/abs/2211.06707v2).
+
+
 __Table of Contents__
 1. [Syntax](#1-syntax)
 2. [Description](#2-description)
@@ -63,7 +66,7 @@ options1 | Description
 **breakconstant** | break in constant
 **noconstant** | suppresses constant
 **nobreakvariables(varlist1)** | variables with no structural break(s)
-**vce(type)** | covariance matrix estimator, allowed: ssr, hac, np and nw
+**vce(type)** | covariance matrix estimator, allowed: ssr, hac, hc and np
 
 #### Options for unknown breakdates
 
