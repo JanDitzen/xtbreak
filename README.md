@@ -4,7 +4,7 @@
 
 For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and for **xtbreak estimate** see [xtbreak estimate](docs/xtbreak_estimate.md).
 
-Current Version: **1.1** (07.02.2022)
+Current Version: ![version](https://img.shields.io/github/v/release/janditzen/xtbreak) ![release](https://img.shields.io/github/release-date/janditzen\xtbreak)
 
 Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
 
