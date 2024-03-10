@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak test}{right: v. 1.4 - 10. March 2024}
+{hi:help xtbreak test}{right: v. 1.3 - 23. March 2023}
 
 {hline}
 {title:Title}

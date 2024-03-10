@@ -221,7 +221,10 @@ program define xtbreak_tests, rclass
 				local nofixedeffects "nofixedeffects"				
 			}
 
-						
+			*** generate new tvar from 1...T
+			tempvar tvar
+			egen `tvar' = group(`tvar_o') if `touse'
+			
 			*** tsset varlist 
 			issorted `idvars' `tvar_o'
 			tsrevar `varlist'
@@ -239,12 +242,9 @@ program define xtbreak_tests, rclass
 				gettoken tmp1 tmp2: indepdepvars
 				*local csa "`tmp2'"
 				*local csanobreak "`nobreakvariables'"
-				hascommonfactors `tmp2' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csa) localnamek(kfactorsauto)
-
+				hascommonfactors `tmp2' if `touse' , tvar(`tvar') idvar(`idvar') localname(csa)
 				issorted `idvars' `tvar_o'
-				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csanobreak) localnamek(nbkfactorsauto)
-
-
+				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar') idvar(`idvar') localname(csanobreak)
 				
 			}
 			local num_csanb = 0
@@ -254,7 +254,7 @@ program define xtbreak_tests, rclass
 				issorted `idvars' `tvar_o'
 				tempname csa_name1 csa_name2
 				local 0 `csa'
-				syntax [varlist(ts)] , [lags(numlist)  EXCludecsa ]
+				syntax varlist(ts) , [lags(numlist)  EXCludecsa ]
 				
 				if "`lags'" == "" { 
 					local lags "0"
@@ -265,7 +265,7 @@ program define xtbreak_tests, rclass
 				}
 				
 				issorted `idvars' `tvar_o'
-				get_csa `varlist' , idvar("`idvar'") tvar("`tvar_o'") cr_lags("`lags'") touse(`touse') csa("`csa_name1'")
+				get_csa `varlist' , idvar("`idvar'") tvar("`tvar'") cr_lags("`lags'") touse(`touse') csa("`csa_name1'")
 				
 				local csa_list "`r(varlist)'"
 				local num_csa = wordcount("`csa_list'")
@@ -275,8 +275,7 @@ program define xtbreak_tests, rclass
 			}
 			
 			if "`kfactors'" != "" {
-				tsunab kfactors: `kfactors'
-				local csa_list "`csa_list' `kfactors' `kfactorsauto'"
+				local csa_list "`csa_list' `kfactors'"
 			}
 
 			if "`csanobreak'" != "" {
@@ -292,7 +291,7 @@ program define xtbreak_tests, rclass
 				if "`excludecsa'" == "" {
 					local dyn2 "dyn"
 				}
-				get_csa `varlist' , idvar("`idvar'") tvar("`tvar_o'") cr_lags("`lags'") touse(`touse') csa("`csanb_name1'")
+				get_csa `varlist' , idvar("`idvar'") tvar("`tvar'") cr_lags("`lags'") touse(`touse') csa("`csanb_name1'")
 				
 				local csanb_list "`r(varlist)'"				
 				local num_csanb = wordcount("`csanb_list'")
@@ -302,8 +301,7 @@ program define xtbreak_tests, rclass
 			}
 
 			if "`nbkfactors'" != "" {
-				tsunab nbkfactors: `nbkfactors'
-				local csanb_list "`csanb_list' `nbkfactors' `nbkfactorsauto'"
+				local csanb_list "`csanb_list' `nbkfactors'"
 			}
 
 			*** internal use: dynamic panel forces dynamic program to remove CSA as well.
@@ -314,12 +312,9 @@ program define xtbreak_tests, rclass
 				local dynamicpartial = 0
 			}
 
-			issorted `idvars' `tvar_o'	
+issorted `idvars' `tvar_o'	
 			markout `touse' `indepdepvars' `nobreakvariables' `csa_list' `csanb_list'
-			*** generate new tvar from 1...T
-			tempvar tvar
-			egen `tvar' = group(`tvar_o') if `touse'
-
+			
 			*local num_s = 0
 
 			if "`breakpoints'" != "" {
@@ -338,8 +333,6 @@ program define xtbreak_tests, rclass
 				transbreakpoints `region' , `index' tvar(`tvar' `tvar_o') touse("`touse'") format(`fmt')
 				local region "`r(index)'" 
 			}
-
-
 
 			*** constant and fixed effects 
 			/*
@@ -603,9 +596,10 @@ program define xtbreak_tests, rclass
 						mata mata drop `zeros'
 					}
 
-					tempname Nbreaks				
+					tempname Nbreaks
 					
-					`trace' mata `m_breaks'
+					
+
 					if `opt90_min' == `opt90_max' & `opt95_min' == `opt95_max' & `opt99_min' == `opt99_max' {
 						noi disp as text "Detected number of breaks: " _col(35) %9.0f  `opt99_min'  _col(51)  %9.0f  `opt95_min' _col(67) %9.0f  `opt90_min'
 						matrix `Nbreaks' = (`opt99_min', `opt95_min', `opt90_min')
@@ -633,10 +627,7 @@ program define xtbreak_tests, rclass
 					*noi disp as text "Detected number of breaks: " _col(35) %9.0f  `opt99'  _col(51)  %9.0f  `opt95' _col(67) %9.0f  `opt90'
 				
 					if `all_1_99' == 1 & `all_1_95' == 1 & `all_1_90' == 1 {
-						mata st_local("tmptxt",strofreal(all(`m_breaks':==0)))
-						if `tmptxt' == 1 noi disp as text _col(3) "Maximum number of breaks reached with null always rejected. "
-						if `tmptxt' == 0 noi disp as text _col(3) "Maximum number of breaks reached with null always rejected at level of `c(level)'%. "
-
+						noi disp as text _col(3) "Maximum number of breaks reached with null always rejected. "
 					}
 					else if `all_0_99' == 1 & `all_0_95' == 1 & `all_0_90' == 1 {
 						noi disp as text _col(3) "No breaks detected. "

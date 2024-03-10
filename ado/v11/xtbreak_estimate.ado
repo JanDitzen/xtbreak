@@ -161,7 +161,11 @@ program define xtbreak_estimate, eclass
 				noi disp "Option {cmd:nofixedeffects} assumed."
 				local nofixedeffects "nofixedeffects"				
 			}
-		
+
+
+			*** generate new tvar from 1...T
+			tempvar tvar
+			egen `tvar' = group(`tvar_o') if `touse'
 			
 			*** tsset varlist 
 			issorted `idvars' `tvar_o'
@@ -178,10 +182,8 @@ program define xtbreak_estimate, eclass
 				gettoken tmp1 tmp2: indepdepvars
 				*local csa "`tmp2'"
 				*local csanobreak "`nobreakvariables'"
-				issorted `idvars' `tvar_o'
-				hascommonfactors `tmp2' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csa) localnamek(kfactorsauto)
-				issorted `idvars' `tvar_o'
-				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csanobreak) localnamek(nbkfactorsauto)
+				hascommonfactors `tmp2' if `touse' , tvar(`tvar') idvar(`idvar') localname(csa)
+				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar') idvar(`idvar') localname(csanobreak)
 			}
 			local num_csanb = 0
 			local num_csa = 0
@@ -202,7 +204,7 @@ program define xtbreak_estimate, eclass
 
 				
 				issorted `idvars' `tvar_o'
-				get_csa `varlist' , idvar("`idvar'") tvar("`tvar_o'") cr_lags("`lags'") touse(`touse') csa("`csa_name1'")
+				get_csa `varlist' , idvar("`idvar'") tvar("`tvar'") cr_lags("`lags'") touse(`touse') csa("`csa_name1'")
 				
 				local csa_list "`r(varlist)'"
 				local num_csa = wordcount("`csa_list'")
@@ -212,8 +214,7 @@ program define xtbreak_estimate, eclass
 			}
 			
 			if "`kfactors'" != "" {
-				tsunab kfactors: `kfactors'
-				local csa_list "`csa_list' `kfactors' `kfactorsauto'"
+				local csa_list "`csa_list' `kfactors'"
 			}
 
 			if "`csanobreak'" != "" {
@@ -229,7 +230,7 @@ program define xtbreak_estimate, eclass
 				if "`excludecsa'" == "" {
 					local dyn2 "dyn"
 				}
-				get_csa `varlist' , idvar("`idvar'") tvar("`tvar_o'") cr_lags("`lags'") touse(`touse') csa("`csanb_name1'")
+				get_csa `varlist' , idvar("`idvar'") tvar("`tvar'") cr_lags("`lags'") touse(`touse') csa("`csanb_name1'")
 				
 				local csanb_list "`r(varlist)'"
 				local num_csanb = wordcount("`csanb_list'")
@@ -239,8 +240,7 @@ program define xtbreak_estimate, eclass
 			}
 
 			if "`nbkfactors'" != "" {
-				tsunab nbkfactors: `nbkfactors'
-				local csanb_list "`csanb_list' `nbkfactors' `nbkfactorsauto'"
+				local csanb_list "`csanb_list' `nbkfactors'"
 			}
 
 			*** internal use: dynamic panel forces dynamic program to remove CSA as well.
@@ -253,11 +253,6 @@ program define xtbreak_estimate, eclass
 			
 			issorted `idvars' `tvar_o'		
 			markout `touse' `indepdepvars' `nobreakvariables' `csa_list' `csanb_list'
-
-			*** generate new tvar from 1...T
-			tempvar tvar
-			egen `tvar' = group(`tvar_o') if `touse'
-			
 			*** constant and fixed effects 
 			/*
 			Cases 						Options
@@ -373,17 +368,22 @@ program define xtbreak_estimate, eclass
 			matrix rownames breaks =  Index TimeValue
 			matrix colnames breaks =  `tmp'		 
 			
+			mata st_matrix("CI",`EstCI')
 			
 			qui sum `tvar_o' if `touse'
 			local adj = `r(min)' - 1
-			qui xtset
-			local deltat = `r(tdelta)'
-						
-			/// CI, second part is CI in time: Breaks(Time) + Length of CI * delta_t; delta_t is delta of time variable
-			mata st_matrix("CI", `EstCI' \ (st_matrix("breaks")[2,.] :+ (`EstCI':-`EstBreak'') :* `deltat' ))
+			mata st_matrix("CI", `EstCI' \ `EstCI' :+`adj')
 			matrix rownames CI =  Low Up Low Up
 			matrix roweq CI = Index Index TimeValue TimeValue
 			matrix colnames CI =  `tmp'	
+
+
+
+			*mata st_matrix("b",`EstCoeff')
+			*tsunab vars: `varlist'
+			*gettoken lhs rhs: vars
+			*matrix rownames b = `tmp' `=`breaks' + 1'
+			*matrix colnames b = `rhs'
 
 			local timetype : format `tvar_o'
 
@@ -427,10 +427,8 @@ program define xtbreak_estimate, eclass
 		forvalues i = 1(1)`breaks'{
 			local val = breaks[2,`i']
 			local ini = breaks[1,`i']
-			///local low = CI[1,`i']+`adj'
-			///local up = CI[2,`i']+`adj'
-			local low = CI[3,`i']
-			local up = CI[4,`i']
+			local low = CI[1,`i']+`adj'
+			local up = CI[2,`i']+`adj'
 			disp in smcl as text _col(3) "`i'" as result  _col(12) "`ini'" _col(20) `timetype' `val' _col(`colCI1') `timetypeCI' `low' _col(`colCI2') `timetypeCI' `up'
 		}
 		disp in smcl as text "{hline `colMax'}"

@@ -1,7 +1,6 @@
-*! xtbreak version 1.4 - 10.03.2024
+*! xtbreak version 1.3 - 22.03.2023
 /*
 Changelog
-- 10.03.2024 - bug fix when k < q
 - 19.03.2023 - bug when time series and vce(hac) used fixed
 - 15.11.2022 - bug when using fixed effects, FE always partialled out with breaks, fixed.
 			 - added e(SSR) with minimum SSR for xtbreak est
@@ -53,8 +52,8 @@ program define xtbreak, rclass
 		}
 
 		if "`version'" != "" {
-			local version 1.4
-			noi disp "This is version `version' - 10.03.2024"
+			local version 1.3
+			noi disp "This is version `version' - 22.03.2023"
 			return local version "`version'"
 			exit
 		}
@@ -112,22 +111,6 @@ program define xtbreak, rclass
 
 			tempname estBreak Nbreaksmat
 			matrix `Nbreaksmat' = r(Nbreaks)
-
-			/// default 95%
-			if `c(level)' == 99 local c_select = 1
-			else if `c(level)' == 90 local c_select = 3
-			else local c_select = 2
-
-			local estBreak = `Nbreaksmat'[1,`c_select']
-			local cng = 0
-			while `estBreak' == . & `c_select' <= 3 {
-				local ++c_select
-				local estBreak = `Nbreaksmat'[1,`c_select']
-				local ++cng
-			}
-			if `estBreak' == 0 local estBreak = Nbreaksmat[2,`c_select']
-
-/*
 			if `c(level)' == 99 { 
 				local estBreak = `Nbreaksmat'[1,1]
 				if `estBreak' == 0 {
@@ -146,19 +129,12 @@ program define xtbreak, rclass
 					local estBreak = `Nbreaksmat'[2,2] 
 				}
 			}
-
-		*/
 			return add
 
 			if `estBreak' == . | `estBreak'== 0{
 				noi disp ""
 				noi disp in smcl as error "No breaks found, cannot estimate breakpoints."
 				exit
-			}
-			else if `cng' > 0 {
-				if `c_select' == 2 local newLev 95
-				if `c_select' == 3 local newLev 90
-				noi disp in text _col(3) "No breaks found for critival values at `=100-`c(level)''% level, `estBreak' break(s) found at `=100-`newLev''% level. "
 			}
 
 			xtbreak_estimate `anything' `if', `options' breaks(`estBreak')

@@ -25,6 +25,7 @@ syntax anything , [Index] tvar(varlist) touse(varlist) [format(string)]
 
 	local fmt : format `tvar2'
 	
+
 	if "`format'" != "" {
 		local inp `anything'
 		local anything ""
@@ -34,7 +35,7 @@ syntax anything , [Index] tvar(varlist) touse(varlist) [format(string)]
 	}
 
 	foreach ii in `anything' {
-		
+		disp "`ii'"
 		if "`index'" != "" {
 			*** find ival		
 			local i_index = `ii'
@@ -191,21 +192,13 @@ end
 
 capture program drop hascommonfactors
 program define hascommonfactors
-	syntax [varlist(ts default=none) ] [if] , tvar(varname) idvar(varname) localname(string) localnamek(string)
+	syntax [varlist(ts default=none) ] [if] , tvar(varname) idvar(varname) localname(string)
 
 	foreach var in `varlist' {
-		cap tsrevar `var'
-		if _rc != 0 {
-			_xt
-			issorted `r(ivar)' `r(tvar)'
-			tsrevar `var'
-		}
-		
-		local varn `r(varlist)' 
 		tempvar check check2
-		by `tvar' (`idvar'), sort: gen `check' = `varn'[_n]==`varn'[_n-1] `if'
-		by `tvar' (`idvar'), sort: gen `check2' = `varn'[1]
-		by `tvar' (`idvar'), sort: replace `check' = 1 if `varn' == `check2'
+		by `tvar' (`idvar'), sort: gen `check' = `var'[_n]==`var'[_n-1] `if'
+		by `tvar' (`idvar'), sort: gen `check2' = `var'[1]
+		by `tvar' (`idvar'), sort: replace `check' = 1 if `var' == `check2'
 
 		sum `check', meanonly
 
@@ -219,8 +212,7 @@ program define hascommonfactors
 	}
 
 	if "`commfac'" != "" {
-		c_local `localname' "`csa'" 
-		c_local `localnamek' "`commfac'"
+		c_local `localname' "`csa' , deter(`commfac') "
 	}
 	else {
 		c_local `localname' "`csa'"
