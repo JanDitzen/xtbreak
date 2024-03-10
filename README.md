@@ -685,7 +685,14 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structur
 
 # 11. Changes
 
-This version 1.11 - 07.02.2022
+This version 1.4 - 10.03.2024
+
+Changed to 1.4
+- bug fixes
+
+Changed to 1.3
+- fixed error when using fixed effects
+- fixed error when using vce(hac) on time series data
 
 Changes 1.1 to 1.11:
 - fixed error when using Stata 15 and xtbreak, seq (thanks to Zachary Elkins).
