@@ -685,7 +685,10 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structur
 
 # 11. Changes
 
-This version 1.4 - 10.03.2024
+This version 1.5 - 08.05.2024
+
+Changed to 1.5
+- additional checks if breaks and trimming are valid
 
 Changed to 1.4
 - bug fixes
