@@ -69,6 +69,8 @@ Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":
 {p 4 8}{cmd:xtbreak} requires Stata version 15 or higher.{p_end}
 
 {title:Changelog}
+{p 4 4}This version 1.5 - 08.04.2024{p_end}
+{p 4 4} - additional checks to ensure trimming and number of breaks are valid.{p_end]
 {p 4 4}This version 1.4 - 10.03.2024{p_end}
 {p 4 4} - several bug fixes.
 {p 4 4} - added option region() to find breaks within specific region.{p_end}

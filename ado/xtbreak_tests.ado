@@ -329,6 +329,7 @@ program define xtbreak_tests, rclass
 				
 				transbreakpoints `breakpoints' , `index' tvar(`tvar' `tvar_o') touse("`touse'") format(`fmt')
 				local breakpoints "`r(index)'" 
+
 			}
 			
 			if "`region'" != "" {
@@ -477,6 +478,7 @@ program define xtbreak_tests, rclass
 			
 		}
 		else {
+			/*
 			tempname ml ml1
 			if inlist(`trimming',0.05,0.1,0.15,0.2,0.25) == 0 {
 				local trimming_o "`trimming'"
@@ -490,7 +492,7 @@ program define xtbreak_tests, rclass
 
 				
 			}
-
+			*/
 			mata st_local("SeqN",strofreal(rows(`testh')))
 
 			noi disp as text _col(17) as smcl "{hline 17}" as text _col(35) "Bai & Perron Critical Values" as smcl _col(64) "{hline 17}" 
@@ -556,9 +558,9 @@ program define xtbreak_tests, rclass
 				if `hypothesis' == 3 & `SeqN' == 1 {				
 					noi disp as text "* s = " `s'-1
 				}
-				if "`minset'" == "1" {
-					noi disp as text "No critical values for specified trimming available, set to `trimming'"
-				}
+				*if "`minset'" == "1" {
+				*	noi disp as text "No critical values for specified trimming available, set to `trimming'"
+				*}
 			}			
 
 			*** Return

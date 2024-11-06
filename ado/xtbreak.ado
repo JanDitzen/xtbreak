@@ -1,6 +1,9 @@
-*! xtbreak version 1.4 - 10.03.2024
+*! xtbreak version 1.5 - 08.04.2024
 /*
 Changelog
+version 1.5
+- 08.04.2024 - additional checks if trimming, breaks and breakpoints are valid
+version 1.4
 - 10.03.2024 - bug fix when k < q
 - 19.03.2023 - bug when time series and vce(hac) used fixed
 - 15.11.2022 - bug when using fixed effects, FE always partialled out with breaks, fixed.
@@ -11,6 +14,7 @@ Changelog
 version 1.1
 - 15.11.2021 - bug when variable name contained "est". 
 - 07.02.2021 - error when using Stata 15 and xtbreak, local cannot access r() matrix.
+
 */
 
 capture program drop xtbreak
@@ -53,8 +57,8 @@ program define xtbreak, rclass
 		}
 
 		if "`version'" != "" {
-			local version 1.4
-			noi disp "This is version `version' - 10.03.2024"
+			local version 1.5
+			noi disp "This is version `version' - 08.04.2024"
 			return local version "`version'"
 			exit
 		}
