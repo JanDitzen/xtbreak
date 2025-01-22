@@ -37,6 +37,11 @@ structural break.{p_end}
 
 INCLUDE help xtbreak_options
 
+{p 4 4}Data has to be {help tsset} or {help xtset} before using {cmd:xtbreak}. 
+{depvars}, {indepvars} and {it:varlist}, {it:varlist}1 - {it:varlist}5 may contain time-series operators, see {help tsvarlist}.{break}
+{cmd:xtdcce2} requires the {help moremata} package.
+
+
 {title:Contents}
 
 {p 4}{help xtbreak_tests##description:Description}{p_end}
@@ -53,16 +58,16 @@ INCLUDE help xtbreak_options
 {cmd:xtbreak test} implements multiple tests for structural breaks in time series and panel data models.
 The number and period of occurrence of structural breaks can be known and unknown.
 In the case of a known breakpoint {cmd:xtbreak test} can test if the break occurs at a specific point in time.
-For unknown breaks, {cmd:xtbreak test} implements three different hypothesises. 
-The first is no break against the alternative of {it:s} breaks,
-the second hypothesis is no breaks against a lower and upper limit of breaks. 
-The last hypothesis tests the null of {it:s} breaks against the alternative of
+For unknown breaks, {cmd:xtbreak test} implements three different hypothesises, 1, 2 and 3. 
+Hypothesis 1 is no break against the alternative of {it:s} breaks,
+hypothesis 2 is no breaks against a lower and upper limit of breaks. 
+The last hypothesis, 3,  tests the null of {it:s} breaks against the alternative of
 one more break ({it:s+1}).{p_end}
 
 {p 4 4}{cmd:xtbreak test} implements the tests for structural breaks discussed in 
 Bai & Perron ({help xtbreak_tests##BP1998:1998}, {help xtbreak_tests##BP2003:2003}),
 Karavias, Narayan, Westerlund ({help xtbreak_tests##KNW2021:2021})
-and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2021}). 
+and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2024}). 
 
 {p 4 4}For the remainder we assume the following model:{p_end}
 
@@ -107,7 +112,7 @@ The {it:dof_adj} differs for time series and panel datasets.
 For the time series case see Bai & Perron ({help xtbreak_tests##BP1998:1998}, {help xtbreak_tests##BP2003:2003}),
 for the panel data case see 
 Karavias, Narayan, Westerlund ({help xtbreak_tests##KNW2021:2021})
-and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2021}) {p_end}
+and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2024}) {p_end}
 
 {p 4 4}A known break date can be tested with {cmd:xtbreak test} using the option 
 {cmdab:breakp:oints(numlist|datelist,[index])}. 
@@ -120,7 +125,7 @@ If {help numlist} is used, then the option index is required.{p_end}
 offers three different hypothesises:
 
 {marker h1def}
-{p 4}{ul:No break against {it:s} breaks}
+{p 4}{ul:1: No break against {it:s} breaks}
 
 {p 4 4}Formally the hypothesis are:{p_end}
 
@@ -142,7 +147,7 @@ and are supplied by {cmd:xtbreak test}.
 {p_end}
 
 {marker h2}
-{p 4}{ul:No break against {it:s0<= s <=s1} breaks}
+{p 4}{ul:2: No break against {it:s0<= s <=s1} breaks}
 
 {p 4 4}A test of the null hypothesis of no structural change against the alternative that 
 an unknown number of structural breaks have occurred, where this unknown number of breaks
@@ -166,7 +171,7 @@ For the weighted test the test supF(l,q) test statistics are weighted by critica
 Critical values can be found in Bai & Perron ({help xtbreak_tests##BP1998:1998}, {help xtbreak_tests##BP2003:2003}) 
 and are supplied by {cmd:xtbreak test}.{p_end}
 
-{marker h3}{p 4}{ul: {it:s} breaks against {it:s+1} breaks}{p_end}
+{marker h3}{p 4}{ul:3: {it:s} breaks against {it:s+1} breaks}{p_end}
 {p 4 4}A test of the null hypothesis that, {it:s} structural breaks have occurred, 
 against the alternative that {it:s + 1} breaks have occurred is:{p_end}
 
@@ -201,9 +206,9 @@ unweighted for the double maximum test (hypothesis 2).{p_end}
 If a value is chosen for which no critical values exits, {cmd:xtbreak test} will choose the closest level.{p_end}
 
 {p 4 8 12}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##DefUnknown:xtbreak test - unknown break dates}.{break} 
-{cmd:h(1)} test for no breaks vs. {it:s} breaks, {break}
-{cmd:h(2)} for no break vs. {it:s0 <= s <= s1} breaks and {break}
-{cmd:h(3)} for {it:s} vs. {it:s+1} breaks.
+{cmd:h(A)} test for no breaks vs. {it:s} breaks, {break}
+{cmd:h(B)} for no break vs. {it:s0 <= s <= s1} breaks and {break}
+{cmd:h(C)} for {it:s} vs. {it:s+1} breaks.
 Default is hypothesis 3.{p_end}
 
 INCLUDE help xtbreak_options_detail

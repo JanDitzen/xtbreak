@@ -72,6 +72,7 @@ syntax anything , [Index] tvar(varlist) touse(varlist) [format(string)]
 	}
 
 	*** return
+	local val = strtrim(stritrim("`val'"))
 	return local ival "`ival'"
 	return local val "`val'"
 	return local index "`iindex'"
@@ -228,28 +229,155 @@ program define hascommonfactors
 
 end
 
+cap program drop xtbreak_pycheck
+program define xtbreak_pycheck
+	*** Checks for python
+	if c(stata_version) < 16 {
+		noi disp as error "Option Python Requires version 16 or later."
+		error 199
+	}
+	cap python search
+	if _rc != 0 {
+		noi disp as error "Python not installed or linked."
+		error 199
+	}
+	foreach pack in scipy numpy sfi pandas xarray {
+		cap python which `pack'
+		if _rc != 0 local err "`err' `pack'"
+	}
+	if "`err'" != "" {
+		noi disp as error "Packages `err' required but not installed."
+		error 199
+	}
+end
 
-if c(version) >= 16 {
 
+if c(stata_version) >= 16 {
+cap python query
+if _rc == 0 {
+cap python which numpy 
+if _rc == 0 {
+cap python which scipy 
+if _rc == 0 {
+cap python which sfi 
+if _rc == 0 {
+cap python which pandas 
+if _rc == 0 {
+cap python which xarray 
+if _rc == 0 {
 python:
 from sfi import Mata
+from sfi import Macro
 
 import numpy as np
 import xarray as xr
 import pandas as pd
+import scipy as sc
+import time as time
+
+def py_xtb_inverter0(mat):
+	det = np.linalg.det(mat)
+	if det.any() > 0:
+		output = np.linalg.inv(mat)
+	else:
+		output = np.linalg.pinv(mat)
+	return output
+
+def py_xtb_inverter_old(mat):
+	inverter = np.int_(Macro.getLocal("inverter"))
+	det = np.linalg.det(mat)
+	if det.any() == 0:
+		inverter = 0
+
+	if inverter == -1:
+		output = np.linalg.inv(mat)
+	if inverter == 0:
+		output = np.linalg.pinv(mat)
+	if inverter == 1:
+		U, S, Vt = np.linalg.svd(mat)
+		S_inv = sc.linalg.diagsvd(1/S, mat.shape[1], mat.shape[0])
+		output =  Vt.T @ S_inv @ U.T
+	if inverter == 2:
+		output = np.linalg.pinv(mat)
+	if inverter == 3:
+		output = np.linalg.pinv(mat)
+
+	return output
+
+
+def py_xtb_inverter(mat):
+	inverter = np.int_(Macro.getLocal("inverter"))
+	if inverter == -1: inverter = 0
+
+	if inverter == -1:
+		output = np.linalg.inv(mat)
+	if inverter == 0:
+		output = np.linalg.pinv(mat)
+	if inverter == 1:
+		U, S, Vt = np.linalg.svd(mat)
+		S_inv = sc.linalg.diagsvd(1/S, mat.shape[1], mat.shape[0])
+		output =  Vt.T @ S_inv @ U.T
+	if inverter == 2:
+		output = np.linalg.pinv(mat)
+	if inverter == 3:
+		output = np.linalg.pinv(mat)
+
+	return output
+
+def py_xtb_qqx_w0(x1,x2,csa,usei):	
+	if usei == 1:
+		csaT = np.transpose(csa, (0, 2, 1))
+		icsaca = py_xtb_inverter_old((csaT @ csa))
+		x2 = x2 - csa @  (icsaca@ (csaT @ x2))
+		x1 = x1 - csa @  (icsaca@ (csaT @ x1))
+	return np.transpose(x1, (0, 2, 1)) @ x2 
+
+def py_xtb_qqx_w(x1,x2,csa,usei):	
+	if usei == 1:
+		csaT = np.transpose(csa, (0, 2, 1))
+		x2 = x2 - csa @  py_xtb_solver(csaT @ csa, csaT @ x2)
+		x1 = x1 - csa @  py_xtb_solver(csaT @ csa, csaT @ x1)
+	return np.transpose(x1, (0, 2, 1)) @ x2 
+
+def py_xtb_partial(x1,csa,usei):
+	if usei == 1:
+		output = x1 - csa @ py_xtb_solver(csa,x1)
+	else:
+		output = x1
+	return output
+
+def py_xtb_solver(x,y):
+	xx = np.transpose(x, (0, 2, 1))@ x
+	xy = np.transpose(x, (0, 2, 1))@ y
+	det = np.linalg.det(xx)
+	if det.all() == 0:
+		b = py_xtb_inverter(xx) @ xy 
+	else:
+		b = np.linalg.solve(xx,xy)			
+	return b
+
+def py_xtb_solver_s(x,y):
+	det = np.linalg.det(x)
+	if det.all() == 0:
+		b = py_xtb_inverter(x) @ y 
+	else:
+		b = np.linalg.solve(x,y)			
+	return b
+
+
 
 def py_xtb_ssr(mata_data,mata_breaks,mata_N,mata_T,mata_numX):	
+	
+	print("start python prog")
 
 	N = np.int_(Mata.get(mata_N))
 	T = np.int_(Mata.get(mata_T))
-
 	numX = np.int_(Mata.get(mata_numX))
-
 	PosBreaks = np.array(Mata.get(mata_breaks))
 	mat = np.array(Mata.get(mata_data))
 
-	N = N.astype(int)	
-	T = T.astype(int)
+	N = N.astype(int)[0,0]	
+	T = T.astype(int)[0,0]
 	
 	numX = numX.astype(int)
 	numX = numX[0,0]
@@ -258,85 +386,71 @@ def py_xtb_ssr(mata_data,mata_breaks,mata_N,mata_T,mata_numX):
 	numBreaks = PosBreaks.shape
 	numBreaks = numBreaks[0]
 
-	numKTotal = mat.shape[1]-2
-	nx = numX
-	print("numKTotal")
-	print(numKTotal)
-	if nx == numKTotal:
+	numKTotal =mat.shape[1] -2
+
+	if numX == numKTotal:
 		rmCSA = 0
-		csanames = [""]
 	else:
 		rmCSA = 1
-		csanames = ["x"+str(i) for i in range(numX+2,numKTotal+1)]
 
-	columns =["x"+str(i) for i in range(-1,numKTotal+1,1)]
-	xnames = ["x"+str(i) for i in range(2,numX+1,1)]
-
-	data = pd.DataFrame(mat,columns=columns)
-	data.rename(columns={"x-1": "id", "x0": "t"}, errors="raise",inplace=True)
-	data = data.set_index(["id", "t"])	
-	print("numX")
-	print(nx)
-	print(numX)
-	print("numKTotal")
-	print(numKTotal)	
-	print("names")
-	print(columns)
-	print(xnames)
-	print(csanames)
-	print("has csa")
-	print(rmCSA)
-	print(data)
-	numK = mat.shape[1]-3
-	
-	
-	SSR = np.zeros((T[0,0],T[0,0]))	
+	SSR = np.zeros((T,T))	
 
 	
-	PosBreaks = PosBreaks - 1
+	s1 = 0
+	s2 = 0
+	s3 = 0
+	cnti = 0
+	
+	
+	dataR = mat[:,range(2,numKTotal+2)]
+	
+	K_dataR = dataR.shape[1]
+	dataR = dataR.reshape(N,T,K_dataR)
+	
+	selX = list(range(1,numX+1,1))
+	selCSA = list(range(numX+1,K_dataR,1))
+	
 
-	for Breaki in range(0,numBreaks+1):
-		print("regime")
-		print(Breaki)
-		
+	for Breaki in range(0,numBreaks):
+
 		i = PosBreaks[Breaki,0]
 		j = PosBreaks[Breaki,1]
-		tirange = range(i,j+1,1)
+		tirange = list(range(i-1,j,1))
+		csai = 0		
 		
-		csai = 0
+		s_time = time.time()
+		dataRi = dataR[:,tirange,:]
 
-		
-		zz = np.zeros((numX-1,numX-1))
-		zy = np.zeros((numX-1,1))
-		yy = np.zeros((1,1))
-
-		for idx, datai in data.groupby(level=0):
-			y = data.loc[(idx,(tirange)),"x1"]			
-			z = data.loc[(idx,(tirange)),xnames]
-			if rmCSA == 1:
-				csai = data.loc[(idx,(tirange)),csanames]
-				csai = csai.to_numpy()		
-
-			z = z.to_numpy()
-			y = y.to_numpy()
-			
-			yy = yy + py_xtb_qqx(y,y,csai,rmCSA)			
-			zz = zz + py_xtb_qqx(z,z,csai,rmCSA)
-			zy = zy + py_xtb_qqx(z,y,csai,rmCSA)
-
-		res = yy - zy @ (np.linalg.inv(zz) @ zy)
-		SSR[i,j] = res[0,0]
+		y = dataRi[:,:,[0]]
+		z = dataRi[:,:,selX]
 	
-	Mata.create("py_SSR",T[0,0],T[0,0],0)
+		if rmCSA == 1:
+			csai = dataRi[:,:,selCSA]
+
+		s1 = s1 +  time.time() - s_time
+
+		s_time = time.time()
+		yT = py_xtb_partial(y,csai,rmCSA)
+		zT = py_xtb_partial(z,csai,rmCSA)
+		yy = sum(np.transpose(yT, (0, 2, 1)) @ yT)
+		zy = sum(np.transpose(zT, (0, 2, 1)) @ yT)
+		zz = sum(np.transpose(zT, (0, 2, 1)) @ zT)
+		res = yy - zy.T @ py_xtb_solver_s(zz,zy)
+		s3 = s3 + time.time() - s_time
+		
+
+		SSR[i-1,j-1] = res[0,0]
+
+	print([s1,s1/numBreaks])
+	print([s2,s2/numBreaks])
+	print([s3,s3/numBreaks])	
+	
 	Mata.store("py_SSR",SSR)
-
-def py_xtb_qqx(x1,x2,csa,usei):
-	if usei == 1:
-		icsaca = np.linalg.inv((csa.T @ csa))		
-		x2 = x2 - csa @  (icsaca@ (csa.T @ x2))
-		x1 = x1 - csa @  (icsaca@ (csa.T @ x1))
-	return x1.T @ x2 
-
 end
+} 
 }
-
+}
+}
+}
+}
+}

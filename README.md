@@ -6,9 +6,9 @@ For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and
 
 Current Version: ![version](https://img.shields.io/github/v/release/janditzen/xtbreak) ![release](https://img.shields.io/github/release-date/janditzen/xtbreak)
 
-Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
+Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
 
-A working paper describing the panel data theory of xtbreak is available as `Ditzen, J., Karavias, Y. & Westerlund, J. (2023) Multiple Structural Breaks in Interactive Effects Panel Data and the Impact of Quantitative Easing on Bank Lending. arXiv:2211.06707v2 [econ.EM]` [download](https://arxiv.org/abs/2211.06707v2).
+A working paper describing the panel data theory of xtbreak is available as `Ditzen, J., Karavias, Y. & Westerlund, J. (2024) Multiple Structural Breaks in Interactive Effects Panel Data Models. Journal of Applied Econometrics` [download](https://onlinelibrary.wiley.com/doi/10.1002/jae.3097).
 
 
 __Table of Contents__
@@ -16,13 +16,14 @@ __Table of Contents__
 2. [Description](#2-description)
 3. [Options](#3-options)
 4. [Note on Panel Data](#4-note-on-panel-data)
-5. [Examples](#5-examples)
-6. [References](#6-references)
-7. [How to install](#7-how-to-install)
-8. [Citations](#8-citations)
-9. [Questions?](#9-questions?)
-10. [About](#10-authors)
-11. [Changes](#11-changes)
+5. [Python](#5-python)
+6. [Unbalanced Data](#6-unbalanced-data)
+7. [Examples](#7-examples)
+8. [References](#8-references)
+9. [How to install](#9-how-to-install)
+10. [Questions?](#10-questions?)
+11. [About](#11-authors)
+12. [Changes](#12-changes)
 
 # 1. Syntax
 
@@ -39,7 +40,7 @@ xtbreak depvar [indepvars] [if],
 
 ```
 xtbreak test depvar [indepvars] [if], 
-        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options5
+        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options5 options6
 ```
 
 ***breakpoints()*** specifies the time period of the known structural break.
@@ -67,12 +68,17 @@ options1 | Description
 **noconstant** | suppresses constant
 **nobreakvariables(varlist1)** | variables with no structural break(s)
 **vce(type)** | covariance matrix estimator, allowed: ssr, hac, hc and np
+**inverter(type)** inverter, default is speed. See options.
+**python** use Python to calculated SSRs to improve speed. See details.
+**noreweigh** do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unabalanced panels with missing data.
+
 
 #### Options for unknown breakdates
 
 options2 | Description
 --- | ---
 **trimming(real)** | minimal segment length
+**error(real)** | error margin for partial break model
 
 #### Options for testing with unknown breakdates and hypothesis(2)
 
@@ -91,15 +97,25 @@ options4 | Description
 
 options5 | Description
 --- | ---
-***nofixedeffects*** | suppresses fixed effects (only for panel data sets)
-***breakfixedeffects*** | break in fixed effects
-***csd*** | add cross-section averages of variables with and without breaks.
-***csa(varlist)*** | Variables with breaks used to calculate cross-sectional averages
-***csanobreak(varlist)*** | Variables without breaks used to calculate cross-sectional averages
-***kfactors(varlist)*** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
-***nbkfactors(varlist)*** | same as above but without breaks.
+**nofixedeffects** | suppresses fixed effects (only for panel data sets)
+**breakfixedeffects** | break in fixed effects
+**csd** | add cross-section averages of variables with and without breaks.
+**csa(varlist)** | Variables with breaks used to calculate cross-sectional averages
+**csanobreak(varlist)** | Variables without breaks used to calculate cross-sectional averages
+**kfactors(varlist)** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
+**nbkfactors(varlist)** | same as above but without breaks.
 
- Data has to be ``xtset`` before using ``xtbreak``. ``depvars``, ``indepvars`` and ``varlist1``, ``varlist2`` may contain time-series operators. Data has to be balanced.
+#### Options for automatic estimation of number and location of break
+
+options6 | Description
+--- | ---
+**skiph2** | skips hypohesis B
+**clevel(#)** | specifies level for critical values to detect breaks.
+**strict** | strict behaviour of sequential test. Improves speed.
+**maxbreaks(#)** | sets maximum number of breaks for sequential test. Improves speed.
+
+
+ Data has to be ``xtset`` before using ``xtbreak``. ``depvars``, ``indepvars`` and ``varlist1``, ``varlist2`` may contain time-series operators. 
 
 
 # 2. Description
@@ -107,7 +123,7 @@ options5 | Description
 
 **xtbreak estimate** estimates the break points, that is, it estimates *T1*, *T2*, ..., *Ts*.  The underlying idea is that if the model with the true breakdates given a number of breaks has a smaller sum of squared residuals (SSR) than a model with incorrect breakdates.  To find the breakdates, xtbreak estimate uses the alogorthim (dynamic program) from Bai and Perron (2003).  All necessary SSRs are calculated and then the smalles one selected. For more details see [xtbreak estimate](docs/xtbreak_estimate.md).
 
-**xtbreak** implements the tests for and estimation of structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2021).
+**xtbreak** implements the tests for and estimation of structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2024).
 
 For the remainder we assume the following model:
 
@@ -151,6 +167,13 @@ Option | Description
 ***csanobreak()*** | same as ***csa()*** but for variables without a break.
 ***kfactors(varlist)*** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
 ***nbkfactors(varlist)*** | same as above but without breaks.
+***inverter(type)*** | sets the inverter. type can be:  speed (invsym), precision, qr (equivalent to precision; qrinv), chol (chol), p (pinv), or lu (luinv).  Choice of inverter has implications on speed and precision.  For an overview see [https://www.stata.com/manuals/m-4solvers.pdf]([M-4] solvers).
+***python*** |  use Python to calculated SSRs to improve speed.  Requires Stata 16 or later, Python and the following packages: scipy, numpy, pandas and xarray.  
+***noreweigh*** | avoids to reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unabalanced panels with missing data.  Results with this options should be used indicative.  See also section on Unbalanced Panels.
+***skiph2*** |  Skips Hypothesis 2 (H0: no break vs H1: \(0 < s < s_{max}\) breaks) when running xtbreak without the estimate or test option.
+***cvalue(level)*** |  specifies the level of the critical value to be used to estimate the number of breaks using the sequential test.  For example cvalue(0.99) uses the 1\% critical values to determine the number of breaks using the sequential test.  See level(#) for further details.
+***strict*** |  enforces strict behaviour of the sequential test to determine number of breaks.  Sequential test will stop once F(s+1|s) is not rejected given a rejection of F(s|s-1).  Option improves speed in large time series, but should be used with caution.
+***maxbreaks(#)*** | limits number of breaks when using the sequential test to determine number of breaks.  Option improves speed in large time series, but should be used with caution.
 
 # 4. Note on panel data
 
@@ -170,7 +193,27 @@ where b0 is the pooled constant without break, a(i) the fixed effects, b(1) a co
 
 In the estimation of the breakpoints, cross-sectional averages are not taken into account.
 
-# 5. Examples
+# 5. Python
+
+The option python uses Python to calculate the sum of squared residuals (SSRs) necessary to compute the F-Statistics to estimate the dates of breaks and perform tests for an unknown break date.  The number of possible SSRs can be very large and computation time consuming.  For example, for a model without non-breaking variables, one break (m=1) and a minimal segment length of h=trimming * T, the number of SSRs is: 
+
+```T (T + 1)/2 − (h − 1)T + (h − 2)(h − 1)/2 − h2m(m + 1)/2,```
+
+hence in the order of O(T^2).  Using Python improves the speed of calculations.
+
+Python cannot be combined with unbalanced panels.  It uses the standard inverter from numpy (linalg.inv), the pseudo-inverse (linalg.pinv) or SVD decomposition (scipy.linalg.svd).  Differences between results obtained with and without the Python option may occur for ill-conditioned or (nearly) invertible matrices.
+
+**xtbreak** checks if the Python and required packages (numpy, scipy, xarray and pandas) are installed. The option python can only be used with Stata 16 or later.
+
+# 6. Unbalanced Data
+
+**xtbreak** allows for unbalanced panels when using panel data. Pure time series data (i.e. data with only one cross-section) with gaps is not allowed.  In the case of unbalanced panels, the degree of freedom adjustment for the sup F(s) statistic are adjusted.
+
+While **xtbreak**  kallows for unbalanced data, results should be taken with extra caution. The underlying assumption is that the break dates are the same for all units, including those with gaps in the data.  The break date estimation can be biased if data is very unbalanced, that is if a large number of time periods are missing for multiple units.  Care is also required if estimated breaks coincide with the start or end of unbalanced panels.  We strongly recommend to investigate the SSRs using estat ssr after an estimation with a single break point to identify increases or decreases in the estimated SSRs.
+
+The option noreweigh avoids to reweigh time-individual errors for the calculation of the SSR to artificially increase the SSR of unabalanced sections of the panel. Results with this options should be used indicative.
+
+# 7. Examples
 
 ## Time Series
 
@@ -183,25 +226,37 @@ use  https://github.com/JanDitzen/xtbreak/raw/main/data/US.dta
 ```
 
 We start with no prior knowledge of i) the number of breaks and ii) the exact date of each break. 
+As the data might be non-stationary, we use first differences.
 Therefore before estimating the breakpoints we use the sequential F-Test based on hypothesis 2:
 
 ```
-xtbreak deaths L.cases
+xtbreak d.deaths d.L(1/3).cases
 
-Sequential test for multiple breaks at unknown breakpoints
-(Ditzen, Karavias & Westerlund. 2021)
+Test for multiple breaks at unknown breakdates
+(Bai & Perron. 1998. Econometrica)
+H0: no break(s) vs. H1: 1 <= s <= 5 break(s)
 
                 ----------------- Bai & Perron Critical Values -----------------
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- F(1|0)             111.74            12.29            8.58            7.04
- F(2|1)              65.88            13.89           10.13            8.51
- F(3|2)              22.32            14.80           11.14            9.41
- F(4|3)               5.11            15.28           11.83           10.04
- F(5|4)              27.28            15.76           12.25           10.58
+ UDmax               28.91             6.09            4.74            4.13
 --------------------------------------------------------------------------------
-Detected number of breaks: (min)          3               3               3
+
+Sequential test for multiple breaks at unknown breakpoints
+(Ditzen, Karavias & Westerlund. 2024)
+
+                ----------------- Bai & Perron Critical Values -----------------
+                     Test          1% Critical     5% Critical    10% Critical
+                  Statistic          Value            Value           Value
+--------------------------------------------------------------------------------
+ F(1|0)              28.51             6.09            4.66            4.03
+ F(2|1)               5.47             6.59            5.24            4.64
+ F(3|2)               2.78             6.92            5.61            4.99
+ F(4|3)               2.70             7.33            5.87            5.23
+ F(5|4)              19.84             7.49            6.05            5.45
+--------------------------------------------------------------------------------
+Detected number of breaks: (min)          1               2               2
                            (max)          5               5               5
 --------------------------------------------------------------------------------
 Null hypothesis rejected more than once after non-rejection.
@@ -209,33 +264,34 @@ Null hypothesis rejected more than once after non-rejection.
  number of breaks for which the null hypothesis is rejected.
 
 Estimation of break points
-                                                           T    =     82
-                                                           SSR  =    148.42
-                                                      Trimming  =      0.15
+                                            Number of obs       =     79
+                                            SSR                 =     49.07
+                                            Trimming            =      0.15
 --------------------------------------------------------------------------------
   #      Index     Date                          [95% Conf. Interval]
 --------------------------------------------------------------------------------
-  1        16      2020w20                       2020w19        2020w21
-  2        47      2020w51                       2020w19        2021w31
-  3        59      2021w11                       2021w10        2021w12
+  1        15      2020w22                       2020w21        2020w23
+  2        45      2020w52                       2020w51        2021w1 
 --------------------------------------------------------------------------------
-```
-
-We find three breaks, the first in week 20 in 2020 , the second at the end of 2020 and the third in week 11 in 2021. The second break has however large confidence intervals. This indicates that the change in the coefficients is small. We estimate the model with two breaks:
 
 ```
-xtbreak estimate deaths L1.cases, breaks(2)
+
+We find two breaks, the first in week 22 in 2020 and the second at the end of 2020. We can directly estimate the model with two breaks:
+
+```
+xtbreak estimate d.deaths d.L(1/3).cases, breaks(2)
 
 Estimation of break points
-                                                           T    =     82
-                                                           SSR  =    226.85
-                                                      Trimming  =      0.15
+                                            Number of obs       =     79
+                                            SSR                 =     49.07
+                                            Trimming            =      0.15
 --------------------------------------------------------------------------------
   #      Index     Date                          [95% Conf. Interval]
 --------------------------------------------------------------------------------
-  1        16      2020w20                       2020w19        2020w21
-  2        59      2021w11                       2021w9         2021w13
+  1        15      2020w22                       2020w21        2020w23
+  2        45      2020w52                       2020w51        2021w1 
 --------------------------------------------------------------------------------
+
 ```
 
 We find the same two break points.
@@ -243,7 +299,7 @@ We find the same two break points.
 Next we test the hypothesis of no breaks against 2 breaks using hypothesis 1:
 
 ```
-xtbreak test deaths L1.cases, hypothesis(1) breaks(2)
+xtbreak test d.deaths d.L(1/3).cases , hypothesis(1) breaks(2)
 
 Test for multiple breaks at unknown breakdates
 (Bai & Perron. 1998. Econometrica)
@@ -253,27 +309,22 @@ H0: no break(s) vs. H1: 2 break(s)
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- supW(tau)          134.70             9.36            7.22            6.28
+ supF                19.95             4.82            4.00            3.58
 --------------------------------------------------------------------------------
-Estimated break points:  2020w20 2021w11
+Estimated break points: 2020w22 2020w52
 Trimming: 0.15
-
 ```
-
-The test statistic is the same, however the critical values are smaller placing a lower bound on the rejection of the hypothesis.
-
 Since we have an estimate of the breakpoints, we can test the two breakpoints 
 as known breakpoints:
 
 ```
-xtbreak test deaths L1.cases, breakpoints(2020w20 2021w8 , fmt(tw))
+xtbreak test d.deaths d.L(1/3).cases , hypothesis(1) breakpoints(2020W22 2020w52, fmt(tw))
 Test for multiple breaks at known breakdates
 (Bai & Perron. 1998. Econometrica)
 H0: no breaks vs. H1: 2 break(s)
 
- W(tau)        =      116.95
+ F             =       19.95
  p-value (F)   =        0.00
-
 ```
 
 Since we are using a *datelist*, we need to specify the format of it.
@@ -282,7 +333,7 @@ Since we are using a *datelist*, we need to specify the format of it.
 We have established that we have found 2 breaks. We can test the hypothesis 3, i.e. 2 breaks against the alternative of 3 breaks:
 
 ```
-xtbreak test deaths L1.cases, hypothesis(3) breaks(3)
+xtbreak test d.deaths d.L(1/3).cases , hypothesis(3) breaks(3)
 
 Test for multiple breaks at unknown breakpoints
 (Bai & Perron. 1998. Econometrica)
@@ -292,110 +343,99 @@ H0: 2 vs. H1: 3 break(s)
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- F(s+1|s)*           22.32            14.80           11.14            9.41
+ F(s+1|s)*            2.78             6.92            5.61            4.99
 --------------------------------------------------------------------------------
 * s = 2
 Trimming: 0.15
-```
 
-First, note that we have to define in ``breaks()`` the alternative, that is we use ``breaks(3)``. Secondly we can not reject the hypothesis of 2 breaks. However as discussed before, the 3rd break is very small. Using panel data models might add further information and improve the estimation.
-
-So far we have assumed no break in the constant, only in the number of COVID cases. We can test for only a break in the constant and keep the coefficient of the cases fixed. To do so, the options ``nobreakvar(L.cases)`` and ``breakconstant`` are required.
 
 ```
-xtbreak test deaths , breakconstant nobreakvar(L1.cases) breaks(3) h(1)
+
+First, note that we have to define in ``breaks()`` the alternative, that is we use ``breaks(3)``. Secondly we can not reject the hypothesis of 2 breaks. 
+
+To allow for a break in the constant as well, the ``breakconstant`` option can be used:
+
+```
+xtbreak test d.deaths d.L(1/3).cases , hypothesis(1) breaks(2) breakconstant
 
 Test for multiple breaks at unknown breakdates
 (Bai & Perron. 1998. Econometrica)
-H0: no break(s) vs. H1: 3 break(s)
+H0: no break(s) vs. H1: 2 break(s)
 
                 ----------------- Bai & Perron Critical Values -----------------
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- supW(tau)           20.00             7.60            5.96            5.21
+ supF                16.27             4.14            3.44            3.15
 --------------------------------------------------------------------------------
-Estimated break points:  2020w21 2020w46  2021w8
+Estimated break points: 2020w23 2020w52
 Trimming: 0.15
-
 ```
 
-After testing for breaks thoroughly we can estimate the breaks and construct confidence intervals:
+To test if there is only a break in the constant and the cases are nobreaking, the variables are added into the ``nobreakvar()`` option:
 
 ```
-xtbreak estimate deaths L1.cases, breaks(2)
+xtbreak test d.deaths  , hypothesis(1) breaks(2) breakconstant nobreakvar(d.L(1/3).cases)
 
-Estimation of break points
-                                                           T    =     82
-                                                           SSR  =    226.85
-                                                      Trimming  =      0.15
+Test for multiple breaks at unknown breakdates
+(Bai & Perron. 1998. Econometrica)
+H0: no break(s) vs. H1: 2 break(s)
+
+                ----------------- Bai & Perron Critical Values -----------------
+                     Test          1% Critical     5% Critical    10% Critical
+                  Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
-  #      Index     Date                          [95% Conf. Interval]
+ supF                 4.57             9.36            7.22            6.28
 --------------------------------------------------------------------------------
-  1        16      2020w20                       2020w19        2020w21
-  2        59      2021w11                       2021w9         2021w13
---------------------------------------------------------------------------------
+Estimated break points: 2020w18 2020w29
+Trimming: 0.15
 ```
 
-If we want to see the index of the confidence interval rather than the date, the option {cmd:showindex} can be used:
+There is no evidence for breaks in the constant only.
+
+After estimation, we can split the breaking variable using ``estat split`` and then run a OLS regression:
 
 ```
-xtbreak estimate deaths L1.cases, breaks(2) showindex
+xtbreak estimate d.deaths d.L(1/3).cases, breaks(2)
 
-Estimation of break points
-                                                 T    =     82
-                                                 SSR  =    226.85
-                                            Trimming  =      0.15
-----------------------------------------------------------------------
-  #      Index     Date                [95% Conf. Interval]
-----------------------------------------------------------------------
-  1        16      2020w20             15             17
-  2        59      2021w11             57             61
-----------------------------------------------------------------------
-```
-
-We can split the variable L1.cases into the different values for each regime using ``estat split``. The variable list is saved in **r(varlist)** and we run a simple OLS regression on it:
-
-```
-
-. estat split
-New variables created: L_cases1 L_cases2 L_cases3
+ estat split
+New variables created: LD_cases1 LD_cases2 LD_cases3 L2D_cases1 L2D_cases2 L2D_cases3 L3D_cases1 L3D_cases2 L3D_cases3
 
 . reg deaths `r(varlist)'
 
-      Source |       SS           df       MS      Number of obs   =        82
--------------+----------------------------------   F(3, 78)        =    338.24
-       Model |  2951.18975         3  983.729918   Prob > F        =    0.0000
-    Residual |  226.851495        78   2.9083525   R-squared       =    0.9286
--------------+----------------------------------   Adj R-squared   =    0.9259
-       Total |  3178.04125        81  39.2350771   Root MSE        =    1.7054
+      Source |       SS           df       MS      Number of obs   =        79
+-------------+----------------------------------   F(9, 69)        =      1.91
+       Model |  596.717902         9  66.3019891   Prob > F        =    0.0649
+    Residual |  2396.27612        69  34.7286394   R-squared       =    0.1994
+-------------+----------------------------------   Adj R-squared   =    0.0949
+       Total |  2992.99402        78  38.3717182   Root MSE        =    5.8931
 
 ------------------------------------------------------------------------------
       deaths | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-    L_cases1 |   .0589407   .0036153    16.30   0.000     .0517433    .0661381
-    L_cases2 |   .0136155     .00045    30.26   0.000     .0127196    .0145114
-    L_cases3 |   .0064061   .0009669     6.63   0.000     .0044812    .0083311
-       _cons |   1.304738   .3097613     4.21   0.000      .688051    1.921426
+   LD_cases1 |  -.0240564   .0665594    -0.36   0.719    -.1568387    .1087259
+   LD_cases2 |  -.0087608   .0107619    -0.81   0.418    -.0302303    .0127087
+   LD_cases3 |  -.0055262   .0084372    -0.65   0.515    -.0223578    .0113055
+  L2D_cases1 |   .0533405    .084872     0.63   0.532    -.1159745    .2226556
+  L2D_cases2 |   .0147102   .0128244     1.15   0.255    -.0108738    .0402942
+  L2D_cases3 |  -.0045495   .0090462    -0.50   0.617    -.0225961    .0134971
+  L3D_cases1 |   .0808952   .0675054     1.20   0.235    -.0537745    .2155649
+  L3D_cases2 |   .0297254   .0120054     2.48   0.016     .0057753    .0536754
+  L3D_cases3 |  -.0033342   .0081565    -0.41   0.684     -.019606    .0129375
+       _cons |   7.041891   .7204465     9.77   0.000      5.60464    8.479143
 ------------------------------------------------------------------------------
-
 ```
 
 Finally, we can draw a scatter plot of the variables with a different colour for each segement. 
 The command line is ``estat scatter varlist`` where *varlist* is the independent variable (X), 
 the dependent variable is automatically added on the y-axis.
 
-```
-xtbreak estimate deaths L1.cases, breaks(2) showindex
-estat scatter L.cases
-
-```
-
 ![scatter-plot](docs/DeathsScatter.jpg?raw=true "Scatter Plot")
 
-With a bit more of codeing, see [example.do](https://github.com/JanDitzen/xtbreak/tree/main/examples/xtbreak_example.do), we can create a plot with confidence intervals:
+With a bit more of codeing, see [example.do](https://github.com/JanDitzen/xtbreak/tree/main/examples/xtbreak_example.do), we can create a plot with confidence intervals and indicate the different regimes:
 
 ![scatter-plot](docs/DeathsEstCI.png?raw=true "Confidence Intervals")
+
 
 ## Panel Exampels
 
@@ -405,211 +445,113 @@ First we load the dataset:
 ```
 use https://github.com/JanDitzen/xtbreak/raw/main/data/US_panel.dta
 ```
-As before, we start with the sequential F-Test and the estimation of the break dates. We account for heteroskedasticity and autocorrelation by using an HAC robust variance estimator with the option vce(hac). Otherwise the syntax remains the same. ``xtbreak`` automatically detects if a panel or time series is used. 
+As before, we start with the sequential F-Test and the estimation of the break dates. We use the heterosekdastic standard errors and a trimming of 1%. Otherwise the syntax remains the same. ``xtbreak`` automatically detects if a panel or time series is used. 
 
 ```
-xtbreak deaths L.cases, vce(hac)
+xtbreak d.deaths d.L(1/3).cases, vce(hc) trim(0.1) 
 
-Sequential test for multiple breaks at unknown breakpoints
-(Ditzen, Karavias & Westerlund. 2021)
+Test for multiple breaks at unknown breakdates
+(Ditzen, Karavias & Westerlund. 2024)
+H0: no break(s) vs. H1: 1 <= s <= 9 break(s)
 
                 ----------------- Bai & Perron Critical Values -----------------
                      Test          1% Critical     5% Critical    10% Critical
                   Statistic          Value            Value           Value
 --------------------------------------------------------------------------------
- F(1|0)              29.59            12.29            8.58            7.04
- F(2|1)              37.75            13.89           10.13            8.51
- F(3|2)              10.88            14.80           11.14            9.41
- F(4|3)              21.38            15.28           11.83           10.04
- F(5|4)               8.29            15.76           12.25           10.58
+ UDmax               13.60             6.25            4.95            4.42
 --------------------------------------------------------------------------------
-Detected number of breaks: (min)          2               2               4
-                           (max)          4               4               4
+
+Sequential test for multiple breaks at unknown breakpoints
+(Ditzen, Karavias & Westerlund. 2024)
+
+                ----------------- Bai & Perron Critical Values -----------------
+                     Test          1% Critical     5% Critical    10% Critical
+                  Statistic          Value            Value           Value
+--------------------------------------------------------------------------------
+ F(1|0)              11.90             6.24            4.87            4.26
+ F(2|1)               9.31             6.78            5.51            4.85
+ F(3|2)               8.50             7.20            5.81            5.21
+ F(4|3)              10.76             7.45            5.99            5.49
+ F(5|4)               1.14             7.65            6.20            5.65
+ F(6|5)               4.82             7.79            6.34            5.78
+ F(7|6)               1.24             7.84            6.42            5.89
+ F(8|7)               2.20             7.90            6.54            5.98
+ F(9|8)               2.44             7.93            6.65            6.12
+--------------------------------------------------------------------------------
+Detected number of breaks:                4               4               4
+--------------------------------------------------------------------------------
+The detected number of breaks indicates the highest number of
+ breaks for which the null hypothesis is rejected.
+
+Estimation of break points
+                                            Number of obs       =   4740
+                                            Number of Groups    =     60
+                                            Obs per group       =     79
+                                            SSR                 =     13.88
+                                            Trimming            =      0.10
+--------------------------------------------------------------------------------
+  #      Index     Date                          [95% Conf. Interval]
+--------------------------------------------------------------------------------
+  1        7       2020w14                       2020w13        2020w15
+  2        14      2020w21                       2020w20        2020w22
+  3        46      2021w1                        2020w52        2021w2 
+  4        53      2021w8                        2021w7         2021w9 
+--------------------------------------------------------------------------------
+
+```
+
+As there might be cross-sectional dependence presence, we add cross-sectional averages und use standard errors from Westerlund, Petrova and Norkute (2019):
+
+```
+ xtbreak d.deaths d.L(1/3).cases,  csa(d.l.cases) vce(wpn) trim(0.1) skiph2
+
+Sequential test for multiple breaks at unknown breakpoints
+(Ditzen, Karavias & Westerlund. 2024)
+
+                ----------------- Bai & Perron Critical Values -----------------
+                     Test          1% Critical     5% Critical    10% Critical
+                  Statistic          Value            Value           Value
+--------------------------------------------------------------------------------
+ F(1|0)               6.32             6.24            4.87            4.26
+ F(2|1)              68.68             6.78            5.51            4.85
+ F(3|2)              73.44             7.20            5.81            5.21
+ F(4|3)               9.10             7.45            5.99            5.49
+ F(5|4)               4.50             7.65            6.20            5.65
+ F(6|5)              13.82             7.79            6.34            5.78
+ F(7|6)              10.33             7.84            6.42            5.89
+ F(8|7)              10.40             7.90            6.54            5.98
+ F(9|8)               8.04             7.93            6.65            6.12
+--------------------------------------------------------------------------------
+Detected number of breaks: (min)          4               4               4
+                           (max)          9               9               9
 --------------------------------------------------------------------------------
 Null hypothesis rejected more than once after non-rejection.
  The detected number of breaks indicates the minimum and maximum
  number of breaks for which the null hypothesis is rejected.
 
 Estimation of break points
-                                                           N    =     60
-                                                           T    =     82
-                                                           SSR  =     52.33
-                                                      Trimming  =      0.15
+                                            Number of obs       =   4740
+                                            Number of Groups    =     60
+                                            Obs per group       =     79
+                                            SSR                 =     10.89
+                                            Trimming            =      0.10
 --------------------------------------------------------------------------------
   #      Index     Date                          [95% Conf. Interval]
 --------------------------------------------------------------------------------
-  1        15      2020w19                       2020w18        2020w20
-  2        59      2021w11                       2021w10        2021w12
---------------------------------------------------------------------------------
-```
-
-We find evidence for 2 and 4 breaks. ``xtbreak`` displays the number of breaks the first time the hypothesis is not rejected, in this case 2 breaks. As this is a panel data set, we account for cross-section dependence as well using ``csa(L.cases)`` and we set the minimal length to 10% with ``minlength(0.1)``:
-
-```
-xtbreak deaths L.cases, vce(hac) csa(L.cases) trimming(0.1)
-
-Sequential test for multiple breaks at unknown breakpoints
-(Ditzen, Karavias & Westerlund. 2021)
-
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- F(1|0)              10.80            13.00            9.10            7.42
- F(2|1)               8.10            14.51           10.55            9.05
- F(3|2)              12.77            15.44           11.36            9.97
- F(4|3)               4.47            15.73           12.35           10.49
- F(5|4)               9.27            16.39           12.97           10.91
- F(6|5)               5.22            16.60           13.45           11.29
- F(7|6)               5.05            16.78           13.88           11.86
- F(8|7)               5.61            16.90           14.12           12.26
- F(9|8)               4.89            16.99           14.45           12.57
---------------------------------------------------------------------------------
-Detected number of breaks: (min)          .               1               1
-                           (max)          .               3               3
---------------------------------------------------------------------------------
-Null hypothesis rejected more than once after non-rejection.
- The detected number of breaks indicates the minimum and maximum
- number of breaks for which the null hypothesis is rejected.
-
-Estimation of break points
-                                                           N    =     60
-                                                           T    =     82
-                                                           SSR  =     54.06
-                                                      Trimming  =      0.10
---------------------------------------------------------------------------------
-  #      Index     Date                          [95% Conf. Interval]
---------------------------------------------------------------------------------
-  1        15      2020w19                       2020w18        2020w20
+  1        7       2020w14                       2020w13        2020w15
+  2        14      2020w21                       2020w20        2020w22
+  3        45      2020w52                       2020w51        2021w1 
+  4        53      2021w8                        2021w7         2021w9 
 --------------------------------------------------------------------------------
 Cross-section averages:
-  with breaks: L.cases
-```
-
-Using this we observe that the values of the test stastic across all F-Statistics are relatively low. We are never able to reject the hypothesis of no break at a level of 1\%. Using a level of 5\%, we are able to reject F(1|0) and F(3|2), which implies either no break (indicated by .), 1 break or 3 breaks. We will investigate this next.
-
-We test the null of no breaks against up to 5 breaks and abbreviate hypothesis with ``h``:
-
-```
-xtbreak test deaths L.cases, h(2) breaks(5) trim(0.1) vce(hac) csa(L.cases)
-
-T
-Test for multiple breaks at unknown breakdates
-(Ditzen, Karavias & Westerlund. 2021)
-H0: no break(s) vs. H1: 1 <= s <= 5 break(s)
-
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- UDmax(tau)          12.20            13.07            9.52            8.05
---------------------------------------------------------------------------------
-* evaluated at a level of 0.95.
-Trimming: 0.10
-Cross-section averages:
-  with breaks: L.cases
+  with breaks: LD.cases
 
 ```
 
-We find evidence for breaks, thus we are going to test the alternatives of one and three breaks:
-
-```
-xtbreak test deaths L.cases, h(1) breaks(1) trim(0.1) vce(hac) csa(L.cases)
-
-Test for multiple breaks at known breakdates
-(Karavias, Narayan & Westerlund. 2021)
-H0: no break(s) vs. H1: 1 break(s)
-
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- supW(tau)           10.80            13.00            9.10            7.42
---------------------------------------------------------------------------------
-Estimated break points:  2020w19
-Trimming: 0.10
-Cross-section averages:
-  with breaks: L.cases
-
-```
-
-and
-
-```
-xtbreak test deaths L.cases, h(1) breaks(3) trim(0.1) vce(hac) csa(L.cases)
-
-Test for multiple breaks at unknown breakdates
-(Ditzen, Karavias & Westerlund. 2021)
-H0: no break(s) vs. H1: 3 break(s)
-
-                ----------------- Bai & Perron Critical Values -----------------
-                     Test          1% Critical     5% Critical    10% Critical
-                  Statistic          Value            Value           Value
---------------------------------------------------------------------------------
- supW(tau)           12.20             8.42            6.84            6.09
---------------------------------------------------------------------------------
-Estimated break points:  2020w19 2020w51  2021w9
-Trimming: 0.10
-Cross-section averages:
-  with breaks: L.cases
-
-```
-
-Given that we are just about to reject the null hypothesis in the case of 1 break, we will assume 3 breaks. Next we are going to estimate the break points and run a fixed effects regression:
-
-```
-xtbreak estimate deaths L.cases, breaks(3) trim(0.1) vce(hac) csa(L.cases)
-
-Estimation of break points
-                                                           N    =     60
-                                                           T    =     82
-                                                           SSR  =     25.99
-                                                      Trimming  =      0.10
---------------------------------------------------------------------------------
-  #      Index     Date                          [95% Conf. Interval]
---------------------------------------------------------------------------------
-  1        15      2020w19                       2020w18        2020w20
-  2        47      2020w51                       2020w50        2020w52
-  3        57      2021w9                        2021w8         2021w10
---------------------------------------------------------------------------------
-Cross-section averages:
-  with breaks: L.cases
+The estimated break dates remain the same.
 
 
-estat split L.cases
-New variables created: L_cases1 L_cases2 L_cases3 L_cases4
-
-xtreg deaths `r(varlist)', fe
-
-Fixed-effects (within) regression               Number of obs     =      4,920
-Group variable: ID                              Number of groups  =         60
-
-R-squared:                                      Obs per group:
-     Within  = 0.8144                                         min =         82
-     Between = 0.9721                                         avg =       82.0
-     Overall = 0.8565                                         max =         82
-
-                                                F(4,4856)         =    5325.62
-corr(u_i, Xb) = 0.3305                          Prob > F          =     0.0000
-
-------------------------------------------------------------------------------
-      deaths | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-    L_cases1 |   .0745328   .0008793    84.76   0.000      .072809    .0762566
-    L_cases2 |   .0123852   .0001553    79.77   0.000     .0120808    .0126895
-    L_cases3 |   .0157277    .000136   115.67   0.000     .0154611    .0159942
-    L_cases4 |   .0077951   .0002327    33.50   0.000     .0073389    .0082512
-       _cons |   .0172031   .0018211     9.45   0.000     .0136328    .0207734
--------------+----------------------------------------------------------------
-     sigma_u |  .03534295
-     sigma_e |  .10880368
-         rho |  .09544505   (fraction of variance due to u_i)
-------------------------------------------------------------------------------
-F test that all u_i=0: F(59, 4856) = 7.29                    Prob > F = 0.0000
-
-```
-
-# 6. References
+# 8. References
 
 Andrews, D. W. K. (1993).  Tests for Parameter Instability and Structural Change With Unknown Change Point.  Econometrica, 61(4), 821–856. [link](https://www.jstor.org/stable/2951764).
 
@@ -617,11 +559,13 @@ Bai, B. Y. J., & Perron, P. (1998).  Estimating and Testing Linear Models with M
 
 Bai, J., & Perron, P. (2003).  Computation and analysis of multiple structural change models.  Journal of Applied Econometrics, 18(1), 1–22. [link](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659).
 
-Ditzen, J., Karavias, Y. & Westerlund, J. (2023) Multiple Structural Breaks in Interactive Effects Panel Data and the Impact of Quantitative Easing on Bank Lending. arXiv:2211.06707v2 [econ.EM] [download](https://arxiv.org/abs/2211.06707v2)
+Ditzen, J., Karavias, Y. & Westerlund, J. (2024) Testing for Multiple Structural Breaks in Panel Data. Journal of Applied Econometrics [link](https://onlinelibrary.wiley.com/doi/full/10.1002/jae.3097)
 
-Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM]. [link](https://arxiv.org/abs/2110.14550).
+Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM]. [link](https://arxiv.org/abs/2110.14550).
 
 Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. arXiv:2111.03035 [econ.EM]. [link](https://arxiv.org/abs/2111.03035)
+
+Westerlund, J., Petrova, Y., & Norkute, M. (2019).  CCE in fixed-T panels.  Journal of Applied Econometrics, 34(5), 1–16. [link](https://onlinelibrary.wiley.com/doi/10.1002/jae.2707)
 
 ## Slides
 1. [Slides 2020 Swiss Stata User Group Meeting](https://www.stata.com/meeting/switzerland20/slides/Switzerland20_Ditzen.pdf)
@@ -629,7 +573,7 @@ Karavias, Y, Narayan P. & Westerlund, J. (2021) Structural breaks in Interactive
 3. [Slides 2021 US Stata Conference](https://www.stata.com/meeting/us21/slides/US21_Ditzen.pdf)
 
 
-# 7. How to install
+# 9. How to install
 
 The latest version of the ***xtbreak*** package can be obtained by typing in Stata:
 
@@ -640,27 +584,11 @@ net from https://janditzen.github.io/xtbreak/
 ``xtbreak`` requires Stata 15 or newer.
 
 
-# 8. Citations
-
-``xtbreak`` has been used in (selection):
-
-1. Regulator, E., Fallon, J., Cunningham, M. and da Silva Rosa, R., 2021. Methodological issues in estimating the equity beta for Australian network energy businesses. [Link](https://www.aer.gov.au/system/files/Report%20to%20the%20AER%20-%20Methodological%20issues%20in%20estimating%20the%20equity%20beta%20for%20Australian%20network%20energy%20businesses%20-%2030%20June%202021.pdf)
-
-2. Gabriel Chodorow-Reich, Adam M. Guren, and Timothy J. McQuade, 2021. "The 2000s Housing Cycle With 2020 Hindsight: A Neo-Kindlebergerian View". NBER Working Paper No. 29140. [Link](https://www.nber.org/papers/w29140)
-
-3. Rohne Till, E, 2022. Is this time different? Social capability and catch-up growth in Ethiopia, 1950–2020. Journal of International Development, 34( 7), 1259– 1281. [Link](https://doi.org/10.1002/jid.3630)
-
-4. Thai-Ha Le, Manh-Tien Bui, Gazi Salah Uddin, 2022. Economic and social impacts of conflict: A cross-country analysis, Economic Modelling, Volume 115. [Link](https://doi.org/10.1016/j.econmod.2022.105980).
-
-5. Rekha R, Suresh Babu M. 2022. Premature deindustrialisation and growth slowdowns in middle-income countries. Structural Change and Economic Dynamics. Volume 62. [Link](https://doi.org/10.1016/j.strueco.2022.04.001).
-
-6. Kenneth S. Rogoff, Barbara Rossi, and Paul Schmelzing. 2022. Long-Run Trends in Long-Maturity Real Rates 1311-2021. NBER Working Paper No. 30475. [Link](https://www.nber.org/papers/w30475)
-
-# 9. Questions?
+# 10. Questions?
 
 Questions? Feel free to write us an email, open an [issue](https://github.com/JanDitzen/xtbreak/issues) or [start a discussion](https://github.com/JanDitzen/xtbreak/discussions).
 
-# 10. Authors
+# 11. Authors
 
 #### Jan Ditzen (Free University of Bozen-Bolzano)
 
@@ -668,9 +596,9 @@ Email: jan.ditzen@unibz.it
 
 Web: www.jan.ditzen.net
 
-### Yiannis Karavias (University of Birmingham)
+### Yiannis Karavias (Brunel University)
 
-Email: I.Karavias@bham.ac.uk
+Email: yiannis.karavias@brunel.ac.uk
 
 Web: https://sites.google.com/site/yianniskaravias/
 
@@ -681,11 +609,13 @@ Email: joakim.westerlund@nek.lu.se
 Web: https://sites.google.com/site/perjoakimwesterlund/
 
 ## Please cite as follows:
-Ditzen, J., Karavias, Y. & Westerlund, J. (2021) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].
+Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].
 
-# 11. Changes
+# 12. Changes
 
-This version 1.5 - 08.05.2024
+Changed to 2.0
+- Bugfixes in dynamic program, partial break model and variance estimator.
+- Added options inverter(), skiph2, strict, maxbreaks(), python and allow for unbalanced panels.
 
 Changed to 1.5
 - additional checks if breaks and trimming are valid

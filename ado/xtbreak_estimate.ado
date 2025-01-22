@@ -30,19 +30,42 @@ program define xtbreak_estimate, eclass
 		forcefe								/// internal option: allows for fixed effects with constant
 		FORCECONstant						/// forces constant
 		allowunbalanced						/// allows unbalanced data
+		NOREWEIGH							/// reweight in case of unabalanced data
 		donotdisptrim						/// do not show trimming at bottom
 		python								/// use python to calculate SSR
+		INVerter(string)					/// favour precision over speed; options: speed (default), precision, qr, chol, p or lu
+		NODEPLAG							/// do not check if lag of dep var used
 	]
 
 		*** mark sample
 		tempname touse
 		marksample touse
-		
+
 		************************************************
 		**** Checks
 		************************************************
+		/* Inverter:
+		-1 Speed (invsym)
+		0 Precision QR
+		1 Chol
+		2 LU
+		3 P (Moore Penrose)
+		*/
+
+		if "`inverter'" == "speed" local inverter = -1 
+		else if "`inverter'" == "precision" | "`inverter'" == "qr"  local inverter = 0
+		else if "`inverter'" == "chol" local inverter = 1
+		else if "`inverter'" == "lu" local inverter = 2
+		else if "`inverter'" == "p" local inverter = 3
+		else local inverter = -1
+
+		if "`breaks'" == "0" {
+			ereturn scalar num_breaks = 0
+			exit
+		}
+
 		if "`python'" != "" {
-			noi disp "USE PYTHON!"
+			xtbreak_pycheck
 		}
 		*** check that moremata is installed
 		qui{
@@ -67,8 +90,9 @@ program define xtbreak_estimate, eclass
 			disp "varlist is `varlist'"
 			local varlist_o `varlist'
 
-			if "`vce'" == "" & "`varestimator'" != "" {
-				local vce "`vce'"
+			if "`vce'" == "" local vce ssr
+			else if "`vce'" == "" & "`varestimator'" != "" {
+				local vce "`varestimator'"
 			}
 			
 			*** parse options
@@ -84,12 +108,16 @@ program define xtbreak_estimate, eclass
 			else  if strlower("`vce'") == "hc" | {
 				local vce = 4
 			}
+			else  if strlower("`vce'") == "wpn" | {
+				local vce = 5
+			}
 			else {
+				noi disp "Invalid choice for variance estimator. Default set to SSR."
 				/// standard case; for panel switch to KW; for time series to ssr 
 				local vce = 99
 			}
 			
-*** check for impossible options
+			*** check for impossible options
 			if wordcount("`varlist'") == 1 {
 				if "`breakconstant'" == "" {
 					noi disp "No variable(s) to test."
@@ -115,45 +143,78 @@ program define xtbreak_estimate, eclass
 			}
 			
 			*** check if tsset or xtset and sorted
-			
 			cap _xt
 			if _rc == 0 {
-				local tvar_o `r(tvar)'
-				local idvar `r(ivar)'	
+				xtset
+				local tvar_o `r(timevar)'
+				local idvar `r(panelvar)'	
 				local idvars `idvar'
 				local IsPanel = 0
-				xtset
-				if 	`r(imax)' != `r(imin)' {
+				
+				if 	`r(imax)' != `r(imin)' | "`idvar'" != "" {
 					local IsPanel = 1
 				}
+
+				_xtstrbal `idvar' `tvar_o' `touse'
+				if "`r(strbal)'" != "yes" {
+					noi disp in ye "Panel is unbalanced or has missing values in variables. SSRs reweighed to account for missings, see help file."
+				}
+
 				*** Only internal/testing option!
+				/*
 				if "`allowunbalanced'" != "" { 
+					noi disp as error "OPTION NOT OFFICIALY SUPPORTED!!! "
+					/*
 					tempvar ino
 					gen `ino' = 1
 					tsfill, full
 					tsrevar `varlist', list 
-					foreach var in `r(varlist)' {
+					foreach var in `r(varlist)' `nobreakvariables'  {
 						replace `var' = 0 if `ino' == .
 					} 
 					markout `touse' `varlist'
 					drop `ino' 
-					xtset
+					xtset*/
+					
 				}
-				if "`r(balanced)'" != "strongly balanced" {
-					noi disp as error "Only balanced panels allowed."
-					error(199)
-				}		
+				else {
+					_xtstrbal `idvar' `tvar_o' `touse'
+					if "`r(strbal)'" != "yes" {
+						noi disp as error "Panel is unbalanced or has missing values in variables. Balanced panels are required."
+						error(498)
+					}
+				}
+				*/
+				
 			}
 			else{
+				tsreport if `touse'
+				if "`r(N_gaps)'" != "0" {
+					noi disp as error "Time Series contains gaps. Gaps are not allowed."
+					error(498)
+				}
 				tsset
 				if "`r(panelvar)'" == "" {	
-					local tvar_o `r(timevar)'
 					tempvar idvar_bogus
 					gen `idvar_bogus' = 1
-					local idvar `idvar_bogus' 
+					local tvar_o `r(timevar)'
+					local idvar `idvar_bogus'
+					local idvars  
+					local IsPanel = 0
 				}
-				local IsPanel = 0
-			}			
+				else {
+					local IsPanel = 1
+				}
+			}
+			
+			if `IsPanel' == 0 {
+				if "`csa'" != "" | "`csanobreak'" != "" | "`csd'" != "" {
+					noi disp as error "Options csa, csanobreak or csd can only be used in panels."
+					local csa ""
+					local csanobreak ""
+					local csd ""
+				}
+			}	
 			issorted `idvars' `tvar_o'
 			
 			*** Additional check if panel model used and only breakconstant specified, assumption is no fixed effects
@@ -167,10 +228,42 @@ program define xtbreak_estimate, eclass
 			issorted `idvars' `tvar_o'
 			tsrevar `varlist'
 			local indepdepvars "`r(varlist)'"
+
+			*** Check if nobreakvar and depvars include same vars
+			local check_all_vars: list indepdepvars & nobreakvariables
+			if "`check_all_vars'" != "" {
+				noi disp as error "Variable(s) `check_all_vars' defined as breaking and non-breaking."
+				error 198
+			}
 			
+			*** Check for lag of dep var and collinearity
+			gettoken tmp1 tmp2: indepdepvars
+			_rmcoll `tmp2' `nobreakvariables' L.`tmp1'  if `touse'
+			if r(k_omitted) > 0 & regexm("`r(varlist)'","oL.`tmp1'") & "`nodeplag'" == "" {
+				_rmcoll L.`tmp1' `tmp2' `nobreakvariables' if `touse' , forcedrop
+				local Ltmp `tmp2' `nobreakvariables' 
+				local Ltmp2 `r(varlist)'
+				local dropped_var: list Ltmp2 - Ltmp
+				*noi disp as error "Warning: lagged dependent variables not allowed in the panel case. Remove the lagged dependent variable and specify an appropriate vce option. Serial correlation in panels is dealt through the error variance-covariance matrix."
+				if `IsPanel' == 1 local LagDepWarningMSG "Warning: lagged dependent variables not allowed in the panel case. Remove the lagged dependent variable and specify an appropriate vce option. Serial correlation in panels is dealt through the error variance-covariance matrix."
+			}
+			else if r(k_omitted) > 0 {
+				noi _rmcoll `indepdepvars' `nobreakvariables'  if `touse'
+				local tmpvarlist `r(varlist)'
+				local indepdepvars: list indepdepvars & tmpvarlist
+				local nobreakvariables: list nobreakvariables & tmpvarlist
+
+			}
+			else {
+				noi _rmdcoll `indepdepvars' `nobreakvariables' if `touse'
+				local tmpvarlist `tmp1' `r(varlist)'
+				local indepdepvars: list indepdepvars & tmpvarlist
+				local nobreakvariables: list nobreakvariables & tmpvarlist
+			}
+
 			*** adjust touse
 			markout `touse' `indepdepvars'
-			
+
 			*** create cross-sectional averages
 			*** main csd option - will overwrite csa and csanobreak!
 			if "`csd'" != "" {
@@ -213,6 +306,8 @@ program define xtbreak_estimate, eclass
 			
 			if "`kfactors'" != "" {
 				tsunab kfactors: `kfactors'
+				hascommonfactors `kfactors'  if `touse' , tvar(`tvar_o') idvar(`idvar') localname(check) localnamek(tmp)
+				if "`check'" != "" noi disp in ye "Variable `check' not constant across units. Variable not a common factor!"
 				local csa_list "`csa_list' `kfactors' `kfactorsauto'"
 			}
 
@@ -240,6 +335,8 @@ program define xtbreak_estimate, eclass
 
 			if "`nbkfactors'" != "" {
 				tsunab nbkfactors: `nbkfactors'
+				hascommonfactors `nbkfactors'  if `touse' , tvar(`tvar_o') idvar(`idvar') localname(check) localnamek(tmp)
+				if "`check'" != "" noi disp in ye "Variable `check' not constant across units. Variable not a common factor!"
 				local csanb_list "`csanb_list' `nbkfactors' `nbkfactorsauto'"
 			}
 
@@ -250,6 +347,18 @@ program define xtbreak_estimate, eclass
 			else {
 				local dynamicpartial = 0
 			}
+
+			issorted `idvars' `tvar_o'	
+			*** check for collinear factors
+			if "`csa_list'`csanb_list'" != "" {
+				qui _rmcoll `csa_list' `csanb_list' if `touse'
+				if r(k_omitted) > 0 {
+					noi _rmcoll `csa_list' `csanb_list' if `touse'
+					local tmpvarlist `r(varlist)'
+					local csa_list: list csa_list & tmpvarlist
+					local csanb_list: list csanb_list & tmpvarlist
+				}
+			} 
 			
 			issorted `idvars' `tvar_o'		
 			markout `touse' `indepdepvars' `nobreakvariables' `csa_list' `csanb_list'
@@ -361,8 +470,8 @@ program define xtbreak_estimate, eclass
 
 
 			issorted `idvars' `tvar_o'
-			tempname EstCoeff EstCov EstBreak EstCI level stats
-			mata xtbreak_EstBreaks("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`trimming',"`region'",`vce',`demean',(`dynamicpartial',`num_csa',`num_csanb'),`error',1,`EstCoeff'=.,`EstCov'=.,`EstBreak'=.,`EstCI'=.,"`level'", "`stats'","`python'"!="")
+			tempname EstCoeff EstCov EstBreak EstCI level stats EstSSRMat
+			mata xtbreak_EstBreaks("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`trimming',"`region'",`vce',`demean',(`dynamicpartial',`num_csa',`num_csanb'),`error',1,`EstCoeff'=.,`EstCov'=.,`EstBreak'=.,`EstCI'=.,`EstSSRMat'=.,"`level'", "`stats'","`python'"!="")
 			
 
 			mata st_local("`EstBreak'",invtokens(strofreal(`EstBreak'')))
@@ -411,15 +520,27 @@ program define xtbreak_estimate, eclass
 			local colMax = 70
 			local adj = 0
 		}
+		local colheader = `colheader' - 15
 
 		disp ""
 		disp in smcl as text _col(1) "Estimation of break points"
+		disp in smcl as text _col(`colheader') "Number of obs" _col(`colCI2') "= " as result %6.0f `stats'_NT
 		if `stats'_N >  1 {
-			disp in smcl as text _col(`colheader') "N" _col(`colCI2') "= " as result %6.0f `stats'_N
+			disp in smcl as text _col(`colheader') "Number of Groups" _col(`colCI2') "= " as result %6.0f `stats'_N
 		}
-		disp in smcl as text _col(`colheader') "T"  _col(`colCI2') "= " as result %6.0f `stats'_T
+		if `balanced' == 1 & `stats'_N >  1{
+			disp in smcl as text _col(`colheader') "Obs per group"  _col(`colCI2') "= " as result %6.0f `stats'_T
+		}
+		else if `stats'_N >  1{
+			dis "" 
+			disp in smcl as text _col(`colheader') "Obs per group:" 
+			disp in smcl as text _col(`=`colheader'+15') "min"  _col(`colCI2') "= " as result %6.0f `stats'_Tmin
+			disp in smcl as text _col(`=`colheader'+15') "avg"  _col(`colCI2') "= " as result %6.1f `stats'_Tavg
+			disp in smcl as text _col(`=`colheader'+15') "max"  _col(`colCI2') "= " as result %6.0f `stats'_Tmax	
+			dis ""
+		}
 		disp in smcl as text _col(`colheader') "SSR "  _col(`colCI2') "= " as result %9.2f `stats'_minSSR
-		disp in smcl as text _col(`=`colheader'-5') "Trimming "  _col(`colCI2') "= " as result %9.2f `trimming'
+		disp in smcl as text _col(`colheader') "Trimming "  _col(`colCI2') "= " as result %9.2f `trimming'
 		disp in smcl as text "{hline `colMax'}"
 		disp in smcl as text _col(3) "#" _col(10) "Index" _col(20) "Date" _col(`colCI1') "[`=`level''% Conf. Interval]"
 		disp in smcl as text "{hline `colMax'}"
@@ -445,6 +566,8 @@ program define xtbreak_estimate, eclass
 			}
 		}
 
+		if "`LagDepWarningMSG'" != "" noi disp as text  "`LagDepWarningMSG'"
+
 		return clear
 		ereturn clear
 
@@ -454,7 +577,15 @@ program define xtbreak_estimate, eclass
 		gettoken lhs rhs: vars
 		ereturn hidden local breakvars "`rhs'"
 		ereturn hidden local depvar "`lhs'"
-		ereturn hidden matrix SSRm = `stats'_SSRm
+		
+		ereturn matrix SSRmat = `stats'_SSRmat
+
+		if "`breaks'" == "1" {
+			ereturn matrix SSRvec = `stats'_SSRvec
+			
+		}
+		mata xtbreak_SSRvec = `EstSSRMat'
+
 		ereturn local cmd "`cmd'"
 		
 		ereturn matrix breaks = breaks
@@ -463,7 +594,13 @@ program define xtbreak_estimate, eclass
 
 		ereturn hidden local estat_cmd "xtbreak_estat"
 		ereturn hidden scalar HasBreakCons = ("`breakconstant'`breakfixedeffects'" != "") 
+		if wordcount("`breaks'") == 1 ereturn scalar num_breaks = `breaks'
+		else ereturn scalar num_breaks = wordcount("`breaks'")
 
+		/// clear memory
+		foreach el in EstCoeff EstCov EstBreak EstCI   EstSSRMat {
+			cap mata mata drop `el'
+		}
 
 
 end

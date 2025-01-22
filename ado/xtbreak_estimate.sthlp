@@ -21,6 +21,11 @@
 
 INCLUDE help xtbreak_options
 
+{p 4 4}Data has to be {help tsset} or {help xtset} before using {cmd:xtbreak}. 
+{depvars}, {indepvars} and {it:varlist}, {it:varlist}1 - {it:varlist}5 may contain time-series operators, see {help tsvarlist}.{break}
+{cmd:xtdcce2} requires the {help moremata} package.
+
+
 {title:Contents}
 
 {p 4}{help xtbreak_estimate##description:Description}{p_end}
@@ -59,7 +64,7 @@ T1, T2, ..., Ts.
 It implements the methods for detection of structural breaks discussed in 
 Bai & Perron ({help xtbreak_estimate##BP1998:1998}, {help xtbreak_estimate##BP2003:2003}),
 Karavias, Narayan, Westerlund ({help xtbreak_estimate##KNW2021:2022})
-and Ditzen, Karavias, Westerlund ({help xtbreak_estimate##DKW2021:2021}). 
+and Ditzen, Karavias, Westerlund ({help xtbreak_estimate##DKW2021:2024}). 
 The underlying idea is that if the model with the true breakdates given a number of breaks
 has a smaller sum of squared residuals (SSR) than a model with 
 incorrect breakdates. 
@@ -98,13 +103,14 @@ INCLUDE help xtbreak_PanelVarCov
 {col 8}{cmd: e(breaks)}{col 27}Matrix with break dates. First row indicates the index (t=1,..,T), second the value of the time identifier (for example 2000, 2001, ...).
 {col 8}{cmd: e(CI)}{col 27}Confidence intervals with dimension {it:4 x number_breaks}.  
 {col 27}The first two rows are the lower and upper 95% intervals using time indices, the second two rows are in the value of the time identifier.
+{col 8}{cmd: e(ssr)}{col 27}Matrix with SSRs for selection of break dates. Only if breaks(1) used.
 
 {col 4} Macros
 {col 8}{cmd: e(sample)}{col 27}sample
 
 {marker postest}{title:Postestimation}
 
-{p 4 4}{cmd:xtbreak estimate} supports three {cmd:estat} functions. The syntax to create an indicator is:{p_end}
+{p 4 4}{cmd:xtbreak estimate} supports four {cmd:estat} functions. The syntax to create an indicator is:{p_end}
 
 {p 8 13}{cmd:estat} {cmdab:indic:ator} [{newvar}]{p_end}
 
@@ -124,6 +130,11 @@ the dependent variable in the y-axis:{p_end}
 {cmd:estat scatter} draws a scatter plot with the dependent variable on the
 y-axis and a variable with breaks defined in {varname} on the x-axis. 
 {p_end}
+
+{p 4 4}In the case of a single break, a line plot with the SSRs can be drawn using:{p_end}
+{p 8 13}{cmd:estat ssr}{p_end}
+
+{p 4 4}The break is indicated by a dotted line and at the minimum of the SSRs.{p_end}
 
 {marker examples}{title:Examples}
 

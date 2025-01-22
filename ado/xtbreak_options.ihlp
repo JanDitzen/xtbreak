@@ -7,6 +7,10 @@
 {synopt:{opt noconst:ant}}suppresses constant or pooled constant in panel model{p_end}
 {synopt:{opt nobreakvar:iables(varlist1)}}variables with no structural break(s){p_end}
 {synopt:{opt vce(type)}}covariance matrix estimator, allowed: ssr, hac, hc and np{p_end}
+{synopt:{opt inverter(type)}}inverter, default is speed. See {help xtbreak##inverter:options}.{p_end}
+{synopt:{opt python}}use Python to calculated SSRs to improve speed. See {help xtbreak##python:details}.{p_end}
+{synopt:{opt noreweigh}} do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period
+in order to increase the SSR of segments of unabalanced panels with missing data.{p_end}
 {synoptline}
 {p2colreset}{...}
 {marker options2}
@@ -21,7 +25,7 @@ Option is {cmd:region(}{it:num#1 num#2}| {it: date#1 date#2}{cmd: [,index|fmt(}{
 {synoptline}
 {p2colreset}{...}
 {marker options3}
-{p 4}{bf:Options for testing with unknown breakdates and {cmd:hypothesis(2)}}{p_end}
+{p 4}{bf:Options for testing with unknown breakdates and {cmd:hypothesis(B)}}{p_end}
 {synoptset 30}{...}
 {synopt:{it:options3}}Description{p_end}
 {synoptline}
@@ -30,7 +34,7 @@ Option is {cmd:region(}{it:num#1 num#2}| {it: date#1 date#2}{cmd: [,index|fmt(}{
 {synoptline}
 {p2colreset}{...}
 {marker options4}
-{p 4}{bf:Options for testing with unknown breakdates and {cmd:hypothesis(3)}}{p_end}
+{p 4}{bf:Options for testing with unknown breakdates and {cmd:hypothesis(C)}}{p_end}
 {synoptset 30}{...}
 {synopt:{it:options4}}Description{p_end}
 {synoptline}
@@ -53,9 +57,3 @@ The factors in this list are affected by structural breaks in that their loading
 {synopt:{opt nbkf:actors(varlist5)}}same as above but without breaks.{p_end}
 {synoptline}
 {p2colreset}{...}
-
-
-{p 4 4}Data has to be {help tsset} or {help xtset} before using {cmd:xtbreak}. 
-Data has to be balanced.
-{depvars}, {indepvars} and {it:varlist}, {it:varlist}1 - {it:varlist}5 may contain time-series operators, see {help tsvarlist}.{break}
-{cmd:xtdcce2} requires the {help moremata} package.

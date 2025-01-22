@@ -34,5 +34,6 @@ we can treat them as the combination of both.{p_end}
 {col 8}{hline 11}{c +}{hline 65} 
 {col 9}{it:ssr}{col 19}{c |} Variance Covariance estimator based on SSR: cov = (X'X)^(-1)*SSR
 {col 9}{it:hc}{col 19}{c |} heteroskedastic robust; HC0
-{col 9}{it:hac}{col 19}{c |} heteroskedastic and autocorrelation robust from KNW ({help xtbreak_estimate##KNW2021:2022})
+{col 9}{it:hac}{col 19}{c |} heteroskedastic and autocorrelation robust from KNW ({help xtbreak_estimate##KNW2021:2023})
 {col 9}{it:np}{col 19}{c |} non-parametric estimator of Pesaran ({help xtbreak##Pesaran2006:2006)}
+{col 9}{it:wpn}{col 19}{c |} fixed T estimator from Westerlund, Petrova and Norkute and ({help xtbreak##WPN2019:2019)}

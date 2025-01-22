@@ -40,3 +40,23 @@ across the cross-sectional dimension such as
 seasonal dummies or other observed
 common factors such as asset returns and oil prices with and without breaks.
 {p_end}
+{marker inverter}
+{p 4 8 12}{cmdab:inv:erter(}{it:type}{cmd:)} sets the inverter. {it:type} can be: 
+{it:speed} ({help mata invsym:invsym}), 
+{it:precision}, {it:qr} (equivalent to precision; {help mata qrinv:qrinv}), 
+{it:chol} ({help mata cholinv:chol}),
+{it:p} ({help mata pinv:pinv}), or
+{it:lu} ({help mata luinv:luinv}).
+Choice of inverter has implications on speed and precision. 
+For an overview see {help [M-4] solvers}.
+{p_end}
+
+{p 4 8 12}{cmd:python} use Python to calculated SSRs to improve speed. 
+Requires Stata 16 or later, Python and the following packages: scipy, numpy, pandas and xarray. 
+See {help xtbreak##python:details}.{p_end}
+
+{p 4 8 12}{cmd:noreweigh} avoids to reweigh time-unit specific errors by the number of total observations over actual observations for a given time period
+in order to increase the SSR of segments of unabalanced panels with missing data.
+ Results with this options should be used indicative.
+See also section on {help xtbreak##unbalanced:Unbalanced Panels}.
+{p_end}

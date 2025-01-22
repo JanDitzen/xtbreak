@@ -17,11 +17,12 @@ Computation and analysis of multiple structural change models.
 Journal of Applied Econometrics, 18(1), 1–22.
 {browse "https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659":link}.{p_end}
 
-{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2021) 
-Testing for Multiple Structural Breaks in Panel Data.
-Available upon request.{p_end}
+{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2024) 
+Multiple Structural Breaks in Interactive Effects Panel Data Models
+Journal of Applied Econometrics
+{browse "https://onlinelibrary.wiley.com/doi/10.1002/jae.3097":Link}.{p_end}
 
-{p 4 8}Ditzen, J., Karavias, Y. & Westerlund, J. (2021) 
+{p 4 8}Ditzen, J., Karavias, Y. & Westerlund, J. (2025) 
 Testing and Estimating Structural Breaks in
 Time Series and Panel Data in Stata.
 arXiv:2110.14550 [econ.EM].{break} 
@@ -32,10 +33,15 @@ arXiv:2110.14550 [econ.EM].{break}
 {browse "https://www.stata.com/meeting/us21/slides/US21_Ditzen.pdf": 2021 US}.
 {p_end}
 
-{marker KNW2021}{p 4}Karavias, Y, Narayan P. & Westerlund, J. (2022)
+{marker KNW2021}{p 4}Karavias, Y, Narayan P. & Westerlund, J. (2023)
 Structural breaks in Interactive Effects Panels and the Stock Market Reaction to COVID–19. 
-Journal of Business & Economic Statistics. 
+Journal of Business & Economic Statistics. 41(3), 653-666
 {browse "https://www.tandfonline.com/doi/full/10.1080/07350015.2022.2053690":link}.{p_end}
+
+{marker WPN2019}{p 4}Westerlund, J., Petrova, Y., & Norkute, M. (2019). 
+CCE in fixed-T panels. 
+Journal of Applied Econometrics, 34(5), 1–16. 
+{browse "https://doi.org/10.1002/jae.2707":link}.{p_end}
 
 {marker Pesaran2006}{p 4}Pesaran, H. (2006)
 Estimation and inference in large heterogeneous panels with a multifactor error structure.
@@ -48,8 +54,8 @@ Econometrica, 74(4), 967-1012.
 {p 4}Email: {browse "mailto:jan.ditzen@unibz.it":jan.ditzen@unibz.it}{p_end}
 {p 4}Web: {browse "www.jan.ditzen.net":www.jan.ditzen.net}{p_end}
 
-{p 4}Yiannis Karavias (University of Birmingham){p_end}
-{p 4}Email: {browse "mailto:I.Karavias@bham.ac.uk":I.Karavias@bham.ac.uk}{p_end}
+{p 4}Yiannis Karavias (Brunel University){p_end}
+{p 4}Email: {browse "mailto:yiannis.karavias@brunel.ac.uk":yiannis.karavias@brunel.ac.uk}{p_end}
 {p 4}Web: {browse "https://sites.google.com/site/yianniskaravias/":https://sites.google.com/site/yianniskaravias/}{p_end}
 
 {p 4}Joakim Westerlund (Lund University){p_end}
@@ -57,7 +63,7 @@ Econometrica, 74(4), 967-1012.
 {p 4}Web: {browse "https://sites.google.com/site/perjoakimwesterlund/":https://sites.google.com/site/perjoakimwesterlund/}{p_end}
 
 {p 4 8}Please cite as follows:{break}
-Ditzen, J, Y. Karavias and J. Westerlund. 2021. Testing and Estimating Structural Breaks in
+Ditzen, J, Y. Karavias and J. Westerlund. 2025. Testing and Estimating Structural Breaks in
 Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":arXiv:2110.14550} [econ.EM].{p_end}
 
 {title:How to install}
@@ -69,10 +75,13 @@ Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":
 {p 4 8}{cmd:xtbreak} requires Stata version 15 or higher.{p_end}
 
 {title:Changelog}
-{p 4 4}This version 1.5 - 08.04.2024{p_end}
-{p 4 4} - additional checks to ensure trimming and number of breaks are valid.{p_end]
-{p 4 4}This version 1.4 - 10.03.2024{p_end}
-{p 4 4} - several bug fixes.
+{p 4 4}This version 2.0 - 20.01.2025{p_end}
+{p 4 4} - Bugfixes in dynamic program, partial break model and variance estimator.{p_end}
+{p 4 4} - Added option inverter().{p_end}
+{p 4 4}Changes to version 1.5 - 08.04.2024{p_end}
+{p 4 4} - additional checks to ensure trimming and number of breaks are valid.{p_end}
+{p 4 4}Changes to version 1.4 - 10.03.2024{p_end}
+{p 4 4} - several bug fixes.{p_end}
 {p 4 4} - added option region() to find breaks within specific region.{p_end}
 {p 4 4} - estat split creates a variable for constant/fixed effect if those break.{p_end}
 {p 4 4}Changes 1.1 to 1.11:{p_end}

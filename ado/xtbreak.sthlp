@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: xtbreak v. 1.5 - 08. April 2024}
+{hi:help xtbreak}{right: xtbreak v. 2.0 - 20.01.2025}
 
 {hline}
 {title:Title}
@@ -16,7 +16,9 @@
 {p 4 13}{cmd:xtbreak} {depvar} [{indepvars}]  {ifin} {cmd:,}
 {cmd:{help xtbreak##options1:options1}}
 {cmd:{help xtbreak##options1:options2}}
-{cmd:{help xtbreak##options5:options5}}{p_end}
+{cmd:{help xtbreak##options5:options5}}
+{cmd:{help xtbreak##options6:options6}}
+{p_end}
 
 {p 4}{ul:Testing for {bf:known} structural breaks:}{p_end}
 
@@ -31,7 +33,7 @@ structural break.{p_end}
 {p 4}{ul:Testing for {bf:unknown} structural breaks:}{p_end}
 
 {p 4 13}{cmd:xtbreak} {cmd:test} {depvar} [{indepvars}]  {ifin} {cmd:,}
-{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} 
+{cmdab:h:ypothesis(}{bf:A|B|C}{cmd:)} 
 {cmd:breaks(}{it:#}{cmd:)} 
 {cmd:{help xtbreak##options1:options1}}
 {cmd:{help xtbreak##options2:options2}}
@@ -40,7 +42,7 @@ structural break.{p_end}
 {cmd:{help xtbreak##options5:options5}}
 {p_end}
 
-{p 8}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
+{p 8}{cmdab:h:ypothesis(}{bf:A|B|C}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
 {cmd:breaks(#)} sets the number of breaks.
 {p_end}
 
@@ -66,12 +68,31 @@ using {help net install}.{p_end}
 
 INCLUDE help xtbreak_options
 
+{marker options}
+{p 4}{bf:Options for automatic estimation of number and location of break}{p_end}
+{synoptset 30}{...}
+{synopt:{it:options6}}Description{p_end}
+{synoptline}
+{synopt:{opt skiph2}}skips hypohesis B{p_end}
+{synopt:{opt clevel(#)}}specifies level for critical values to detect breaks. {p_end}
+{synopt:{opt strict}}strict behaviour of sequential test. Improves speed.{p_end}
+{synopt:{opt maxbreaks(#)}}sets maximum number of breaks for sequential test. Improves speed.{p_end}
+{synoptline}
+{p2colreset}{...}
+
+{p 4 4}Data has to be {help tsset} or {help xtset} before using {cmd:xtbreak}. 
+{depvars}, {indepvars} and {it:varlist}, {it:varlist}1 - {it:varlist}5 may contain time-series operators, see {help tsvarlist}.{break}
+{cmd:xtdcce2} requires the {help moremata} package.
+
+
 {title:Contents}
 
 {p 4}{help xtbreak##description:Description}{p_end}
 {p 4}{help xtbreak##options:Options}{p_end}
 {p 4}{help xtbreak##note_panel:Panel Data}{p_end}
 {p 4}{help xtbreak##cov:Covariance Estimator}{p_end}
+{p 4}{help xtbreak##python:Python}{p_end}
+{p 4}{help xtbreak##unbalanced:Unbalanced Panel Data}{p_end}
 {p 4}{help xtbreak##example:Examples}{p_end}
 {p 4}{help xtbreak##references:Refrences}{p_end}
 {p 4}{help xtbreak##about:Authors and About}{p_end}
@@ -100,7 +121,7 @@ For a further explanation see {help xtbreak_estimate:xtbreak estimate}.{p_end}
 {p 4 4}{cmd:xtbreak} implements the tests for and estimation of structural breaks discussed in 
 Bai & Perron ({help xtbreak_tests##BP1998:1998}, {help xtbreak_tests##BP2003:2003}),
 Karavias, Narayan, Westerlund ({help xtbreak_tests##KNW2021:2022})
-and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2021}). 
+and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2024}). 
 
 {p 4 4}If neither {cmd:test} or {cmd:estimate} is defined,
 {cmd:xtbreak} will do a sequential F-Test based on hypothesis 3 to determine the 
@@ -140,6 +161,19 @@ INCLUDE help xtbreak_options_detail
 
 {p 4 8 12}{cmd:showindex} shows index for confidence intervals rather than formatted time value.{p_end}
 
+{p 4 8 12}{cmd:skiph2} Skips Hypothesis 2 (H0: no break vs H1: \(0 < s < s_{max}\) breaks) when running {cmd:xtbreak} without the {cmd:estimate} or {cmd:test} option.{p_end}
+
+{p 4 8 12}{cmd:cvalue(level)} specifies the level of the critical value to be used to estimate the number of breaks using the sequential test. 
+For example {cmd:cvalue(0.99)} uses the 1\% critical values to determine the number of breaks using the sequential test. 
+See {cmd:level(#)} for further details.{p_end}
+
+{p 4 8 12}{cmd:strict} enforces strict behaviour of the sequential test to determine number of breaks.
+Sequential test will stop once F(s+1|s) is not rejected given a rejection of F(s|s-1).
+Option improves speed in large time series, but should be used with caution.{p_end} 
+
+{p 4 8 12}{cmdab:max:breaks(#)} limits number of breaks when using the sequential test to determine number of breaks.
+Option improves speed in large time series, but should be used with caution.{p_end} 
+
 {p 4 8 12}{cmd:update} Update {cmd:xtbreak} from Github. 
 This is essentially the following call:{p_end}
 {col 8}{stata `"net install xtbreak , from("https://janditzen.github.io/xtbreak/") force replace"'}
@@ -147,6 +181,41 @@ This is essentially the following call:{p_end}
 {p 4 8 12}{cmd:version} Displays version.{p_end}
 
 INCLUDE help xtbreak_PanelVarCov
+
+{marker python}
+{title:Python}
+
+{p 4 4}The option {cmd:python} uses Python to calculate the sum of squared residuals (SSRs) necessary to compute the F-Statistics to 
+estimate the dates of breaks and perform tests for an unknown break date.
+The number of possible SSRs can be very large and computation time consuming.
+For example, for a model without non-breaking variables, one break (m=1) and a minimal segment length of
+h=trimming * T, the number of SSRs is: T (T + 1)/2 − (h − 1)T + (h − 2)(h − 1)/2 − h2m(m + 1)/2,
+hence in the order of O(T^2).
+Using Python improves the speed of calculations.{p_end}
+
+{p 4 4}Python cannot be combined with unbalanced panels.
+It uses the standard inverter from numpy (linalg.inv), the pseudo-inverse (linalg.pinv) or SVD decomposition (scipy.linalg.svd).
+Differences between results obtained with and without the 
+Python option may occur for ill-conditioned or (nearly) invertible 
+matrices.
+{p_end}
+
+{p 4 4}{cmd:xtbreak} checks if the Python and required packages (numpy, scipy, xarray and pandas) are installed. The option {cmd:python} can only be used with Stata 16 or later.{p_end}
+
+{marker unbalanced}
+{title:Unbalanced Panel Data}
+
+{p 4 4}{cmd: xtbreak} allows for unbalanced panels when using panel data. 
+7Pure time series data (i.e. data with only one cross-section) with gaps is not allowed. 
+In the case of unbalanced panels, the degree of freedom adjustment for the sup F(s) statistic are adjusted.{p_end}
+
+{p 4 4}While {cmd: xtbreak}allows for unbalanced data, results should be taken with extra caution. 
+The underlying assumption is that the break dates are the same for all units, including those with gaps in the data. 
+The break date estimation can be biased if data is very unbalanced, that is if a large number of time periods are missing for multiple units. 
+Care is also required if estimated breaks coincide with the start or end of unbalanced panels. 
+We strongly recommend to investigate the SSRs using {cmd: estat ssr} after an estimation with a single break point to identify increases or decreases in the estimated SSRs.{p_end}
+
+{p 4 4}The option {cmd:noreweigh} avoids to reweigh time-individual errors for the calculation of the SSR to artificially increase the SSR of unabalanced sections of the panel. Results with this options should be used indicative.{p_end}
 
 {marker example}
 {title:Examples}
