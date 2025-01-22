@@ -27,9 +27,6 @@ Critical values are available for %5, 10%, 15%, 20% and 25%.{p_end}
 
 {p 4 8 12}{cmd:error(}{it:real}{cmd:)} define error margin for partial break model.{p_end}
 
-{p 4 8 12}{cmd:region(}{it:num#1 num#2}| {it: date#1 date#2}{cmd: [,index|fmt(}{help format}{cmd:)])} specifies between which dates to search for unknown breakpoints. 
-{it:num#1}/{it:date#1} defines the start and {it:num#2}/{it:date#2} the end of the interval. Syntax is the same as for {cmd:breakdates}.{p_end}
-
 {p 4 8 12}{cmd:csd} adds cross-section averages of variables with and without breaks.{p_end}
 
 {p 4 8 12}{cmd:csa({varlist})} and {cmd:csanobreak()} specify the variables with and without breaks which are added as cross-sectional averages. 

@@ -33,7 +33,7 @@ structural break.{p_end}
 {p 4}{ul:Testing for {bf:unknown} structural breaks:}{p_end}
 
 {p 4 13}{cmd:xtbreak} {cmd:test} {depvar} [{indepvars}]  {ifin} {cmd:,}
-{cmdab:h:ypothesis(}{bf:A|B|C}{cmd:)} 
+{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} 
 {cmd:breaks(}{it:#}{cmd:)} 
 {cmd:{help xtbreak##options1:options1}}
 {cmd:{help xtbreak##options2:options2}}
@@ -42,7 +42,7 @@ structural break.{p_end}
 {cmd:{help xtbreak##options5:options5}}
 {p_end}
 
-{p 8}{cmdab:h:ypothesis(}{bf:A|B|C}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
+{p 8}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
 {cmd:breaks(#)} sets the number of breaks.
 {p_end}
 
@@ -206,10 +206,10 @@ matrices.
 {title:Unbalanced Panel Data}
 
 {p 4 4}{cmd: xtbreak} allows for unbalanced panels when using panel data. 
-7Pure time series data (i.e. data with only one cross-section) with gaps is not allowed. 
+Pure time series data (i.e. data with only one cross-section) with gaps is not allowed. 
 In the case of unbalanced panels, the degree of freedom adjustment for the sup F(s) statistic are adjusted.{p_end}
 
-{p 4 4}While {cmd: xtbreak}allows for unbalanced data, results should be taken with extra caution. 
+{p 4 4}While {cmd: xtbreak} allows for unbalanced data, results should be taken with extra caution. 
 The underlying assumption is that the break dates are the same for all units, including those with gaps in the data. 
 The break date estimation can be biased if data is very unbalanced, that is if a large number of time periods are missing for multiple units. 
 Care is also required if estimated breaks coincide with the start or end of unbalanced panels. 

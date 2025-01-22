@@ -103,7 +103,11 @@ INCLUDE help xtbreak_PanelVarCov
 {col 8}{cmd: e(breaks)}{col 27}Matrix with break dates. First row indicates the index (t=1,..,T), second the value of the time identifier (for example 2000, 2001, ...).
 {col 8}{cmd: e(CI)}{col 27}Confidence intervals with dimension {it:4 x number_breaks}.  
 {col 27}The first two rows are the lower and upper 95% intervals using time indices, the second two rows are in the value of the time identifier.
-{col 8}{cmd: e(ssr)}{col 27}Matrix with SSRs for selection of break dates. Only if breaks(1) used.
+{col 8}{cmd: e(SSRvmat)}{col 27}Matrix with segment-specific SSR. Row indicates start, column indicates end of segment.
+{col 8}{cmd: e(SSRvec)}{col 27}Vector with SSRs for selection of break dates. Only available when breaks(1) used.
+
+{col 4} Scalars
+{col 8} {cmd:e(num_breaks)}{col 27}Number of breaks. If automatic detection used, then estimated number of breaks.
 
 {col 4} Macros
 {col 8}{cmd: e(sample)}{col 27}sample

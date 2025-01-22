@@ -72,9 +72,7 @@ twoway 	(tsline deaths if year > 2019 , 	///
 *** Panel case
 use https://github.com/JanDitzen/xtbreak/raw/main/data/US_panel.dta
 
-xtbreak test d.deaths , breakconstant nobreakvar(d.L(1/3).cases) breaks(2) h(1)
-
-xtbreak deaths L.cases, trimming(0.1) vce(hac) csa(L.cases)
+xtbreak deaths L.cases, trimming(0.1) vce(wpn) csa(L.cases)
 
 xtbreak test deaths L.cases, h(2) breaks(5) trimming(0.1) vce(hac) csa(L.cases)
 

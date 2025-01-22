@@ -20,8 +20,6 @@ in order to increase the SSR of segments of unabalanced panels with missing data
 {synoptline}
 {synopt:{opt trim:ming(real)}}minimal segment length, default is 15%{p_end}
 {synopt:{opt error(real)}}error margin for partial break model{p_end}
-{synopt:{opt region(region_options)}}specifies between which dates to search for unknown breakpoints. 
-Option is {cmd:region(}{it:num#1 num#2}| {it: date#1 date#2}{cmd: [,index|fmt(}{help format}{cmd:)])} and the syntax is the same as for {cmd:breakpoints}.{p_end}
 {synoptline}
 {p2colreset}{...}
 {marker options3}
