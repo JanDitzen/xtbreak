@@ -1,7 +1,6 @@
 **** Auxiliary programs
 
 *** checks if data is sorted, if not then sorts it
-capture program drop issorted
 program define issorted
 	syntax	varlist 
 	
@@ -14,7 +13,6 @@ program define issorted
 
 end
 
-capture program drop transbreakpoints
 program define transbreakpoints, rclass
 syntax anything , [Index] tvar(varlist) touse(varlist) [format(string)]
 	tokenize `tvar'
@@ -81,7 +79,6 @@ end
 
 ** xtdcce2_csa creates cross-sectional averages
 ** option numberonly gives only lag number in cross_structure
-capture program drop get_csa
 program define get_csa, rclass
 	syntax varlist(ts) , idvar(varlist) tvar(varlist) cr_lags(numlist) touse(varlist) csa(string) [cluster(varlist) numberonly tousets(varlist)]
 
@@ -189,8 +186,6 @@ end
 // -------------------------------------------------------------------------------------------------
 // has common factors
 // -------------------------------------------------------------------------------------------------
-
-capture program drop hascommonfactors
 program define hascommonfactors
 	syntax [varlist(ts default=none) ] [if] , tvar(varname) idvar(varname) localname(string) localnamek(string)
 
@@ -229,7 +224,6 @@ program define hascommonfactors
 
 end
 
-cap program drop xtbreak_pycheck
 program define xtbreak_pycheck
 	*** Checks for python
 	if c(stata_version) < 16 {

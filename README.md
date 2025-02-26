@@ -31,7 +31,7 @@ __Table of Contents__
 
 ```
 xtbreak depvar [indepvars] [if], 
-        options1 options5 
+        options1 options2 options3 options5 options6
 
 ```
 
@@ -40,7 +40,7 @@ xtbreak depvar [indepvars] [if],
 
 ```
 xtbreak test depvar [indepvars] [if], 
-        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options5 options6
+        breakpoints(numlist| datelist [,index| fmt(string)]) options1 options5 
 ```
 
 ***breakpoints()*** specifies the time period of the known structural break.
@@ -70,8 +70,6 @@ options1 | Description
 **vce(type)** | covariance matrix estimator, allowed: ssr, hac, hc and np
 **inverter(type)** inverter, default is speed. See options.
 **python** use Python to calculated SSRs to improve speed. See details.
-**noreweigh** do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unabalanced panels with missing data.
-
 
 #### Options for unknown breakdates
 
@@ -104,6 +102,7 @@ options5 | Description
 **csanobreak(varlist)** | Variables without breaks used to calculate cross-sectional averages
 **kfactors(varlist)** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
 **nbkfactors(varlist)** | same as above but without breaks.
+**noreweigh** do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unabalanced panels with missing data.
 
 #### Options for automatic estimation of number and location of break
 
@@ -612,6 +611,9 @@ Web: https://sites.google.com/site/perjoakimwesterlund/
 Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].
 
 # 12. Changes
+
+Changed to 2.1
+- Bugfix using hypothesis 2 and min and max number of breaks.
 
 Changed to 2.0
 - Bugfixes in dynamic program, partial break model and variance estimator.

@@ -1,6 +1,8 @@
-*! xtbreak version 2.0 - 20.01.2025
+*! xtbreak version 2.1 - 25.02.2025
 /*
 Changelog
+version 2.1
+- 25.02.2025 - bug fix in breaks(min max) using h(2)
 version 2.0
 - 02.05.2024 - additional check if time series used, then csa option ignored
 - 06.11.2024 - bug fixed in xtbreak_listbreaks()
@@ -18,10 +20,8 @@ version 1.4
 version 1.1
 - 15.11.2021 - bug when variable name contained "est". 
 - 07.02.2021 - error when using Stata 15 and xtbreak, local cannot access r() matrix.
-
 */
 
-capture program drop xtbreak
 
 program define xtbreak, rclass
 	syntax [anything] [if], [* version update ] 
@@ -61,8 +61,8 @@ program define xtbreak, rclass
 		}
 
 		if "`version'" != "" {
-			local version 2.0
-			noi disp "This is version `version' - 20.01.2025"
+			local version 2.1
+			noi disp "This is version `version' - 25.02.2025"
 			return local version "`version'"
 			exit
 		}
@@ -76,7 +76,7 @@ program define xtbreak, rclass
 			exit
  		}
  		else {
-			if `mataversion' < 1.01 {
+			if `mataversion' < 2.1 {
 				noi disp "mata library outdated. Pleae update xtbreak:"
 				noi disp as smcl "{stata:xtbreak, update}"
 				exit

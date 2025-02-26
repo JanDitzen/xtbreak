@@ -1,4 +1,3 @@
-capture program drop xtbreak_estat
 program define xtbreak_estat, rclass
 
 	gettoken subcmd rest: 0 
@@ -212,17 +211,3 @@ program define plot_ssr
 
 end
 
-/*
-cap mata mata drop xtbreak_get_ssr()
-mata:
-	function xtbreak_get_ssr(real matrix ssr, string scalar start, string scalar end, string scalar T)
-	{
-		_editmissing(ssr,0)
-		output = J(T,1,.)
-		for (j=start+1;j<=end;j++) {
-			output[j] = ssr[start,j] + ssr[j+1,T]
-		}
-		return(output)
-	}
-end
-*/

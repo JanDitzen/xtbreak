@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: xtbreak v. 2.0 - 20.01.2025}
+{hi:help xtbreak}{right: xtbreak v. 2.1 - 26.02.2025}
 
 {hline}
 {title:Title}
@@ -15,7 +15,8 @@
 
 {p 4 13}{cmd:xtbreak} {depvar} [{indepvars}]  {ifin} {cmd:,}
 {cmd:{help xtbreak##options1:options1}}
-{cmd:{help xtbreak##options1:options2}}
+{cmd:{help xtbreak##options2:options2}}
+{cmd:{help xtbreak##options3:options3}}
 {cmd:{help xtbreak##options5:options5}}
 {cmd:{help xtbreak##options6:options6}}
 {p_end}

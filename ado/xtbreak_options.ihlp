@@ -9,8 +9,6 @@
 {synopt:{opt vce(type)}}covariance matrix estimator, allowed: ssr, hac, hc and np{p_end}
 {synopt:{opt inverter(type)}}inverter, default is speed. See {help xtbreak##inverter:options}.{p_end}
 {synopt:{opt python}}use Python to calculated SSRs to improve speed. See {help xtbreak##python:details}.{p_end}
-{synopt:{opt noreweigh}} do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period
-in order to increase the SSR of segments of unabalanced panels with missing data.{p_end}
 {synoptline}
 {p2colreset}{...}
 {marker options2}
@@ -53,5 +51,7 @@ in order to increase the SSR of segments of unabalanced panels with missing data
  Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
 The factors in this list are affected by structural breaks in that their loadings change.{p_end}
 {synopt:{opt nbkf:actors(varlist5)}}same as above but without breaks.{p_end}
+{synopt:{opt noreweigh}} do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period
+in order to increase the SSR of segments of unabalanced panels with missing data.{p_end}
 {synoptline}
 {p2colreset}{...}

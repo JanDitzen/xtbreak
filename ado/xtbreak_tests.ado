@@ -1,6 +1,4 @@
 *! xbtreak test program
-capture program drop xtbreak_tests
-
 program define xtbreak_tests, rclass
 	syntax varlist(min=1 ts) [if] , [			///
 			Hypothesis(string)					/// which hypothesis to test
@@ -347,10 +345,7 @@ program define xtbreak_tests, rclass
 				hascommonfactors `tmp2' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csa) localnamek(kfactorsauto)
 
 				issorted `idvars' `tvar_o'
-				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csanobreak) localnamek(nbkfactorsauto)
-
-				noi disp "csa nb: `csanobreak' (`nbkfactorsauto') -- csa `csa' - `nobreakvariables' "
-				
+				hascommonfactors `nobreakvariables' if `touse' , tvar(`tvar_o') idvar(`idvar') localname(csanobreak) localnamek(nbkfactorsauto)				
 			}
 			local num_csanb = 0
 			local num_csa = 0

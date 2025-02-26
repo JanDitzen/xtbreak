@@ -75,7 +75,9 @@ Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":
 {p 4 8}{cmd:xtbreak} requires Stata version 15 or higher.{p_end}
 
 {title:Changelog}
-{p 4 4}This version 2.0 - 20.01.2025{p_end}
+{p 4 4}This version 2.1 - 25.02.2025{p_end}
+{p 4 4} - Bug fixed for hypothesis 2 and min and max number of breaks.{p_end}
+{p 4 4}Changes to version 2.0 - 20.01.2025{p_end}
 {p 4 4} - Bugfixes in dynamic program, partial break model and variance estimator.{p_end}
 {p 4 4} - Added options inverter(), skiph2, strict, maxbreaks(), python and allow for unbalanced panels.{p_end}
 {p 4 4}Changes to version 1.5 - 08.04.2024{p_end}

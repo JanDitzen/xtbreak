@@ -1,6 +1,6 @@
 {smcl}
 {hline}
-{hi:help xtbreak estimate}{right: v. 1.5 - 08. April 2024}
+{hi:help xtbreak estimate}{right: v. 2.1 - 25. February 2025}
 
 {hline}
 {title:Title}
