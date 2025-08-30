@@ -6,9 +6,9 @@ For an overview of **xtbreak test** see [xtbreak test](docs/xtbreak_test.md) and
 
 Current Version: ![version](https://img.shields.io/github/v/release/janditzen/xtbreak) ![release](https://img.shields.io/github/release-date/janditzen/xtbreak)
 
-Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. arXiv:2110.14550 [econ.EM].` A working paper describing `xtbreak` is available [here](https://arxiv.org/abs/2110.14550).
+Please cite as `Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structural Breaks in Time Series and Panel Data in Stata. The Stata Journal. 25(3).` [download](https://journals.sagepub.com/doi/10.1177/1536867X251365449).
 
-A working paper describing the panel data theory of xtbreak is available as `Ditzen, J., Karavias, Y. & Westerlund, J. (2024) Multiple Structural Breaks in Interactive Effects Panel Data Models. Journal of Applied Econometrics` [download](https://onlinelibrary.wiley.com/doi/10.1002/jae.3097).
+A paper describing the panel data theory of xtbreak is available as `Ditzen, J., Karavias, Y. & Westerlund, J. (2024) Multiple Structural Breaks in Interactive Effects Panel Data Models. Journal of Applied Econometrics. 40(1).` [download](https://onlinelibrary.wiley.com/doi/10.1002/jae.3097).
 
 
 __Table of Contents__
