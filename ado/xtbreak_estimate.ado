@@ -31,7 +31,8 @@ program define xtbreak_estimate, eclass
 		allowunbalanced						/// allows unbalanced data
 		NOREWEIGH							/// reweight in case of unabalanced data
 		donotdisptrim						/// do not show trimming at bottom
-		python								/// use python to calculate SSR
+		PYTHONdum							/// use python
+		python(string)						/// specify parallel cores; -1/max ; 0 no python; > 0 number of cores
 		INVerter(string)					/// favour precision over speed; options: speed (default), precision, qr, chol, p or lu
 		NODEPLAG							/// do not check if lag of dep var used
 	]
@@ -63,7 +64,16 @@ program define xtbreak_estimate, eclass
 			exit
 		}
 
-		if "`python'" != "" {
+		if "`python'`pythondum'" != "" {
+			if "`python'" == "max" local python = -1 
+			if "`pythondum'" != "" & "`python'" == "" local python = 1			
+			
+		}
+		else {
+			local python = 0
+		}
+		
+		if `python' > 0 {
 			xtbreak_pycheck
 		}
 		*** check that moremata is installed
@@ -470,7 +480,7 @@ program define xtbreak_estimate, eclass
 
 			issorted `idvars' `tvar_o'
 			tempname EstCoeff EstCov EstBreak EstCI level stats EstSSRMat
-			mata xtbreak_EstBreaks("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`trimming',"`region'",`vce',`demean',(`dynamicpartial',`num_csa',`num_csanb'),`error',1,`EstCoeff'=.,`EstCov'=.,`EstBreak'=.,`EstCI'=.,`EstSSRMat'=.,"`level'", "`stats'","`python'"!="")
+			mata xtbreak_EstBreaks("`indepdepvars'","`nobreakvariables'","`csa_list'","`csanb_list'","`idvar' `tvar'","`touse'",`breaks',`trimming',"`region'",`vce',`demean',(`dynamicpartial',`num_csa',`num_csanb'),`error',1,`EstCoeff'=.,`EstCov'=.,`EstBreak'=.,`EstCI'=.,`EstSSRMat'=.,"`level'", "`stats'",`python')
 			
 
 			mata st_local("`EstBreak'",invtokens(strofreal(`EstBreak'')))

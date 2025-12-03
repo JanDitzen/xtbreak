@@ -1,9 +1,9 @@
 v 3
-d xtbreak Estimation and testing of multiple structural breaks in time series and panel data (25-02-2025)
+d xtbreak Estimation and testing of multiple structural breaks in time series and panel data (03-12-2025)
 d Jan Ditzen, Free University of Bozen-Bolzano, jan.ditzen@unibz.it, jan.ditzen.net
 d Yiannis Karavias, Brunel University, I.Karavias@bham.ac.uk, https://sites.google.com/site/yianniskaravias/
 d Joakim Westerlund, Lund University, joakim.westerlund@nek.lu.se, https://sites.google.com/site/perjoakimwesterlund/
-d Distribution date: 20250225
+d Distribution date: 20251203
 
 f ado\xtbreak.ado  
 f ado\xtbreak.sthlp     
@@ -14,8 +14,8 @@ f ado\xtbreak_estimate.ado
 f ado\xtbreak_estimate.sthlp
 f ado\xtbreak_options.ihlp
 f ado\xtbreak_options_detail.ihlp
-f ado\xtbreak_tests.ado 
-f ado\xtbreak_tests.sthlp
+f ado\xtbreak_test.ado 
+f ado\xtbreak_test.sthlp
 f ado\xtbreak_PanelVarCov.ihlp
 f ado\lxtbreak.mlib
    

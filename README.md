@@ -612,6 +612,9 @@ Ditzen, J., Karavias, Y. & Westerlund, J. (2025) Testing and Estimating Structur
 
 # 12. Changes
 
+Changed to 2.2
+- Bugfix using xtbreak estimate and python.
+
 Changed to 2.1
 - Bugfix using hypothesis 2 and min and max number of breaks.
 

@@ -1,7 +1,7 @@
 {smcl}
 {hline}
-{hi:help xtbreak estimate}{right: v. 2.1 - 25. February 2025}
-
+{hi:help xtbreak estimate}{right: v. 2.2 - 03. December 2025}
+{right:SJ25-3: st0781}
 {hline}
 {title:Title}
 
@@ -23,7 +23,7 @@ INCLUDE help xtbreak_options
 
 {p 4 4}Data has to be {help tsset} or {help xtset} before using {cmd:xtbreak}. 
 {depvars}, {indepvars} and {it:varlist}, {it:varlist}1 - {it:varlist}5 may contain time-series operators, see {help tsvarlist}.{break}
-{cmd:xtdcce2} requires the {help moremata} package.
+{cmd:xtbreak} requires the {help moremata} package.
 
 
 {title:Contents}

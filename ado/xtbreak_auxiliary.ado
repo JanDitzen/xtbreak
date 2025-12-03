@@ -235,7 +235,7 @@ program define xtbreak_pycheck
 		noi disp as error "Python not installed or linked."
 		error 199
 	}
-	foreach pack in scipy numpy sfi pandas xarray {
+	foreach pack in scipy numpy sfi   joblib  {
 		cap python which `pack'
 		if _rc != 0 local err "`err' `pack'"
 	}
@@ -244,7 +244,6 @@ program define xtbreak_pycheck
 		error 199
 	}
 end
-
 
 if c(stata_version) >= 16 {
 cap python query
@@ -255,196 +254,200 @@ cap python which scipy
 if _rc == 0 {
 cap python which sfi 
 if _rc == 0 {
-cap python which pandas 
-if _rc == 0 {
-cap python which xarray 
+cap python which joblib 
 if _rc == 0 {
 python:
-from sfi import Mata
-from sfi import Macro
+
+from sfi import Mata, Macro
 
 import numpy as np
-import xarray as xr
-import pandas as pd
 import scipy as sc
-import time as time
+import scipy.linalg as la
+from joblib import Parallel, delayed, cpu_count
+import time as _time
+from multiprocessing import Pool, cpu_count
 
-def py_xtb_inverter0(mat):
-	det = np.linalg.det(mat)
-	if det.any() > 0:
-		output = np.linalg.inv(mat)
-	else:
-		output = np.linalg.pinv(mat)
-	return output
+def py_xtb_inverter(mat: np.ndarray) -> np.ndarray:
+    """
+    Invert matrix using runtime control from Stata/Mata macro 'inverter'.
 
-def py_xtb_inverter_old(mat):
-	inverter = np.int_(Macro.getLocal("inverter"))
-	det = np.linalg.det(mat)
-	if det.any() == 0:
-		inverter = 0
+    inverter = -1 -> force np.linalg.inv
+    inverter = 0  -> Moore-Penrose pseudo-inverse
+    inverter = 1  -> SVD-based inversion
+    inverter = 2  -> np.linalg.pinv
+    inverter = 3  -> np.linalg.pinv
+    """
+    #try:
+    inverter = int(Macro.getLocal("inverter"))
+    #except Exception:
+    #    inverter = 0 
+    
+    if inverter == -1:
+        try:
+        	return np.linalg.inv(mat)
+        except np.linalg.LinAlgError:
+            inverter = 0
 
-	if inverter == -1:
-		output = np.linalg.inv(mat)
-	if inverter == 0:
-		output = np.linalg.pinv(mat)
-	if inverter == 1:
-		U, S, Vt = np.linalg.svd(mat)
-		S_inv = sc.linalg.diagsvd(1/S, mat.shape[1], mat.shape[0])
-		output =  Vt.T @ S_inv @ U.T
-	if inverter == 2:
-		output = np.linalg.pinv(mat)
-	if inverter == 3:
-		output = np.linalg.pinv(mat)
+    if inverter == 0:
+        return np.linalg.pinv(mat)
 
-	return output
+    if inverter == 1:
+        U, S, Vt = np.linalg.svd(mat)
+        S_inv = sc.linalg.diagsvd(1 / S, mat.shape[1], mat.shape[0])
+        return Vt.T @ S_inv @ U.T
 
-
-def py_xtb_inverter(mat):
-	inverter = np.int_(Macro.getLocal("inverter"))
-	if inverter == -1: inverter = 0
-
-	if inverter == -1:
-		output = np.linalg.inv(mat)
-	if inverter == 0:
-		output = np.linalg.pinv(mat)
-	if inverter == 1:
-		U, S, Vt = np.linalg.svd(mat)
-		S_inv = sc.linalg.diagsvd(1/S, mat.shape[1], mat.shape[0])
-		output =  Vt.T @ S_inv @ U.T
-	if inverter == 2:
-		output = np.linalg.pinv(mat)
-	if inverter == 3:
-		output = np.linalg.pinv(mat)
-
-	return output
-
-def py_xtb_qqx_w0(x1,x2,csa,usei):	
-	if usei == 1:
-		csaT = np.transpose(csa, (0, 2, 1))
-		icsaca = py_xtb_inverter_old((csaT @ csa))
-		x2 = x2 - csa @  (icsaca@ (csaT @ x2))
-		x1 = x1 - csa @  (icsaca@ (csaT @ x1))
-	return np.transpose(x1, (0, 2, 1)) @ x2 
-
-def py_xtb_qqx_w(x1,x2,csa,usei):	
-	if usei == 1:
-		csaT = np.transpose(csa, (0, 2, 1))
-		x2 = x2 - csa @  py_xtb_solver(csaT @ csa, csaT @ x2)
-		x1 = x1 - csa @  py_xtb_solver(csaT @ csa, csaT @ x1)
-	return np.transpose(x1, (0, 2, 1)) @ x2 
-
-def py_xtb_partial(x1,csa,usei):
-	if usei == 1:
-		output = x1 - csa @ py_xtb_solver(csa,x1)
-	else:
-		output = x1
-	return output
-
-def py_xtb_solver(x,y):
-	xx = np.transpose(x, (0, 2, 1))@ x
-	xy = np.transpose(x, (0, 2, 1))@ y
-	det = np.linalg.det(xx)
-	if det.all() == 0:
-		b = py_xtb_inverter(xx) @ xy 
-	else:
-		b = np.linalg.solve(xx,xy)			
-	return b
-
-def py_xtb_solver_s(x,y):
-	det = np.linalg.det(x)
-	if det.all() == 0:
-		b = py_xtb_inverter(x) @ y 
-	else:
-		b = np.linalg.solve(x,y)			
-	return b
+    if inverter in (2, 3):
+        return np.linalg.pinv(mat)
 
 
+def _batch_solve(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    """
+    Solve A @ X = B for batched matrices.
+    Shapes:
+      A: (..., n, n)
+      B: (..., n, k)
+    """
+    try:
+    	return np.linalg.solve(A, B)
+    except np.linalg.LinAlgError:
+        return py_xtb_inverter(A) @ B
 
-def py_xtb_ssr(mata_data,mata_breaks,mata_N,mata_T,mata_numX):	
-	
-	print("start python prog")
 
-	N = np.int_(Mata.get(mata_N))
-	T = np.int_(Mata.get(mata_T))
-	numX = np.int_(Mata.get(mata_numX))
-	PosBreaks = np.array(Mata.get(mata_breaks))
-	mat = np.array(Mata.get(mata_data))
+def _batch_xtx(X: np.ndarray) -> np.ndarray:
+    return np.einsum('bij,bik->bjk', X, X)
 
-	N = N.astype(int)[0,0]	
-	T = T.astype(int)[0,0]
-	
-	numX = numX.astype(int)
-	numX = numX[0,0]
 
-	PosBreaks = PosBreaks.astype(int)
-	numBreaks = PosBreaks.shape
-	numBreaks = numBreaks[0]
+def _batch_xty(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
+    return np.einsum('bij,bik->bjk', X, Y)
 
-	numKTotal =mat.shape[1] -2
+def py_xtb_solver(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    xx = _batch_xtx(x)
+    xy = _batch_xty(x, y)
 
-	if numX == numKTotal:
-		rmCSA = 0
-	else:
-		rmCSA = 1
+    return _batch_solve(xx, xy)
 
-	SSR = np.zeros((T,T))	
 
-	
-	s1 = 0
-	s2 = 0
-	s3 = 0
-	cnti = 0
-	
-	
-	dataR = mat[:,range(2,numKTotal+2)]
-	
-	K_dataR = dataR.shape[1]
-	dataR = dataR.reshape(N,T,K_dataR)
-	
-	selX = list(range(1,numX+1,1))
-	selCSA = list(range(numX+1,K_dataR,1))
-	
+def py_xtb_solver_s(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    return _batch_solve(x, y)
 
-	for Breaki in range(0,numBreaks):
 
-		i = PosBreaks[Breaki,0]
-		j = PosBreaks[Breaki,1]
-		tirange = list(range(i-1,j,1))
-		csai = 0		
-		
-		s_time = time.time()
-		dataRi = dataR[:,tirange,:]
+def py_xtb_partial(x1: np.ndarray, csa: np.ndarray, usei: int) -> np.ndarray:
+    if usei == 1 and csa is not None and csa.size:
+        return x1 - csa @ py_xtb_solver(csa, x1)
+    return x1
 
-		y = dataRi[:,:,[0]]
-		z = dataRi[:,:,selX]
-	
-		if rmCSA == 1:
-			csai = dataRi[:,:,selCSA]
+def _process_break(dataR, PosBreak, selX, selCSA, rmCSA):
+    i, j = PosBreak
+    tirange = slice(i - 1, j)
 
-		s1 = s1 +  time.time() - s_time
+    t0 = _time.perf_counter()
+    dataRi = dataR[:, tirange, :]
+    y = dataRi[:, :, [0]]
+    z = dataRi[:, :, selX]
+    csai = dataRi[:, :, selCSA] if rmCSA == 1 and selCSA else None
+    t_block = _time.perf_counter() - t0
 
-		s_time = time.time()
-		yT = py_xtb_partial(y,csai,rmCSA)
-		zT = py_xtb_partial(z,csai,rmCSA)
-		yy = sum(np.transpose(yT, (0, 2, 1)) @ yT)
-		zy = sum(np.transpose(zT, (0, 2, 1)) @ yT)
-		zz = sum(np.transpose(zT, (0, 2, 1)) @ zT)
-		res = yy - zy.T @ py_xtb_solver_s(zz,zy)
-		s3 = s3 + time.time() - s_time
-		
+    t0 = _time.perf_counter()
+    yT = py_xtb_partial(y, csai, rmCSA)
+    zT = py_xtb_partial(z, csai, rmCSA)
 
-		SSR[i-1,j-1] = res[0,0]
+    yy = np.einsum('bij,bik->jk', yT, yT)
+    zy = np.einsum('bij,bik->jk', zT, yT)
+    zz = np.einsum('bij,bik->jk', zT, zT)
 
-	print([s1,s1/numBreaks])
-	print([s2,s2/numBreaks])
-	print([s3,s3/numBreaks])	
-	
-	Mata.store("py_SSR",SSR)
+    beta_rhs = py_xtb_solver_s(zz[None, ...], zy[None, ...])[0]
+    res = yy - zy.T @ beta_rhs
+    t_calc = _time.perf_counter() - t0
+
+    return i, j, float(res[0, 0]), t_block, t_calc
+
+
+def py_xtb_ssr(mata_data, mata_breaks, mata_N, mata_T, mata_numX, m_jobs):
+    """
+    Parallelized SSR computation with runtime core control via Python argument.
+
+    Parameters
+    ----------
+    n_jobs : int, default=-1
+        Number of parallel jobs:
+          -1 -> all available cores
+           1 -> sequential
+          >1 -> fixed number of workers
+    """
+    print("start python prog")
+
+    t0 = _time.perf_counter()
+    max_cores = cpu_count()
+    n_jobs = np.int_(Mata.get(m_jobs))
+
+    max_cores = cpu_count()
+    try:
+        n_jobs = int(np.int_(Mata.get(m_jobs)))
+    except Exception:
+        print("Invalid n_jobs, falling back to 1 core")
+        n_jobs = 1
+
+    n_jobs = max(1, min(n_jobs if n_jobs != -1 else max_cores, max_cores))
+
+    print(f"Number of jobs:{n_jobs}")
+
+    N = int(np.int_(Mata.get(mata_N))[0, 0])
+    T = int(np.int_(Mata.get(mata_T))[0, 0])
+    numX = int(np.int_(Mata.get(mata_numX))[0, 0])
+    print(f"N = {N}, T = {T}")
+
+    PosBreaks = np.array(Mata.get(mata_breaks), dtype=int)
+    numBreaks = PosBreaks.shape[0]
+
+    mat = np.array(Mata.get(mata_data))
+    t_load = _time.perf_counter() - t0
+
+    print("Data Mean")
+    print(np.mean(mat,axis=0))	
+
+    numKTotal = mat.shape[1] - 2
+    rmCSA = 0 if numX == numKTotal else 1
+
+    dataR = mat[:, range(2, numKTotal + 2)]
+    K_dataR = dataR.shape[1]
+    dataR = dataR.reshape(N, T, K_dataR)
+
+    selX = list(range(1, numX + 1))
+    selCSA = list(range(numX + 1, K_dataR))
+
+   
+    results = []
+
+    if n_jobs == 1:
+    	for Breaki in range(numBreaks):
+            results.append(
+                _process_break(dataR, PosBreaks[Breaki], selX, selCSA, rmCSA)
+            )
+    else:
+
+        results = Parallel(n_jobs=n_jobs, prefer="threads")(
+            delayed(_process_break)(dataR, PosBreaks[Breaki], selX, selCSA, rmCSA)
+            for Breaki in range(numBreaks)
+        )
+  
+    SSR = np.zeros((T, T))
+    t_blocks, t_calc = 0.0, 0.0
+    for i, j, res_scalar, tb, tp in results:
+        SSR[i - 1, j - 1] = res_scalar
+        t_blocks += tb
+        t_calc += tp
+   
+    print(["block time", t_blocks, t_blocks / max(numBreaks, 1)])
+    print(["calculation time", t_calc, t_calc / max(numBreaks, 1)])
+    print(["loading_time", t_load, t_load / max(numBreaks, 1)])
+    Mata.store("py_SSR", SSR)
+
 end
+
 } 
 }
 }
 }
 }
 }
-}
+

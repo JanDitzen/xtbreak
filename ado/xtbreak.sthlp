@@ -1,7 +1,7 @@
 {smcl}
 {hline}
-{hi:help xtbreak}{right: xtbreak v. 2.1 - 26.02.2025}
-
+{hi:help xtbreak}{right: xtbreak v. 2.2 - 03.12.2025}
+{right:SJ25-3: st0781}
 {hline}
 {title:Title}
 
@@ -9,7 +9,7 @@
 
 {title:Syntax}
 
-{p 4}For a more detailed description for {bf:testing} see {help xtbreak_tests:xtbreak test} and on {bf:estimation} see {help xtbreak_estimate:xtbreak estimate}.
+{p 4}For a more detailed description for {bf:testing} see {help xtbreak_test:xtbreak test} and on {bf:estimation} see {help xtbreak_estimate:xtbreak estimate}.
 
 {p 4}{ul:Automatic estimation of number and location of break:}{p_end}
 
@@ -43,7 +43,7 @@ structural break.{p_end}
 {cmd:{help xtbreak##options5:options5}}
 {p_end}
 
-{p 8}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##hypothesis:hypothesises}. 
+{p 8}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_test##hypothesis:hypothesises}. 
 {cmd:breaks(#)} sets the number of breaks.
 {p_end}
 
@@ -108,7 +108,7 @@ The first is no break against the alternative of {it:s} breaks,
 the second hypothesis is no breaks against a lower and upper limit of breaks. 
 The last hypothesis tests the null of {it:s} breaks against the alternative of
 one more break ({it:s+1}). 
-For a further explanation see {help xtbreak_tests:xtbreak test}.{p_end}
+For a further explanation see {help xtbreak_test:xtbreak test}.{p_end}
 
 {p 4 4}
 {cmd:xtbreak estimate} estimates the location of the break points.
@@ -120,9 +120,9 @@ All {it:necessary} SSRs are calculated and then the smallest one selected.
 For a further explanation see {help xtbreak_estimate:xtbreak estimate}.{p_end}
 
 {p 4 4}{cmd:xtbreak} implements the tests for and estimation of structural breaks discussed in 
-Bai & Perron ({help xtbreak_tests##BP1998:1998}, {help xtbreak_tests##BP2003:2003}),
-Karavias, Narayan, Westerlund ({help xtbreak_tests##KNW2021:2022})
-and Ditzen, Karavias, Westerlund ({help xtbreak_tests##DKW2021:2024}). 
+Bai & Perron ({help xtbreak_test##BP1998:1998}, {help xtbreak_test##BP2003:2003}),
+Karavias, Narayan, Westerlund ({help xtbreak_test##KNW2021:2022})
+and Ditzen, Karavias, Westerlund ({help xtbreak_test##DKW2021:2025}). 
 
 {p 4 4}If neither {cmd:test} or {cmd:estimate} is defined,
 {cmd:xtbreak} will do a sequential F-Test based on hypothesis 3 to determine the 
@@ -153,7 +153,7 @@ unweighted for the double maximum test (hypothesis 2).{p_end}
 {p 4 8 12}{cmd:level(#)} set level for critical values for weighted double maximum test.
 If a value is chosen for which no critical values exists, {cmd:xtbreak test} will choose the closest level.{p_end}
 
-{p 4 8 12}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_tests##DefUnknown:xtbreak test - unknown break dates}.{break} 
+{p 4 8 12}{cmdab:h:ypothesis(}{bf:1|2|3}{cmd:)} specifies which hypothesis to test, see {help xtbreak_test##DefUnknown:xtbreak test - unknown break dates}.{break} 
 {cmd:h(1)} test for no breaks vs. {it:s} breaks, {break}
 {cmd:h(2)} for no break vs. {it:s0 <= s <= s1} breaks and {break}
 {cmd:h(3)} for {it:s} vs. {it:s+1} breaks.{p_end}

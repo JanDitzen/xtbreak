@@ -17,7 +17,7 @@ Computation and analysis of multiple structural change models.
 Journal of Applied Econometrics, 18(1), 1–22.
 {browse "https://onlinelibrary.wiley.com/doi/full/10.1002/jae.659":link}.{p_end}
 
-{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2024) 
+{marker DKW2021}{p 4}Ditzen, J., Karavias, Y. & Westerlund, J. (2025) 
 Multiple Structural Breaks in Interactive Effects Panel Data Models
 Journal of Applied Econometrics
 {browse "https://onlinelibrary.wiley.com/doi/10.1002/jae.3097":Link}.{p_end}
@@ -75,7 +75,9 @@ Time Series and Panel Data in Stata. {browse "https://arxiv.org/abs/2110.14550":
 {p 4 8}{cmd:xtbreak} requires Stata version 15 or higher.{p_end}
 
 {title:Changelog}
-{p 4 4}This version 2.1 - 25.02.2025{p_end}
+{p 4 4}This version 2.2 - 03.12.2025
+{p 4 4} - Bug fixed when using xtbreak estimate and python option.{p_end}
+{p 4 4}Changes to version 2.1 - 25.02.2025{p_end}
 {p 4 4} - Bug fixed for hypothesis 2 and min and max number of breaks.{p_end}
 {p 4 4}Changes to version 2.0 - 20.01.2025{p_end}
 {p 4 4} - Bugfixes in dynamic program, partial break model and variance estimator.{p_end}
