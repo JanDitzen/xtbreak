@@ -66,7 +66,15 @@ program define xtbreak, rclass
 			local version 2.2
 			noi disp "This is version `version' - 03.12.2025"
 			return local version "`version'"
+
+			qui mata mata mlib index
+			tempname mataversion
+			cap mata st_numscalar("`mataversion'",xtbreak_m_version())
+
+			noi disp "xtbreak mata version " `mataversion'
+			return scalar mata_version = `mataversion'
 			exit
+			
 		}
 
 		*** check that mata library is installed
@@ -84,7 +92,7 @@ program define xtbreak, rclass
 				exit
 			}
 		}
-
+		
 		*** now start main program
 
 		tokenize `anything' 
