@@ -102,15 +102,15 @@ options5 | Description
 **csanobreak(varlist)** | Variables without breaks used to calculate cross-sectional averages
 **kfactors(varlist)** | Known factors, which are constant across the cross-sectional dimension but are affected by structural breaks. Examples are seasonal dummies or other observed common factors such as asset returns and oil prices. 
 **nbkfactors(varlist)** | same as above but without breaks.
-**noreweigh** do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unabalanced panels with missing data.
+**noreweigh** do not reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unbalanced panels with missing data.
 
 #### Options for automatic estimation of number and location of break
 
 options6 | Description
 --- | ---
-**skiph2** | skips hypohesis B
+**skiph2** | skips hypothesis B
 **clevel(#)** | specifies level for critical values to detect breaks.
-**strict** | strict behaviour of sequential test. Improves speed.
+**strict** | strict behavior of sequential test. Improves speed.
 **maxbreaks(#)** | sets maximum number of breaks for sequential test. Improves speed.
 
 
@@ -118,9 +118,9 @@ options6 | Description
 
 
 # 2. Description
-**xtbreak test** implements multiple tests for structural breaks in time series and panel data models.  The number and period of occurence of structral breaks can be known and unknown.  In the case of a known    breakpoint xtbreak test can test if the break occurs at a specific point in time.  For unknown breaks, xtbreak test implements three different hypothesises.  The first is no break against the alterantive of *s* breaks, the second hypothesis is no breaks against a lower and upper limit of breaks.  The last hypothesis tests the null of s breaks against the alterantive of one more break *(s+1)*. For more details see [xtbreak test](docs/xtbreak_test.md).
+**xtbreak test** implements multiple tests for structural breaks in time series and panel data models.  The number and period of occurrence of structural breaks can be known and unknown.  In the case of a known    breakpoint xtbreak test can test if the break occurs at a specific point in time.  For unknown breaks, xtbreak test implements three different hypothesis.  The first is no break against the alternative of *s* breaks, the second hypothesis is no breaks against a lower and upper limit of breaks.  The last hypothesis tests the null of s breaks against the alternative of one more break *(s+1)*. For more details see [xtbreak test](docs/xtbreak_test.md).
 
-**xtbreak estimate** estimates the break points, that is, it estimates *T1*, *T2*, ..., *Ts*.  The underlying idea is that if the model with the true breakdates given a number of breaks has a smaller sum of squared residuals (SSR) than a model with incorrect breakdates.  To find the breakdates, xtbreak estimate uses the alogorthim (dynamic program) from Bai and Perron (2003).  All necessary SSRs are calculated and then the smalles one selected. For more details see [xtbreak estimate](docs/xtbreak_estimate.md).
+**xtbreak estimate** estimates the break points, that is, it estimates *T1*, *T2*, ..., *Ts*.  The underlying idea is that if the model with the true breakdates given a number of breaks has a smaller sum of squared residuals (SSR) than a model with incorrect breakdates.  To find the breakdates, xtbreak estimate uses the algorithm (dynamic program) from Bai and Perron (2003).  All necessary SSRs are calculated and then the smallest one selected. For more details see [xtbreak estimate](docs/xtbreak_estimate.md).
 
 **xtbreak** implements the tests for and estimation of structural breaks discussed in Bai & Perron (1998, 2003), Karavias, Narayan, Westerlund (2021) and Ditzen, Karavias, Westerlund (2024).
 
@@ -150,14 +150,14 @@ Option | Description
 ***breaks(#)*** |  specifies the number of unknwon breaks under the alternative. For hypothesis 2, ***breaks()*** can take two values, for example breaks(4 6) test for no breaks against 4-6 breaks.  If only one value specfied, then the lower limit is set to 1. If ``h(3)`` and ``sequential`` is used, then ``breaks()`` defines the maximum number of breaks tested for.
 ***showindex*** | show confidence intervals as index.
 ***hypothesis(1\2\3)*** | specifies which hypothesis to test. *h(1)* test for no breaks vs. s breaks, *h(2)* for no break vs. s0 <= s <= s1 breaks and *h(3)* for s vs. s+1 breaks. Hypothesis 3 is the default.
-***sequential*** | sequential F-Test to determin number of breaks.  The number of breaks is varied from s = 0 to breaks()-1 or floor(1/trimming).
+***sequential*** | sequential F-Test to determine number of breaks.  The number of breaks is varied from s = 0 to breaks()-1 or floor(1/trimming).
 ***breakconstant*** | break in constant.  Default is no breaks in deterministics.
 ***noconstant*** | suppresses constant.
 ***nofixedeffects*** | suppresses individual fixed effects.
 ***breakfixedeffects*** | break in fixed effects.
 ***nobreakvariables(varlist1)*** | defines variables with no structural break(s).  *varlist1* can contain time series operators.
 ***vce(type)*** | covariance matrix estimator, allowed: ssr, hac, hc and np.
-***trimming(real)*** | minimal segment length in percent.  The minimal segment length is the minmal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
+***trimming(real)*** | minimal segment length in percent.  The minimal segment length is the minimal time periods between two breaks.  The default is 15% (0.15).  Critical values are available for %5, 10%, 15%, 20% and 25%.
 ***error(real)*** | define error margin for partial break model.
 ***wdmax*** |  Use weighted test statistic instead of unweighted for the double maximum test (hypotheis 2).
 ***level(#)*** | set level for critical values for weighted double maximum test.  If a value is choosen for which no critical values exists, ***xtbreak test*** will choose the closest level.
@@ -168,15 +168,15 @@ Option | Description
 ***nbkfactors(varlist)*** | same as above but without breaks.
 ***inverter(type)*** | sets the inverter. type can be:  speed (invsym), precision, qr (equivalent to precision; qrinv), chol (chol), p (pinv), or lu (luinv).  Choice of inverter has implications on speed and precision.  For an overview see [https://www.stata.com/manuals/m-4solvers.pdf]([M-4] solvers).
 ***python*** |  use Python to calculated SSRs to improve speed.  Requires Stata 16 or later, Python and the following packages: scipy, numpy, pandas and xarray.  
-***noreweigh*** | avoids to reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unabalanced panels with missing data.  Results with this options should be used indicative.  See also section on Unbalanced Panels.
+***noreweigh*** | avoids to reweigh time-unit specific errors by the number of total observations over actual observations for a given time period in order to increase the SSR of segments of unbalanced panels with missing data.  Results with this options should be used indicative.  See also section on Unbalanced Panels.
 ***skiph2*** |  Skips Hypothesis 2 (H0: no break vs H1: \(0 < s < s_{max}\) breaks) when running xtbreak without the estimate or test option.
 ***cvalue(level)*** |  specifies the level of the critical value to be used to estimate the number of breaks using the sequential test.  For example cvalue(0.99) uses the 1\% critical values to determine the number of breaks using the sequential test.  See level(#) for further details.
-***strict*** |  enforces strict behaviour of the sequential test to determine number of breaks.  Sequential test will stop once F(s+1|s) is not rejected given a rejection of F(s|s-1).  Option improves speed in large time series, but should be used with caution.
+***strict*** |  enforces strict behavior of the sequential test to determine number of breaks.  Sequential test will stop once F(s+1|s) is not rejected given a rejection of F(s|s-1).  Option improves speed in large time series, but should be used with caution.
 ***maxbreaks(#)*** | limits number of breaks when using the sequential test to determine number of breaks.  Option improves speed in large time series, but should be used with caution.
 
 # 4. Note on panel data
 
-If a panel dataset is used, xtbreak differentiates between four models.  The first model is a fixed effects model. A break in the fixed effects is not possible. The second and third models arewith a pooled constant (pooled OLS) with and without a break. The last model is a model with neither fixed effects nor a pooled constant.
+If a panel dataset is used, xtbreak differentiates between four models.  The first model is a fixed effects model. A break in the fixed effects is not possible. The second and third models are with a pooled constant (pooled OLS) with and without a break. The last model is a model with neither fixed effects nor a pooled constant.
 
 The following table gives an overview:
 
@@ -202,21 +202,21 @@ hence in the order of O(T^2).  Using Python improves the speed of calculations.
 
 Python cannot be combined with unbalanced panels.  It uses the standard inverter from numpy (linalg.inv), the pseudo-inverse (linalg.pinv) or SVD decomposition (scipy.linalg.svd).  Differences between results obtained with and without the Python option may occur for ill-conditioned or (nearly) invertible matrices.
 
-**xtbreak** checks if the Python and required packages (numpy, scipy, xarray and pandas) are installed. The option python can only be used with Stata 16 or later.
+**xtbreak** checks if the Python and required packages (numpy, scipy, xarray and joblib) are installed. The option python can only be used with Stata 16 or later.
 
 # 6. Unbalanced Data
 
 **xtbreak** allows for unbalanced panels when using panel data. Pure time series data (i.e. data with only one cross-section) with gaps is not allowed.  In the case of unbalanced panels, the degree of freedom adjustment for the sup F(s) statistic are adjusted.
 
-While **xtbreak**  kallows for unbalanced data, results should be taken with extra caution. The underlying assumption is that the break dates are the same for all units, including those with gaps in the data.  The break date estimation can be biased if data is very unbalanced, that is if a large number of time periods are missing for multiple units.  Care is also required if estimated breaks coincide with the start or end of unbalanced panels.  We strongly recommend to investigate the SSRs using estat ssr after an estimation with a single break point to identify increases or decreases in the estimated SSRs.
+While **xtbreak**  allows for unbalanced data, results should be taken with extra caution. The underlying assumption is that the break dates are the same for all units, including those with gaps in the data.  The break date estimation can be biased if data is very unbalanced, that is if a large number of time periods are missing for multiple units.  Care is also required if estimated breaks coincide with the start or end of unbalanced panels.  We strongly recommend to investigate the SSRs using estat ssr after an estimation with a single break point to identify increases or decreases in the estimated SSRs.
 
-The option noreweigh avoids to reweigh time-individual errors for the calculation of the SSR to artificially increase the SSR of unabalanced sections of the panel. Results with this options should be used indicative.
+The option noreweigh avoids to reweigh time-individual errors for the calculation of the SSR to artificially increase the SSR of unbalanced sections of the panel. Results with this options should be used indicative.
 
 # 7. Examples
 
 ## Time Series
 
-This example was presented in similar form at the Stata Conference [2021](https://www.stata.com/meeting/us21/). We will try to estimate the breakpoints in the relationship between COVID infections in the US and excess from the virus in 2020 and 2021. Weekly data is available on [GitHub](https://github.com/JanDitzen/xtbreak/tree/main/data). The variable *deaths* has the deaths from COVID and the variable **cases** contains the number of new covid cases. The idea is that initally more people died from COVID because it was a new virus. Then medical treatment advanced and vaccines became more available which should decrease deaths. On the other hand COVID cases have likely been underreported during the first wave. We assume that there is a lag between the a positive test and death of one week. The data is from the [CDC](https://data.cdc.gov/Case-Surveillance/United-States-COVID-19-Cases-and-Deaths-by-State-o/9mfq-cb36).
+This example was presented in similar form at the Stata Conference [2021](https://www.stata.com/meeting/us21/). We will try to estimate the breakpoints in the relationship between COVID infections in the US and excess from the virus in 2020 and 2021. Weekly data is available on [GitHub](https://github.com/JanDitzen/xtbreak/tree/main/data). The variable *deaths* has the deaths from COVID and the variable **cases** contains the number of new covid cases. The idea is that initially more people died from COVID because it was a new virus. Then medical treatment advanced and vaccines became more available which should decrease deaths. On the other hand COVID cases have likely been under reported during the first wave. We assume that there is a lag between the a positive test and death of one week. The data is from the [CDC](https://data.cdc.gov/Case-Surveillance/United-States-COVID-19-Cases-and-Deaths-by-State-o/9mfq-cb36).
 
 First we load the data into Stata:
 
@@ -425,7 +425,7 @@ New variables created: LD_cases1 LD_cases2 LD_cases3 L2D_cases1 L2D_cases2 L2D_c
 ------------------------------------------------------------------------------
 ```
 
-Finally, we can draw a scatter plot of the variables with a different colour for each segement. 
+Finally, we can draw a scatter plot of the variables with a different colour for each segment. 
 The command line is ``estat scatter varlist`` where *varlist* is the independent variable (X), 
 the dependent variable is automatically added on the y-axis.
 
@@ -499,7 +499,7 @@ Estimation of break points
 
 ```
 
-As there might be cross-sectional dependence presence, we add cross-sectional averages und use standard errors from Westerlund, Petrova and Norkute (2019):
+As there might be cross-sectional dependence presence, we add cross-sectional averages and use standard errors from Westerlund, Petrova and Norkute (2019):
 
 ```
  xtbreak d.deaths d.L(1/3).cases,  csa(d.l.cases) vce(wpn) trim(0.1) skiph2
